@@ -134,6 +134,7 @@ function CarteListe({ liste }: { liste: (typeof LISTES)[number] }): React.JSX.El
 
       <form
         className="liste-ajout"
+        noValidate
         onSubmit={(e) => {
           e.preventDefault()
           void ajouter()

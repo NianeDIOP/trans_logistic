@@ -125,6 +125,9 @@ body { margin: 0; font-family: 'Source Sans 3', sans-serif; font-size: 10pt; lin
 .document .numero { margin-top: 3mm; font-size: 11.5pt; }
 .document .numero strong { font-family: 'Montserrat', sans-serif; font-weight: 700; color: #0b2569; }
 .document .date { margin-top: 1mm; color: #48557a; }
+.reference-avoir { margin-top: 3mm; padding: 2mm 3mm; border-left: .8mm solid #f2b51d; background: #fbf7ea; font-size: 9.5pt; }
+.reference-avoir strong { font-family: 'Montserrat', sans-serif; font-weight: 700; color: #0b2569; }
+.reference-avoir .motif { color: #48557a; }
 .client { width: 82mm; padding: 4mm 5mm; border: .4mm solid #0b2569; border-radius: 2.5mm; }
 .client .libelle { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 7.5pt; letter-spacing: .14em; text-transform: uppercase; color: #c48a0c; }
 .client .nom { margin: 1mm 0 1.5mm; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 11.5pt; color: #0b2569; }
@@ -197,6 +200,13 @@ ${brouillon ? '<div class="filigrane">BROUILLON</div>' : ''}
     <h1>${titre}</h1>
     <div class="numero">N° <strong>${echapper(numero)}</strong></div>
     <div class="date">Date : ${formatDate(facture.date)}</div>
+    ${
+      facture.type === 'avoir' && facture.origine
+        ? `<div class="reference-avoir">Annule la facture N° <strong>${echapper(facture.origine.numero ?? '')}</strong> du ${formatDate(facture.origine.date)}${
+            facture.notes ? `<br><span class="motif">Motif : ${echapper(facture.notes)}</span>` : ''
+          }</div>`
+        : ''
+    }
   </div>
   <div class="client">
     <div class="libelle">Client</div>
@@ -222,7 +232,7 @@ ${brouillon ? '<div class="filigrane">BROUILLON</div>' : ''}
       <tr><td>Total HT</td><td class="num">${montant(facture.total_ht)}</td></tr>
       <tr><td>TVA ${facture.taux_tva} %</td><td class="num">${montant(facture.total_tva)}</td></tr>
       <tr class="ttc"><td>Total TTC</td><td class="num">${montant(facture.total_ttc)}</td></tr>
-      <tr class="net"><td>Net à payer</td><td class="num">${montant(facture.total_ttc)} FCFA</td></tr>
+      <tr class="net"><td>${facture.type === 'avoir' ? 'Montant de l’avoir' : 'Net à payer'}</td><td class="num">${montant(facture.total_ttc)} FCFA</td></tr>
     </tbody>
   </table>
 </section>

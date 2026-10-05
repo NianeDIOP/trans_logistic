@@ -109,6 +109,7 @@ export default function OngletEntreprise({ onModifie }: Props): React.JSX.Elemen
   return (
     <form
       className="onglet"
+      noValidate
       onSubmit={(e) => {
         e.preventDefault()
         void enregistrer()

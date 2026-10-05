@@ -33,6 +33,7 @@ const facture: Facture = {
   total_ht: 72500, base_tva: 70000, total_tva: 12600, total_ttc: 85100, notes: '',
   client_raison_sociale: 'Client <Test> & Cie', client_adresse: 'Rufisque', client_ninea: '0012345',
   client_tel: '', client_email: '', pdf_path: null, cree_le: '', valide_le: '2026-10-05T10:00:00Z',
+  origine: null, avoir: null, regle: 0,
   lignes: [
     ligne,
     { ...ligne, id: 2, ordre: 1, num_conteneur: '', type_conteneur: null, type_libelle: '', zone: '',
@@ -91,5 +92,18 @@ describe('modes de rendu', () => {
     const ecran = modeleFacture(facture, entreprise, ressources, 'ecran').html
     expect(ecran).toContain('<footer class="pied-flux">')
     expect(ecran).toContain('width: 210mm')
+  })
+})
+
+describe('avoir', () => {
+  it('référence la facture annulée et son motif', () => {
+    const avoir = { ...facture, type: 'avoir' as const, numero: 'AV-2M-2026-0001', notes: 'Erreur de zone',
+      origine: { id: 1, numero: '2M-2026-0001', date: '2026-10-05' } }
+    const html = modeleFacture(avoir, entreprise, ressources).html
+    expect(html).toContain('<h1>Avoir</h1>')
+    expect(html).toContain('Annule la facture N° <strong>2M-2026-0001</strong> du 05/10/2026')
+    expect(html).toContain('Motif : Erreur de zone')
+    expect(html).toContain('Montant de l’avoir')
+    expect(html).toContain('Arrêté le présent avoir')
   })
 })

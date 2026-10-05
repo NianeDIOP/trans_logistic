@@ -54,7 +54,7 @@ export function referentiels(db: SqlDatabase): Referentiels {
 
 export function lireFacture(db: SqlDatabase, id: number): Facture {
   const f = db.prepare('SELECT * FROM factures WHERE id = ?').get(id) as
-    | Omit<Facture, 'lignes'>
+    | Omit<Facture, 'lignes' | 'origine' | 'avoir' | 'regle'>
     | undefined
   if (!f) throw new Error('Facture introuvable')
   const lignes = (
@@ -63,7 +63,20 @@ export function lireFacture(db: SqlDatabase, id: number): Facture {
       'soumis_tva'
     > & { soumis_tva: number })[]
   ).map((l) => ({ ...l, soumis_tva: l.soumis_tva === 1 }))
-  return { ...f, lignes }
+  const origine =
+    f.facture_origine_id === null
+      ? null
+      : ((db.prepare('SELECT id, numero, date FROM factures WHERE id = ?').get(f.facture_origine_id) as
+          | Facture['origine']
+          | undefined) ?? null)
+  const avoir =
+    (db
+      .prepare("SELECT id, numero, date FROM factures WHERE facture_origine_id = ? AND type = 'avoir' ORDER BY id LIMIT 1")
+      .get(id) as Facture['avoir'] | undefined) ?? null
+  const { regle } = db
+    .prepare('SELECT COALESCE(SUM(montant), 0) AS regle FROM paiements WHERE facture_id = ?')
+    .get(id) as { regle: number }
+  return { ...f, lignes, origine, avoir, regle }
 }
 
 function libelle(db: SqlDatabase, table: 'types_conteneurs' | 'natures', code: string | null): string {
@@ -222,6 +235,21 @@ export function factureProvisoire(db: SqlDatabase, saisie: FactureSaisie): Factu
     pdf_path: null,
     cree_le: '',
     valide_le: null,
-    lignes
+    lignes,
+    origine: null,
+    avoir: null,
+    regle: 0
   }
+}
+
+/**
+ * Facture à afficher pour une saisie : la facture enregistrée et figée si elle est émise
+ * (valeurs d'origine), sinon le calcul provisoire du brouillon en cours.
+ */
+export function factureAAfficher(db: SqlDatabase, saisie: FactureSaisie): Facture {
+  if (saisie.id !== null) {
+    const f = db.prepare('SELECT statut FROM factures WHERE id = ?').get(saisie.id) as { statut: string } | undefined
+    if (f && f.statut !== 'brouillon') return lireFacture(db, saisie.id)
+  }
+  return factureProvisoire(db, saisie)
 }

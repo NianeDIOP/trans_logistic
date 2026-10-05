@@ -20,11 +20,17 @@ import SelecteurClient from './facture/SelecteurClient'
 import TableauLignes, { LIGNE_CONTENEUR } from './facture/TableauLignes'
 import Totaux from './facture/Totaux'
 import VueFacture from './facture/VueFacture'
+import BadgeStatut from '../components/BadgeStatut'
 
 interface Props {
   /** Brouillon ou facture à ouvrir ; absent pour une nouvelle facture. */
   factureId?: number | null
+  /** Facture dont on reprend le client et les lignes (nouvelle facture datée du jour). */
+  dupliquerDe?: number | null
+  libelleRetour?: string
   onRetour: () => void
+  /** Ouvre une autre facture (avoir, facture d'origine) ou une copie. */
+  onOuvrir: (route: { factureId?: number; dupliquerDe?: number }) => void
 }
 
 function saisieVierge(ref: Referentiels | null): FactureSaisie {
@@ -63,7 +69,13 @@ function versSaisie(f: Facture): FactureSaisie {
 const empreinte = (s: FactureSaisie): string =>
   JSON.stringify({ ...s, lignes: s.lignes.filter((l) => !ligneVide(l)).map(({ genre: _g, ...l }) => l) })
 
-export default function NouvelleFacture({ factureId = null, onRetour }: Props): React.JSX.Element {
+export default function NouvelleFacture({
+  factureId = null,
+  dupliquerDe = null,
+  libelleRetour = 'Accueil',
+  onRetour,
+  onOuvrir
+}: Props): React.JSX.Element {
   const notifier = useNotifier()
   const [referentiels, setReferentiels] = useState<Referentiels | null>(null)
   const [saisie, setSaisie] = useState<FactureSaisie>(() => saisieVierge(null))
@@ -92,13 +104,21 @@ export default function NouvelleFacture({ factureId = null, onRetour }: Props): 
         setSaisie(s)
         setReference(empreinte(s))
         setLibelleClient(f.client_raison_sociale)
+      } else if (dupliquerDe !== null) {
+        // Copie : même client et mêmes lignes, datée du jour, sans numéro.
+        const f = await appel(window.api.factures.lire(dupliquerDe))
+        const s = { ...versSaisie(f), id: null, date: aujourdhui() }
+        setSaisie(s)
+        setReference(empreinte(saisieVierge(ref)))
+        setLibelleClient(f.client_raison_sociale)
+        notifier(`Copie de ${f.numero ?? 'la facture'} : vérifiez les montants avant de valider.`)
       } else {
         const s = saisieVierge(ref)
         setSaisie(s)
         setReference(empreinte(s))
       }
     })().catch((err: Error) => notifier(err.message, 'erreur'))
-  }, [factureId, notifier])
+  }, [factureId, dupliquerDe, notifier])
 
   const totaux = useMemo(
     () =>
@@ -208,27 +228,39 @@ export default function NouvelleFacture({ factureId = null, onRetour }: Props): 
   }, [enregistrer, emise])
 
   const retour = (): void => (modifiee && !emise ? setConfirmation('quitter') : onRetour())
+  // Une facture émise se consulte : elle ne bloque ni Échap ni les raccourcis.
+  const protegee = !emise
 
-  const titre = emise ? `Facture ${emise.facture.numero}` : saisie.id === null ? 'Nouvelle facture' : 'Brouillon de facture'
+  const titre = emise
+    ? `${emise.facture.type === 'avoir' ? 'Avoir' : 'Facture'} ${emise.facture.numero}`
+    : saisie.id === null
+      ? 'Nouvelle facture'
+      : 'Brouillon de facture'
 
   return (
-    <div className="ecran" data-saisie-protegee>
+    <div className="ecran" data-saisie-protegee={protegee ? '' : undefined}>
       <header className="ecran-entete">
         <button className="bouton-retour" onClick={retour}>
           <CaretLeftIcon size={16} weight="bold" />
-          Accueil
+          {libelleRetour}
         </button>
         <span className="ecran-entete-icone">
           <FilePlusIcon size={22} weight="duotone" />
         </span>
         <h1>{titre}</h1>
         {!emise && <span className="badge badge-inactif">Brouillon</span>}
-        {emise && <span className="badge badge-tva">Émise</span>}
+        {emise && <BadgeStatut facture={emise.facture} />}
         {!emise && modifiee && <span className="texte-modifie entete-etat">Modifications non enregistrées</span>}
       </header>
 
       {emise ? (
-        <VueFacture facture={emise.facture} nouvelle={emise.nouvelle} onNouvelleFacture={nouvelleFacture} />
+        <VueFacture
+          facture={emise.facture}
+          nouvelle={emise.nouvelle}
+          onNouvelleFacture={nouvelleFacture}
+          onChange={(facture) => setEmise({ facture, nouvelle: false })}
+          onOuvrir={onOuvrir}
+        />
       ) : !referentiels ? (
         <p className="chargement">Chargement…</p>
       ) : (

@@ -187,3 +187,13 @@ describe('factureProvisoire', () => {
     expect(F.factureProvisoire(db, saisie({ id: v.id })).numero).toBe('2M-2026-0001')
   })
 })
+
+describe('factureAAfficher', () => {
+  it('une facture émise s’affiche avec ses valeurs figées, pas celles des Paramètres actuels', () => {
+    const v = F.enregistrerEtValider(db, saisie())
+    P.modifierEntreprise(db, { ...P.lireEntreprise(db), taux_tva: 10 })
+    const f = F.factureAAfficher(db, saisie({ id: v.id }))
+    expect([f.taux_tva, f.total_tva, f.numero]).toEqual([18, 12600, '2M-2026-0001'])
+    expect(F.factureAAfficher(db, saisie()).taux_tva).toBe(10)
+  })
+})
