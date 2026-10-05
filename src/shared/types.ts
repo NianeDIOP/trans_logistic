@@ -13,6 +13,7 @@ import type {
   ZoneSaisie
 } from './parametres'
 import type { Facture, FactureSaisie, Referentiels } from './factures'
+import type { FiltresHistorique, PageHistorique, Paiement, PaiementSaisie } from './historique'
 
 export interface Entreprise {
   id: number
@@ -122,11 +123,20 @@ export interface FacturesApi {
   enregistrerCopie(id: number): R<string | null>
   imprimer(id: number): R<null>
   supprimerBrouillon(id: number): R<null>
+  /** Historique filtré et paginé. */
+  lister(filtres: FiltresHistorique): R<PageHistorique>
+  paiements(id: number): R<Paiement[]>
+  modesPaiement(): R<ElementListe[]>
+  enregistrerPaiement(id: number, saisie: PaiementSaisie): R<Facture>
+  supprimerPaiement(paiementId: number): R<Facture>
+  /** Annule la facture par un avoir (numéroté et archivé) ; retourne l'avoir. */
+  creerAvoir(id: number, options: { date: string; motif: string }): R<Facture>
 }
 
 export const CANAUX_FACTURES = [
   'referentiels', 'lire', 'enregistrer', 'valider', 'apercu',
-  'ouvrirPdf', 'enregistrerCopie', 'imprimer', 'supprimerBrouillon'
+  'ouvrirPdf', 'enregistrerCopie', 'imprimer', 'supprimerBrouillon',
+  'lister', 'paiements', 'modesPaiement', 'enregistrerPaiement', 'supprimerPaiement', 'creerAvoir'
 ] as const satisfies readonly (keyof FacturesApi)[]
 
 /** API exposée au renderer via `contextBridge` (window.api). */

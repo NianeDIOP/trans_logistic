@@ -66,6 +66,12 @@ export interface Facture {
   cree_le: string
   valide_le: string | null
   lignes: Ligne[]
+  /** Pour un avoir : la facture qu'il annule. */
+  origine: { id: number; numero: string | null; date: string } | null
+  /** Pour une facture annulée : l'avoir correspondant. */
+  avoir: { id: number; numero: string | null; date: string } | null
+  /** Total des règlements enregistrés. */
+  regle: number
 }
 
 /** Tout ce que l'écran de saisie doit proposer, en un seul appel. */

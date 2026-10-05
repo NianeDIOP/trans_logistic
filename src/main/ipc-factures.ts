@@ -4,7 +4,8 @@ import { app, BrowserWindow, dialog, shell } from 'electron'
 import type { Facture, FactureSaisie } from '../shared/factures'
 import { getDatabase } from './db'
 import * as F from './db/factures'
-import { lireEntreprise } from './db/parametres'
+import * as H from './db/historique'
+import { lireEntreprise, listerListe } from './db/parametres'
 import { canal } from './ipc-commun'
 import { archiverPdf, documentFacture, imprimer, pdfExiste } from './pdf/generer'
 
@@ -39,7 +40,7 @@ export function registerFacturesHandlers(): void {
   })
 
   canal('factures:apercu', async (_e, saisie: FactureSaisie) => {
-    const facture = F.factureProvisoire(db(), saisie)
+    const facture = F.factureAAfficher(db(), saisie)
     return (await documentFacture(facture, lireEntreprise(db()), 'ecran')).html
   })
 
@@ -69,4 +70,20 @@ export function registerFacturesHandlers(): void {
   })
 
   canal('factures:supprimerBrouillon', (_e, id: number) => F.supprimerBrouillon(db(), id))
+
+  // Historique, règlements, avoirs
+  canal('factures:lister', (_e, filtres) => H.listerFactures(db(), filtres))
+  canal('factures:paiements', (_e, id: number) => H.listerPaiements(db(), id))
+  canal('factures:modesPaiement', () => listerListe(db(), 'modes_paiement'))
+  canal('factures:enregistrerPaiement', (_e, id: number, saisie) => H.enregistrerPaiement(db(), id, saisie))
+  canal('factures:supprimerPaiement', (_e, paiementId: number) => H.supprimerPaiement(db(), paiementId))
+  canal('factures:creerAvoir', async (_e, id: number, options) => {
+    const avoir = H.creerAvoir(db(), id, options)
+    try {
+      F.definirPdf(db(), avoir.id, await archiverPdf(avoir, lireEntreprise(db())))
+    } catch (err) {
+      console.error('[factures:creerAvoir] archivage du PDF', err)
+    }
+    return F.lireFacture(db(), avoir.id)
+  })
 }

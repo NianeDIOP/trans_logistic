@@ -40,6 +40,7 @@ export default function Modale({
         ref={ref}
         className="modale"
         tabIndex={-1}
+        noValidate
         style={{ width: largeur }}
         role="dialog"
         aria-modal="true"

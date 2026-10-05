@@ -249,6 +249,15 @@ npm run dist       # générer l'installateur Windows
     prix prérempli depuis la grille, prestations en un clic, totaux et lettres en direct, Ctrl+S,
     aperçu A4, confirmation avant validation, vue « facture émise ».
   - Interface forcée en français (`--lang=fr-FR`) pour le format des dates.
-- [ ] Phase 5 — Historique, statuts, paiements, avoirs
+- [x] Phase 5 — Historique, statuts, paiements, avoirs
+  - `src/main/db/historique.ts` : liste filtrée (numéro, client, BL, conteneur, période, statut,
+    « à encaisser », avoirs) et paginée avec totaux du filtre ; règlements (statut recalculé :
+    émise → partiellement payée → payée, `src/core/paiements.ts`) ; avoirs.
+  - Avoir = annulation totale : document `AV-…` qui recopie lignes, montants, taux et client de la facture,
+    numéroté dans la même transaction (`attribuerNumero`) ; la facture passe à « annulee ».
+    Montants de l'avoir stockés en positif (type `avoir`) : à déduire dans le tableau de bord.
+  - `factureAAfficher` : une facture émise s'affiche toujours avec ses valeurs figées.
+  - Écran `pages/Historique.tsx` ; la vue d'une facture émise (`VueFacture`) gère règlements, avoir,
+    duplication et liens facture ↔ avoir. Navigation par `Route` dans `App.tsx` (retour vers l'historique).
 - [ ] Phase 6 — Tableau de bord
 - [ ] Phase 7 — Sauvegarde/restauration, packaging .exe, GitHub Actions
