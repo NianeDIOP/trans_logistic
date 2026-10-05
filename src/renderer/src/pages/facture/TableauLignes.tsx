@@ -1,6 +1,6 @@
 import { PlusIcon, ShippingContainerIcon, TrashIcon } from '@phosphor-icons/react'
 import type { LigneSaisie, Referentiels } from '@shared/factures'
-import { appliquerPrestationsParConteneur, estLigneConteneur } from '../../../../core/facture'
+import { appliquerPrestationsParConteneur, estLigneConteneur, regimeTvaImpose } from '../../../../core/facture'
 import { formatMontant } from '../../../../core/montants'
 import { SaisieMontant } from '../../components/ui/Champ'
 
@@ -31,9 +31,17 @@ function prixGrille(ref: Referentiels, zone: string, type: string | null): numbe
 }
 
 export default function TableauLignes({ lignes, referentiels, erreurs, onChange: transmettre }: Props): React.JSX.Element {
-  // Toute modification recalcule les prestations facturées par conteneur (AGS…).
+  // Régime de TVA imposé : conteneurs toujours soumis ; prestations du catalogue selon les Paramètres
+  // (AGS, Imprimé : hors TVA). Seule une ligne « Autre » se coche à la main.
+  const regimeTva = (l: LigneSaisie): boolean | null => regimeTvaImpose(l, referentiels.prestations)
+  // Toute modification recalcule les prestations facturées par conteneur (AGS…) et le régime de TVA.
   const onChange = (suivantes: LigneSaisie[]): void =>
-    transmettre(appliquerPrestationsParConteneur(suivantes, referentiels.prestations))
+    transmettre(
+      appliquerPrestationsParConteneur(suivantes, referentiels.prestations).map((l) => {
+        const impose = regimeTva(l)
+        return impose === null || impose === l.soumis_tva ? l : { ...l, soumis_tva: impose }
+      })
+    )
   const parConteneur = (l: LigneSaisie): boolean =>
     l.prestation_id !== null && Boolean(referentiels.prestations.find((p) => p.id === l.prestation_id)?.par_conteneur)
   const maj = (index: number, modif: Partial<LigneSaisie>): void => {
@@ -87,7 +95,7 @@ export default function TableauLignes({ lignes, referentiels, erreurs, onChange:
   }
 
   const ajouterLibre = (): void => {
-    onChange([...lignes, { ...LIGNE_CONTENEUR, genre: 'frais', type_conteneur: null, soumis_tva: true, quantite: 1 }])
+    onChange([...lignes, { ...LIGNE_CONTENEUR, genre: 'frais', type_conteneur: null, soumis_tva: false, quantite: 1 }])
     requestAnimationFrame(() => {
       const champs = document.querySelectorAll<HTMLInputElement>('.lignes-saisie .champ-designation')
       champs[champs.length - 1]?.focus()
@@ -221,14 +229,24 @@ export default function TableauLignes({ lignes, referentiels, erreurs, onChange:
                   )}
                 </td>
                 <td className="col-tva">
-                  <input
-                    type="checkbox"
-                    className="case"
-                    checked={l.soumis_tva}
-                    onChange={(e) => maj(i, { soumis_tva: e.target.checked })}
-                    aria-label={`Soumis à TVA, ligne ${i + 1}`}
-                    title={l.soumis_tva ? 'Soumis à TVA' : 'Hors TVA'}
-                  />
+                  {regimeTva(l) === null ? (
+                    <input
+                      type="checkbox"
+                      className="case"
+                      checked={l.soumis_tva}
+                      onChange={(e) => maj(i, { soumis_tva: e.target.checked })}
+                      aria-label={`Soumis à TVA, ligne ${i + 1}`}
+                      title={l.soumis_tva ? 'Soumis à TVA' : 'Hors TVA'}
+                    />
+                  ) : l.soumis_tva ? (
+                    <span className="tva-fixe tva-oui" title={estLigneConteneur(l) ? 'Transport : toujours soumis à TVA' : 'Soumis à TVA (Paramètres → Prestations)'}>
+                      {referentiels.taux_tva} %
+                    </span>
+                  ) : (
+                    <span className="tva-fixe" title="Hors TVA (Paramètres → Prestations)">
+                      Non
+                    </span>
+                  )}
                 </td>
                 <td className="col-actions">
                   <button type="button" className="btn-icone btn-icone-danger" title="Retirer la ligne" onClick={() => supprimer(i)}>

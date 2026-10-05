@@ -144,3 +144,14 @@ export function lignesAutomatiques(prestations: Prestation[]): LigneSaisie[] {
       prestation_id: p.id
     }))
 }
+
+/**
+ * Régime de TVA imposé à une ligne : `true` pour un conteneur (transport, toujours soumis),
+ * celui du catalogue pour une prestation (AGS, Imprimé : hors TVA), `null` pour une ligne libre
+ * (« Autre »), dont le régime se choisit à la main.
+ */
+export function regimeTvaImpose(l: LigneSaisie, prestations: Prestation[]): boolean | null {
+  if (estLigneConteneur(l)) return true
+  const p = l.prestation_id === null ? undefined : prestations.find((x) => x.id === l.prestation_id)
+  return p ? p.soumis_tva : null
+}
