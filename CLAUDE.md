@@ -139,6 +139,20 @@ Gérer les migrations de schéma avec une table `schema_version`.
 - `contextIsolation: true`, `nodeIntegration: false`.
 - Ne jamais committer : `node_modules/`, `dist/`, `release/`, `*.db`, `.env`.
 
+### Identité visuelle (à respecter dans tous les écrans)
+- Charte issue du **logo officiel** (`src/renderer/src/assets/logo-2m.png`, fond transparent) :
+  **bleu roi et or**. Variables dans `styles.css` (`--bleu-marine`, `--bleu-roi`, `--or`, `--degrade-or`…),
+  pas de couleur en dur ailleurs.
+- Polices embarquées (hors ligne) : **Montserrat** pour les titres (800 italique pour les grands titres,
+  comme le logo), **Source Sans 3** pour les textes et chiffres (chiffres tabulaires).
+- Icônes : **Phosphor** (`@phosphor-icons/react`, noms suffixés `Icon`, poids `duotone`), en or sur
+  pastille bleue dans les cartes et en-têtes. **Aucun emoji.**
+- Fenêtre **sans cadre** (`frame: false`) : barre de titre et boutons Réduire / Agrandir / Fermer dessinés
+  par l'application (`TitleBar.tsx`, glyphes dans `components/icons.tsx`).
+- Cartes blanches arrondies (10 px), ombre légère, filet or au survol.
+- Emblème compact « 2M » (`components/Emblem.tsx`, `build/icon.svg`) pour la barre de titre et l'icône
+  Windows ; images de l'installateur NSIS dans `build/`.
+
 ## 8. Commandes
 
 ```bash
@@ -157,7 +171,12 @@ npm run dist       # générer l'installateur Windows
 
 ## 10. Avancement
 
-- [ ] Phase 1 — Squelette Electron/React/SQLite, écran d'accueil 4 boutons
+- [x] Phase 1 — Squelette Electron/React/SQLite, écran d'accueil 4 boutons
+  - electron-vite (sortie dans `out/`), base `trans_logistic.db` dans `userData`.
+  - Migrations dans `src/main/db/migrations.ts` (table `schema_version`), testées avec `node:sqlite`
+    pour ne pas dépendre du binaire better-sqlite3 compilé pour Electron.
+  - Electron 43 (pas 44) : better-sqlite3 13 fournit des binaires précompilés pour cette version.
+  - Taux de TVA stocké en pourcentage entier (`18`).
 - [ ] Phase 2 — `src/core` : calculs TVA, montant en lettres, numérotation + tests
 - [ ] Phase 3 — Paramètres (entreprise, clients, zones/tarifs)
 - [ ] Phase 4 — Nouvelle facture + PDF

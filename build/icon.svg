@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 64 64">
+  <!-- Source de l'icône. Le texte utilise Montserrat ExtraBold Italique (à installer pour le rendu). -->
+  <defs>
+    <linearGradient id="fond" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f56cf"/>
+      <stop offset="1" stop-color="#0b2569"/>
+    </linearGradient>
+    <linearGradient id="or" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe08a"/>
+      <stop offset="0.5" stop-color="#f2b51d"/>
+      <stop offset="1" stop-color="#c48a0c"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#fond)"/>
+  <path d="M5 47 C 20 57, 42 55, 59 35 C 45 50, 24 54, 5 47 Z" fill="url(#or)"/>
+  <text x="31" y="41" text-anchor="middle" font-family="Montserrat" font-weight="800" font-style="italic"
+        font-size="30" letter-spacing="-1" fill="url(#or)">2M</text>
+</svg>

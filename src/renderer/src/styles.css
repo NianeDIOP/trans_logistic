@@ -1,0 +1,577 @@
+/*
+ * 2M Facturation — feuille de style principale.
+ * Charte issue du logo 2M Logistique Transport : bleu roi et or.
+ */
+
+:root {
+  /* Bleus */
+  --bleu-nuit: #061640;
+  --bleu-marine: #0b2569;
+  --bleu: #12389a;
+  --bleu-roi: #1f56cf;
+  --bleu-pale: #eaf0fc;
+  /* Ors */
+  --or-clair: #ffe08a;
+  --or: #f2b51d;
+  --or-fonce: #c48a0c;
+  --degrade-or: linear-gradient(90deg, #c48a0c 0%, #f2b51d 45%, #ffe08a 70%, #f2b51d 100%);
+  --degrade-bleu: linear-gradient(160deg, #1f56cf 0%, #0b2569 100%);
+  /* Neutres */
+  --fond: #f2f4f9;
+  --blanc: #ffffff;
+  --filet: #dde3ef;
+  --texte: #0e1a36;
+  --texte-2: #48557a;
+  --texte-3: #8590aa;
+  --danger: #b3261e;
+  --fermer: #c42b1c;
+
+  --ombre: 0 1px 2px rgb(11 37 105 / 6%), 0 6px 20px rgb(11 37 105 / 7%);
+  --ombre-forte: 0 2px 4px rgb(11 37 105 / 8%), 0 16px 36px rgb(11 37 105 / 14%);
+  --rayon: 10px;
+
+  --police-titre: 'Montserrat', 'Segoe UI', sans-serif;
+  --police: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+
+  --barre-titre: 38px;
+
+  font-family: var(--police);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--texte);
+  background: var(--fond);
+  -webkit-font-smoothing: antialiased;
+  font-variant-numeric: tabular-nums;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: var(--fond);
+  user-select: none;
+}
+
+h1,
+h2,
+p,
+ul {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+img {
+  -webkit-user-drag: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--or);
+  outline-offset: 2px;
+}
+
+kbd {
+  display: inline-block;
+  min-width: 24px;
+  padding: 0 6px;
+  border: 1px solid var(--filet);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--blanc);
+  font-family: var(--police);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: center;
+  color: var(--texte-2);
+}
+
+/* ---------- Structure ---------- */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.app-contenu {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* ---------- Barre de titre ---------- */
+
+.titlebar {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  height: var(--barre-titre);
+  flex-shrink: 0;
+  background: linear-gradient(90deg, var(--bleu-nuit) 0%, var(--bleu-marine) 100%);
+  color: #fff;
+  -webkit-app-region: drag;
+}
+
+.titlebar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--degrade-or);
+}
+
+.titlebar-marque {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 12px;
+  font-family: var(--police-titre);
+  font-size: 12px;
+}
+
+.titlebar-nom {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.titlebar-module {
+  font-weight: 600;
+  color: var(--or);
+}
+
+.titlebar-sep {
+  color: rgb(255 255 255 / 35%);
+}
+
+.titlebar-contexte {
+  font-weight: 600;
+  color: rgb(255 255 255 / 75%);
+}
+
+.titlebar-controles {
+  display: flex;
+  -webkit-app-region: no-drag;
+}
+
+.titlebar-bouton {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  margin-bottom: 2px;
+  border: 0;
+  background: transparent;
+  color: rgb(255 255 255 / 90%);
+  transition: background-color 0.1s;
+}
+
+.titlebar-bouton:hover {
+  background: rgb(255 255 255 / 10%);
+}
+
+.titlebar-bouton:active {
+  background: rgb(255 255 255 / 18%);
+}
+
+.titlebar-fermer:hover {
+  background: var(--fermer);
+  color: #fff;
+}
+
+.titlebar-fermer:active {
+  background: #a3261a;
+}
+
+.titlebar-bouton:focus-visible {
+  outline-offset: -2px;
+}
+
+/* ---------- Accueil ---------- */
+
+.accueil {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.bandeau {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  padding: 28px 56px 32px;
+  background:
+    radial-gradient(ellipse 60% 120% at 100% 0%, var(--bleu-pale) 0%, transparent 70%),
+    var(--blanc);
+  box-shadow: 0 1px 0 var(--filet);
+}
+
+.bandeau::after {
+  content: '';
+  position: absolute;
+  left: 56px;
+  right: 56px;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--degrade-or);
+}
+
+.bandeau-logo {
+  width: 330px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.bandeau-infos {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 40px;
+  border-left: 1px solid var(--filet);
+}
+
+.bandeau-date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--police-titre);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--or-fonce);
+}
+
+.bandeau-infos h1 {
+  margin-top: 6px;
+  font-family: var(--police-titre);
+  font-size: 40px;
+  font-weight: 800;
+  font-style: italic;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--bleu-marine);
+}
+
+.bandeau-accroche {
+  font-size: 16px;
+  color: var(--texte-2);
+}
+
+.bandeau-contacts {
+  display: grid;
+  gap: 4px;
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--texte-2);
+}
+
+.bandeau-contacts li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bandeau-contacts svg {
+  flex-shrink: 0;
+  color: var(--bleu-roi);
+}
+
+.accueil-corps {
+  flex: 1;
+  padding: 32px 56px 24px;
+}
+
+.titre-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  font-family: var(--police-titre);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bleu-marine);
+}
+
+.titre-section::before {
+  content: '';
+  width: 22px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--degrade-or);
+}
+
+.alerte {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  border-left: 4px solid var(--danger);
+  border-radius: 6px;
+  background: #fbeceb;
+  color: var(--danger);
+}
+
+/* Cartes des modules */
+
+.modules {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 1100px) {
+  .modules {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.module {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 236px;
+  padding: 24px 22px 18px;
+  overflow: hidden;
+  border: 1px solid var(--filet);
+  border-radius: var(--rayon);
+  background: var(--blanc);
+  box-shadow: var(--ombre);
+  text-align: left;
+  transition:
+    transform 0.2s ease-out,
+    box-shadow 0.2s ease-out,
+    border-color 0.2s;
+}
+
+.module::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--degrade-or);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease-out;
+}
+
+.module:hover {
+  transform: translateY(-3px);
+  border-color: #c9d4ec;
+  box-shadow: var(--ombre-forte);
+}
+
+.module:hover::after,
+.module:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.module:active {
+  transform: translateY(-1px);
+}
+
+.module-icone {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 10px;
+  border-radius: 14px;
+  background: var(--degrade-bleu);
+  color: var(--or);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 18%),
+    0 6px 14px rgb(18 56 154 / 28%);
+}
+
+.module-icone-grande {
+  width: 88px;
+  height: 88px;
+  border-radius: 22px;
+}
+
+.module-titre {
+  font-family: var(--police-titre);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--bleu-marine);
+}
+
+.module-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--texte-2);
+}
+
+.module-bas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid #edf0f6;
+}
+
+.module-ouvrir {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--police-titre);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bleu-roi);
+}
+
+.module-fleche {
+  transition: transform 0.2s ease-out;
+}
+
+.module:hover .module-fleche {
+  transform: translateX(4px);
+}
+
+.module-raccourci {
+  display: inline-flex;
+  gap: 3px;
+}
+
+/* Barre d'état */
+
+.statut {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 56px;
+  border-top: 1px solid var(--filet);
+  background: var(--blanc);
+  font-size: 13px;
+  color: var(--texte-3);
+}
+
+.statut-base {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statut-base svg {
+  color: var(--bleu-roi);
+}
+
+/* ---------- Écrans de module ---------- */
+
+.ecran {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.ecran-entete {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 56px;
+  background: var(--blanc);
+  box-shadow: 0 1px 0 var(--filet);
+}
+
+.ecran-entete-icone {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-left: 10px;
+  border-radius: 9px;
+  background: var(--degrade-bleu);
+  color: var(--or);
+}
+
+.ecran-entete h1 {
+  font-family: var(--police-titre);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--bleu-marine);
+}
+
+.bouton-retour {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 34px;
+  padding: 0 14px 0 10px;
+  border: 1px solid var(--filet);
+  border-radius: 8px;
+  background: var(--blanc);
+  font-family: var(--police-titre);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bleu);
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+
+.bouton-retour:hover {
+  border-color: var(--bleu-roi);
+  background: var(--bleu-pale);
+}
+
+.ecran-vide {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px;
+  text-align: center;
+}
+
+.ecran-vide h2 {
+  font-family: var(--police-titre);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--bleu-marine);
+}
+
+.ecran-vide p {
+  max-width: 48ch;
+  color: var(--texte-2);
+}
+
+.ecran-vide-aide {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--texte-3) !important;
+}
