@@ -8,7 +8,7 @@ import {
   PhoneIcon
 } from '@phosphor-icons/react'
 import type { AppInfo, Entreprise } from '@shared/types'
-import logo from '../assets/logo-2m.png'
+import logo from '../../../../resources/logo-2m.png'
 import { MENU, type Ecran } from '../navigation'
 
 interface Props {

@@ -44,6 +44,71 @@ export function ChampTexte({ libelle, valeur, onChange, erreur, aide, obligatoir
   )
 }
 
+interface SaisieMontantProps {
+  id?: string
+  valeur: number | null
+  onChange: (v: number | null) => void
+  /** Signale une saisie qui n'est pas un montant entier positif. */
+  onInvalide?: (invalide: boolean) => void
+  placeholder?: string
+  className?: string
+  'aria-label'?: string
+  unite?: boolean
+}
+
+/** Champ de montant en FCFA : séparateur de milliers à la sortie du champ, entier positif uniquement. */
+export function SaisieMontant({
+  id,
+  valeur,
+  onChange,
+  onInvalide,
+  placeholder,
+  className,
+  unite = true,
+  ...rest
+}: SaisieMontantProps): React.JSX.Element {
+  const [texte, setTexte] = useState(valeur === null ? '' : formatMontant(valeur))
+  const [invalide, setInvalide] = useState(false)
+  const enSaisie = useRef(false)
+
+  // Resynchronise l'affichage quand la valeur change de l'extérieur (pas pendant la frappe).
+  useEffect(() => {
+    if (!enSaisie.current) setTexte(valeur === null ? '' : formatMontant(valeur))
+  }, [valeur])
+
+  return (
+    <div className={`saisie-montant ${unite ? '' : 'sans-unite'}`}>
+      <input
+        id={id}
+        className={`saisie ${invalide ? 'saisie-invalide' : ''} ${className ?? ''}`}
+        inputMode="numeric"
+        placeholder={placeholder}
+        value={texte}
+        aria-label={rest['aria-label']}
+        onChange={(e) => {
+          const brut = e.target.value
+          setTexte(brut)
+          const n = brut.trim() === '' ? null : lireMontant(brut)
+          const faux = brut.trim() !== '' && (n === null || n < 0)
+          setInvalide(faux)
+          onInvalide?.(faux)
+          if (brut.trim() === '') onChange(null)
+          else if (n !== null && n >= 0) onChange(n)
+        }}
+        onFocus={(e) => {
+          enSaisie.current = true
+          e.target.select()
+        }}
+        onBlur={() => {
+          enSaisie.current = false
+          if (!invalide) setTexte(valeur === null ? '' : formatMontant(valeur))
+        }}
+      />
+      {unite && <span className="saisie-unite">FCFA</span>}
+    </div>
+  )
+}
+
 interface MontantProps {
   libelle: string
   valeur: number | null
@@ -55,17 +120,8 @@ interface MontantProps {
   className?: string
 }
 
-/** Saisie d'un montant en FCFA : séparateur de milliers à la sortie du champ, entier uniquement. */
 export function ChampMontant({ libelle, valeur, onChange, erreur, aide, obligatoire, placeholder, className }: MontantProps): React.JSX.Element {
-  const [texte, setTexte] = useState(valeur === null ? '' : formatMontant(valeur))
   const [invalide, setInvalide] = useState(false)
-  const enSaisie = useRef(false)
-
-  // Resynchronise l'affichage quand la valeur change de l'extérieur (pas pendant la frappe).
-  useEffect(() => {
-    if (!enSaisie.current) setTexte(valeur === null ? '' : formatMontant(valeur))
-  }, [valeur])
-
   return (
     <Champ
       libelle={libelle}
@@ -75,28 +131,7 @@ export function ChampMontant({ libelle, valeur, onChange, erreur, aide, obligato
       className={className}
     >
       {(id) => (
-        <div className="saisie-montant">
-          <input
-            id={id}
-            className="saisie"
-            inputMode="numeric"
-            placeholder={placeholder}
-            value={texte}
-            onChange={(e) => {
-              setTexte(e.target.value)
-              const n = e.target.value.trim() === '' ? null : lireMontant(e.target.value)
-              setInvalide(e.target.value.trim() !== '' && (n === null || n < 0))
-              if (e.target.value.trim() === '') onChange(null)
-              else if (n !== null && n >= 0) onChange(n)
-            }}
-            onFocus={() => (enSaisie.current = true)}
-            onBlur={() => {
-              enSaisie.current = false
-              if (!invalide) setTexte(valeur === null ? '' : formatMontant(valeur))
-            }}
-          />
-          <span className="saisie-unite">FCFA</span>
-        </div>
+        <SaisieMontant id={id} valeur={valeur} onChange={onChange} onInvalide={setInvalide} placeholder={placeholder} />
       )}
     </Champ>
   )

@@ -9,7 +9,7 @@ import {
 } from '@phosphor-icons/react'
 import type { Client, ClientSaisie } from '@shared/parametres'
 import Badge from '../../components/ui/Badge'
-import { ChampTexte } from '../../components/ui/Champ'
+import FormulaireClient from '../../components/FormulaireClient'
 import EnTeteSection from '../../components/ui/EnTeteSection'
 import Modale from '../../components/ui/Modale'
 import { useNotifier } from '../../components/ui/Notifications'
@@ -38,7 +38,12 @@ export default function OngletClients(): React.JSX.Element {
 
   const ouvrir = (c: Client | null): void => {
     setErreurs({})
-    setEdition({ id: c?.id ?? null, saisie: c ? { ...c } : { ...VIDE } })
+    setEdition({
+      id: c?.id ?? null,
+      saisie: c
+        ? { raison_sociale: c.raison_sociale, adresse: c.adresse, ninea: c.ninea, tel: c.tel, email: c.email }
+        : { ...VIDE }
+    })
   }
 
   const enregistrer = async (): Promise<void> => {
@@ -62,9 +67,6 @@ export default function OngletClients(): React.JSX.Element {
     notifier(`« ${c.raison_sociale} » est de nouveau actif.`)
     charger()
   }
-
-  const maj = (champ: keyof ClientSaisie) => (v: string) =>
-    edition && setEdition({ ...edition, saisie: { ...edition.saisie, [champ]: v } })
 
   return (
     <div className="onglet">
@@ -172,13 +174,11 @@ export default function OngletClients(): React.JSX.Element {
             </>
           }
         >
-          <div className="grille-champs">
-            <ChampTexte className="pleine-largeur" libelle="Raison sociale" obligatoire valeur={edition.saisie.raison_sociale} onChange={maj('raison_sociale')} erreur={erreurs.raison_sociale} />
-            <ChampTexte className="pleine-largeur" libelle="Adresse" valeur={edition.saisie.adresse} onChange={maj('adresse')} />
-            <ChampTexte libelle="NINEA" valeur={edition.saisie.ninea} onChange={maj('ninea')} />
-            <ChampTexte libelle="Téléphone" valeur={edition.saisie.tel} onChange={maj('tel')} />
-            <ChampTexte className="pleine-largeur" libelle="Email" type="email" valeur={edition.saisie.email} onChange={maj('email')} erreur={erreurs.email} />
-          </div>
+          <FormulaireClient
+            saisie={edition.saisie}
+            onChange={(saisie) => setEdition({ ...edition, saisie })}
+            erreurs={erreurs}
+          />
         </Modale>
       )}
       {dialogue}

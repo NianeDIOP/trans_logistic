@@ -12,6 +12,7 @@ import type {
   Zone,
   ZoneSaisie
 } from './parametres'
+import type { Facture, FactureSaisie, Referentiels } from './factures'
 
 export interface Entreprise {
   id: number
@@ -106,12 +107,35 @@ export const CANAUX_PARAMETRES = {
   listes: ['lister', 'ajouter', 'renommer', 'supprimer', 'reactiver']
 } as const satisfies { [G in keyof ParametresApi]: readonly (keyof ParametresApi[G])[] }
 
+export interface FacturesApi {
+  referentiels(): R<Referentiels>
+  lire(id: number): R<Facture>
+  /** Enregistre (ou met à jour) un brouillon. */
+  enregistrer(saisie: FactureSaisie): R<Facture>
+  /** Enregistre, attribue le numéro et archive le PDF. */
+  valider(saisie: FactureSaisie): R<Facture>
+  /** HTML de l'aperçu (page A4) calculé depuis la saisie, sans enregistrer. */
+  apercu(saisie: FactureSaisie): R<string>
+  /** Ouvre le PDF dans la visionneuse de Windows. */
+  ouvrirPdf(id: number): R<null>
+  /** Enregistre une copie du PDF à l'emplacement choisi ; null si annulé. */
+  enregistrerCopie(id: number): R<string | null>
+  imprimer(id: number): R<null>
+  supprimerBrouillon(id: number): R<null>
+}
+
+export const CANAUX_FACTURES = [
+  'referentiels', 'lire', 'enregistrer', 'valider', 'apercu',
+  'ouvrirPdf', 'enregistrerCopie', 'imprimer', 'supprimerBrouillon'
+] as const satisfies readonly (keyof FacturesApi)[]
+
 /** API exposée au renderer via `contextBridge` (window.api). */
 export interface Api {
   getAppInfo(): Promise<AppInfo>
   getEntreprise(): Promise<Entreprise>
   window: WindowApi
   parametres: ParametresApi
+  factures: FacturesApi
 }
 
 /** Noms des canaux IPC. */

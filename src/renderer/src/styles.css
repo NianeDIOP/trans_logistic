@@ -1316,6 +1316,7 @@ textarea.saisie {
 }
 
 .modale {
+  outline: none;
   display: flex;
   flex-direction: column;
   max-width: 100%;
@@ -1386,8 +1387,8 @@ textarea.saisie {
 
 .notifications {
   position: fixed;
+  top: calc(var(--barre-titre) + 16px);
   right: 24px;
-  bottom: 24px;
   z-index: 100;
   display: flex;
   flex-direction: column;
@@ -1444,4 +1445,563 @@ textarea.saisie {
 .notification-fermer:hover {
   background: rgb(255 255 255 / 12%);
   color: #fff;
+}
+
+/* =====================================================================
+ * Nouvelle facture
+ * ===================================================================== */
+
+.ecran-entete .badge {
+  margin-left: 4px;
+}
+
+.entete-etat {
+  margin-left: auto;
+}
+
+.facture-saisie {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px 40px 32px;
+}
+
+.facture-entete {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(170px, 0.8fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.facture-lignes .carte-titre {
+  margin: 0;
+  padding: 18px 22px 14px;
+}
+
+/* Sélecteur de client */
+
+.selecteur {
+  position: relative;
+}
+
+.selecteur-bouton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: auto;
+  min-height: 40px;
+  padding: 6px 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.selecteur-icone {
+  flex-shrink: 0;
+  color: var(--bleu-roi);
+}
+
+.selecteur-valeur {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.selecteur-valeur strong {
+  font-weight: 600;
+  color: var(--texte);
+}
+
+.selecteur-valeur span {
+  overflow: hidden;
+  font-size: 12.5px;
+  color: var(--texte-3);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selecteur-placeholder {
+  color: var(--texte-3);
+}
+
+.selecteur-caret {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--texte-3);
+}
+
+.selecteur-liste {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  overflow: hidden;
+  border: 1px solid var(--filet);
+  border-radius: 10px;
+  background: var(--blanc);
+  box-shadow: var(--ombre-forte);
+  animation: montee 0.12s ease-out;
+}
+
+.selecteur-recherche {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #eef1f7;
+  color: var(--texte-3);
+}
+
+.selecteur-recherche input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  font: inherit;
+  user-select: text;
+}
+
+.selecteur-liste ul {
+  max-height: 260px;
+  margin: 0;
+  padding: 6px;
+  overflow: auto;
+  list-style: none;
+}
+
+.selecteur-liste li {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.selecteur-liste li strong {
+  font-weight: 600;
+}
+
+.selecteur-liste li span {
+  font-size: 12.5px;
+  color: var(--texte-3);
+}
+
+.selecteur-liste li.actif {
+  background: var(--bleu-pale);
+}
+
+.selecteur-liste li.choisi strong {
+  color: var(--bleu-roi);
+}
+
+.selecteur-liste .selecteur-vide {
+  color: var(--texte-3);
+  cursor: default;
+}
+
+.selecteur-creer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 14px;
+  border: 0;
+  border-top: 1px solid #eef1f7;
+  background: #f7f9fd;
+  font-family: var(--police-titre);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bleu-roi);
+  text-align: left;
+}
+
+.selecteur-creer:hover {
+  background: var(--bleu-pale);
+}
+
+/* Lignes de facture */
+
+.lignes-saisie th,
+.lignes-saisie td {
+  padding: 8px 8px;
+}
+
+.lignes-saisie th:first-child,
+.lignes-saisie td:first-child {
+  padding-left: 22px;
+}
+
+.lignes-saisie th:last-child,
+.lignes-saisie td:last-child {
+  padding-right: 16px;
+}
+
+.lignes-saisie tbody tr:hover {
+  background: transparent;
+}
+
+.saisie-compacte {
+  height: 36px;
+  padding: 0 10px;
+  font-size: 14px;
+}
+
+select.saisie {
+  padding-right: 28px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 256 256'%3E%3Cpath fill='%238590aa' d='M213.66 101.66l-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+}
+
+.saisie-montant.sans-unite .saisie {
+  padding-right: 10px;
+}
+
+.lignes-saisie .saisie-montant .saisie {
+  padding-right: 48px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.lignes-saisie .saisie-unite {
+  right: 10px;
+  font-size: 11px;
+}
+
+.col-tva {
+  width: 56px;
+  text-align: center !important;
+}
+
+.case {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--bleu-roi);
+  cursor: pointer;
+}
+
+.ligne-prestation {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ligne-prestation .badge {
+  flex-shrink: 0;
+  min-width: 82px;
+  justify-content: center;
+}
+
+.ligne-aide {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--or-fonce);
+}
+
+.ligne-erreur td {
+  background: #fdf3f2;
+}
+
+.lignes-vide {
+  padding: 28px !important;
+  color: var(--texte-3);
+  text-align: center;
+}
+
+.lignes-bloc > .champ-message {
+  padding: 0 22px;
+  margin-top: 8px;
+}
+
+.lignes-ajout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 22px 18px;
+  border-top: 1px solid #eef1f7;
+  background: #fafbfe;
+}
+
+.lignes-ajout-sep {
+  width: 1px;
+  height: 24px;
+  margin: 0 6px;
+  background: var(--filet);
+}
+
+.puce {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--filet);
+  border-radius: 16px;
+  background: var(--blanc);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--bleu);
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+
+.puce:hover {
+  border-color: var(--bleu-roi);
+  background: var(--bleu-pale);
+}
+
+.puce-prix {
+  padding-left: 6px;
+  border-left: 1px solid var(--filet);
+  font-weight: 400;
+  color: var(--texte-3);
+}
+
+.puce-discrete {
+  border-style: dashed;
+  color: var(--texte-2);
+}
+
+/* Totaux */
+
+.totaux-bloc {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 32px;
+  align-items: center;
+}
+
+.totaux-lettres {
+  padding: 14px 18px;
+  border-left: 4px solid var(--or);
+  border-radius: 0 8px 8px 0;
+  background: #fbf7ea;
+}
+
+.totaux-lettres p {
+  margin-top: 4px;
+  font-family: var(--police-titre);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--bleu-marine);
+}
+
+.totaux-liste {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.totaux-liste div {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid #eef1f7;
+}
+
+.totaux-liste dt {
+  color: var(--texte-2);
+}
+
+.totaux-liste dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.totaux-secondaire dt,
+.totaux-secondaire dd {
+  font-size: 13px;
+  font-weight: 400 !important;
+  color: var(--texte-3) !important;
+}
+
+.totaux-liste .totaux-net {
+  margin-top: 8px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--degrade-bleu);
+}
+
+.totaux-net dt {
+  font-family: var(--police-titre);
+  font-weight: 700;
+  color: #fff !important;
+}
+
+.totaux-net dd {
+  font-family: var(--police-titre);
+  font-size: 18px;
+  font-weight: 800 !important;
+  color: var(--or-clair);
+}
+
+.totaux-net dd span {
+  font-size: 12px;
+}
+
+/* Barre d'actions */
+
+.barre-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding: 14px 40px;
+  border-top: 1px solid var(--filet);
+  background: rgb(255 255 255 / 92%);
+  backdrop-filter: blur(6px);
+}
+
+.barre-actions-gauche {
+  margin-right: auto;
+}
+
+.btn-valider {
+  height: 42px;
+  padding: 0 20px;
+}
+
+/* Aperçu A4 */
+
+.apercu-feuille {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 10px;
+  background: #e7ebf3;
+}
+
+.apercu-feuille iframe {
+  width: 210mm;
+  min-height: 297mm;
+  border: 0;
+  background: #fff;
+  box-shadow: 0 4px 24px rgb(6 22 64 / 18%);
+}
+
+.modale .apercu-feuille {
+  max-height: calc(100vh - 220px);
+  overflow: auto;
+}
+
+/* Facture validée */
+
+.vue-facture {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 24px;
+  align-items: start;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px 40px 40px;
+}
+
+.vue-facture-apercu .apercu-feuille {
+  overflow: auto;
+}
+
+.vue-facture-panneau {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bandeau-succes {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--degrade-bleu);
+  color: #fff;
+  box-shadow: 0 6px 16px rgb(18 56 154 / 25%);
+}
+
+.bandeau-succes svg {
+  flex-shrink: 0;
+  color: var(--or);
+}
+
+.bandeau-succes strong {
+  display: block;
+  font-family: var(--police-titre);
+}
+
+.bandeau-succes span {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.vue-facture-numero {
+  margin: 2px 0 14px;
+  font-family: var(--police-titre);
+  font-size: 22px;
+  font-weight: 800;
+  font-style: italic;
+  color: var(--bleu-marine);
+}
+
+.vue-facture-infos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+
+.vue-facture-infos div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.vue-facture-infos dt {
+  color: var(--texte-3);
+}
+
+.vue-facture-infos dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+}
+
+.vue-facture-montant {
+  color: var(--bleu-marine);
+}
+
+.vue-facture-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vue-facture-actions .btn {
+  justify-content: flex-start;
+  height: 42px;
+}
+
+.btn-nouvelle {
+  margin-top: 6px;
+  border: 1px dashed var(--filet);
+}
+
+.btn-nouvelle:hover {
+  border-color: var(--bleu-roi);
+  color: var(--bleu-roi);
 }

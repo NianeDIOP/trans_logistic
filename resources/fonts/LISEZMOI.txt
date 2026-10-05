@@ -1,0 +1,7 @@
+Polices embarquées dans les factures PDF (fonctionnement hors connexion).
+
+- Montserrat (700, 800 italique) — Julieta Ulanovsky et al., SIL Open Font License 1.1
+- Source Sans 3 (400, 600) — Adobe, SIL Open Font License 1.1
+
+Fichiers copiés depuis les paquets @fontsource/montserrat et @fontsource/source-sans-3.
+Licence : https://openfontlicense.org

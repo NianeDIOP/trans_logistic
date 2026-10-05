@@ -7,7 +7,7 @@ import { Champ, ChampTexte } from '../../components/ui/Champ'
 import EnTeteSection from '../../components/ui/EnTeteSection'
 import { useNotifier } from '../../components/ui/Notifications'
 import { appel, ErreurApi } from '../../lib/appel'
-import logoParDefaut from '../../assets/logo-2m.png'
+import logoParDefaut from '../../../../../resources/logo-2m.png'
 
 const CHAMPS: (keyof EntrepriseSaisie)[] = [
   'raison_sociale', 'rc', 'ninea', 'banque', 'iban', 'siege', 'adresse',

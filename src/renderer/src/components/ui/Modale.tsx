@@ -26,9 +26,11 @@ export default function Modale({
 
   useEffect(() => {
     // Focus sur le premier champ, sinon sur le bouton marqué `data-autofocus`.
+    // À défaut, la fenêtre elle-même, pour qu'Échap la ferme.
     const premier =
       ref.current?.querySelector<HTMLElement>('input, select, textarea') ??
-      ref.current?.querySelector<HTMLElement>('[data-autofocus]')
+      ref.current?.querySelector<HTMLElement>('[data-autofocus]') ??
+      ref.current
     premier?.focus()
   }, [])
 
@@ -37,6 +39,7 @@ export default function Modale({
       <form
         ref={ref}
         className="modale"
+        tabIndex={-1}
         style={{ width: largeur }}
         role="dialog"
         aria-modal="true"

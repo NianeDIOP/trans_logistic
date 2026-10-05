@@ -1,5 +1,12 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
-import { CANAUX_PARAMETRES, IPC, type Api, type ParametresApi } from '../shared/types'
+import {
+  CANAUX_FACTURES,
+  CANAUX_PARAMETRES,
+  IPC,
+  type Api,
+  type FacturesApi,
+  type ParametresApi
+} from '../shared/types'
 
 /** Construit l'API des Paramètres : chaque méthode appelle le canal « parametres:<groupe>:<action> ». */
 function apiParametres(): ParametresApi {
@@ -12,6 +19,14 @@ function apiParametres(): ParametresApi {
     }
   }
   return api as unknown as ParametresApi
+}
+
+function apiFactures(): FacturesApi {
+  const api: Record<string, unknown> = {}
+  for (const action of CANAUX_FACTURES) {
+    api[action] = (...args: unknown[]) => ipcRenderer.invoke(`factures:${action}`, ...args)
+  }
+  return api as unknown as FacturesApi
 }
 
 const api: Api = {
@@ -28,7 +43,8 @@ const api: Api = {
       return () => ipcRenderer.removeListener(IPC.windowMaximizedChanged, listener)
     }
   },
-  parametres: apiParametres()
+  parametres: apiParametres(),
+  factures: apiFactures()
 }
 
 contextBridge.exposeInMainWorld('api', api)
