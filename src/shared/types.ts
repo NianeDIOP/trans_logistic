@@ -23,14 +23,30 @@ export interface AppInfo {
   schemaVersion: number
 }
 
+/** Commandes de la fenêtre (barre de titre personnalisée). */
+export interface WindowApi {
+  minimize(): void
+  toggleMaximize(): void
+  close(): void
+  isMaximized(): Promise<boolean>
+  /** Abonnement aux changements agrandi / restauré. Retourne la fonction de désabonnement. */
+  onMaximizedChange(callback: (maximized: boolean) => void): () => void
+}
+
 /** API exposée au renderer via `contextBridge` (window.api). */
 export interface Api {
   getAppInfo(): Promise<AppInfo>
   getEntreprise(): Promise<Entreprise>
+  window: WindowApi
 }
 
 /** Noms des canaux IPC. */
 export const IPC = {
   appInfo: 'app:info',
-  entrepriseGet: 'entreprise:get'
+  entrepriseGet: 'entreprise:get',
+  windowMinimize: 'window:minimize',
+  windowToggleMaximize: 'window:toggle-maximize',
+  windowClose: 'window:close',
+  windowIsMaximized: 'window:is-maximized',
+  windowMaximizedChanged: 'window:maximized-changed'
 } as const

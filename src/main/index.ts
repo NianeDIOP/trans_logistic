@@ -1,5 +1,7 @@
 import { join } from 'node:path'
 import { app, BrowserWindow, dialog, shell } from 'electron'
+import icon from '../../resources/icon.png?asset'
+import { IPC } from '../shared/types'
 import { closeDatabase, openDatabase } from './db'
 import { registerIpcHandlers } from './ipc'
 
@@ -11,7 +13,10 @@ function createWindow(): void {
     minHeight: 600,
     show: false,
     title: '2M Facturation',
-    autoHideMenuBar: true,
+    icon,
+    // Fenêtre sans cadre : la barre de titre est dessinée par l'application.
+    frame: false,
+    backgroundColor: '#f4f2ed',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,
@@ -21,6 +26,11 @@ function createWindow(): void {
   })
 
   win.once('ready-to-show', () => win.show())
+
+  const notifyMaximized = (): void =>
+    win.webContents.send(IPC.windowMaximizedChanged, win.isMaximized())
+  win.on('maximize', notifyMaximized)
+  win.on('unmaximize', notifyMaximized)
 
   // Les liens externes s'ouvrent dans le navigateur, jamais dans l'application.
   win.webContents.setWindowOpenHandler(({ url }) => {

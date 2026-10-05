@@ -1,10 +1,19 @@
 import { useEffect, useState } from 'react'
 import type { AppInfo, Entreprise } from '@shared/types'
+import Logo from '../components/Logo'
+import { IconBaseLocale, IconFlecheDroite } from '../components/icons'
 import { MENU, type Ecran } from '../navigation'
 
 interface Props {
   onOuvrir: (ecran: Ecran) => void
 }
+
+const formatDate = new Intl.DateTimeFormat('fr-FR', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric'
+})
 
 export default function Accueil({ onOuvrir }: Props): React.JSX.Element {
   const [entreprise, setEntreprise] = useState<Entreprise | null>(null)
@@ -22,37 +31,81 @@ export default function Accueil({ onOuvrir }: Props): React.JSX.Element {
 
   return (
     <div className="accueil">
-      <header className="accueil-entete">
-        <h1>{entreprise?.raison_sociale ?? '2M LOGISTIQUE ET TRANSPORT'}</h1>
-        <p className="sous-titre">Facturation du transport de conteneurs</p>
-      </header>
+      <aside className="identite">
+        <div className="identite-haut">
+          <Logo size={56} variante="trait" />
+          <p className="identite-raison">{entreprise?.raison_sociale ?? '2M Logistique et Transport'}</p>
+          <p className="identite-activite">Transport et logistique de conteneurs</p>
+        </div>
 
-      {erreur && <p className="erreur">Erreur : {erreur}</p>}
+        <p className="identite-date">{formatDate.format(new Date())}</p>
 
-      <nav className="menu-grille">
-        {MENU.map((m) => (
-          <button key={m.ecran} className="menu-bouton" onClick={() => onOuvrir(m.ecran)}>
-            <span className="menu-icone" aria-hidden="true">
-              {m.icone}
-            </span>
-            <span className="menu-titre">{m.titre}</span>
-            <span className="menu-description">{m.description}</span>
-          </button>
-        ))}
-      </nav>
-
-      <footer className="accueil-pied">
         {entreprise && (
-          <span>
-            RC : {entreprise.rc} · NINEA : {entreprise.ninea} · {entreprise.tel}
-          </span>
+          <dl className="identite-legal">
+            <div>
+              <dt>RC</dt>
+              <dd>{entreprise.rc}</dd>
+            </div>
+            <div>
+              <dt>NINEA</dt>
+              <dd>{entreprise.ninea}</dd>
+            </div>
+            <div>
+              <dt>Siège</dt>
+              <dd>{entreprise.siege}</dd>
+            </div>
+            <div>
+              <dt>Tél.</dt>
+              <dd>{entreprise.tel}</dd>
+            </div>
+          </dl>
         )}
-        {info && (
-          <span className="version">
-            Version {info.version} · schéma {info.schemaVersion}
-          </span>
+      </aside>
+
+      <section className="espace">
+        <header className="espace-entete">
+          <p className="surtitre">Espace de travail</p>
+          <h1>Facturation</h1>
+        </header>
+
+        {erreur && (
+          <p className="alerte" role="alert">
+            Impossible de lire la base de données : {erreur}
+          </p>
         )}
-      </footer>
+
+        <nav className="modules" aria-label="Modules">
+          {MENU.map((m, i) => (
+            <button key={m.ecran} className="module" onClick={() => onOuvrir(m.ecran)}>
+              <span className="module-haut">
+                <span className="module-icone">
+                  <m.Icone size={28} />
+                </span>
+                <span className="module-numero">{String(i + 1).padStart(2, '0')}</span>
+              </span>
+              <span className="module-titre">{m.titre}</span>
+              <span className="module-description">{m.description}</span>
+              <span className="module-bas">
+                <kbd>Ctrl</kbd>
+                <kbd>{m.touche}</kbd>
+                <IconFlecheDroite size={18} className="module-fleche" />
+              </span>
+            </button>
+          ))}
+        </nav>
+
+        <footer className="statut">
+          <span className="statut-base">
+            <IconBaseLocale size={14} />
+            Données enregistrées sur cet ordinateur
+          </span>
+          {info && (
+            <span className="statut-version">
+              v{info.version} · schéma {info.schemaVersion}
+            </span>
+          )}
+        </footer>
+      </section>
     </div>
   )
 }

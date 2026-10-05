@@ -139,6 +139,17 @@ Gérer les migrations de schéma avec une table `schema_version`.
 - `contextIsolation: true`, `nodeIntegration: false`.
 - Ne jamais committer : `node_modules/`, `dist/`, `release/`, `*.db`, `.env`.
 
+### Identité visuelle (à respecter dans tous les écrans)
+- **Aucun emoji** dans l'interface. Icônes SVG maison uniquement (`src/renderer/src/components/icons.tsx` :
+  grille 24 px, trait 1,5 px, `currentColor`). Ajouter les nouvelles icônes dans ce fichier, même style.
+- Fenêtre **sans cadre** (`frame: false`) : barre de titre et boutons Réduire / Agrandir / Fermer
+  dessinés par l'application (`TitleBar.tsx`).
+- Polices embarquées (hors ligne) : IBM Plex Sans (texte), IBM Plex Mono (numéros, montants, références).
+- Palette définie dans `styles.css` (`--encre`, `--papier`, `--signal`…) : pas de couleur en dur ailleurs.
+- Style sobre : filets fins, angles de 2 px, pas d'ombres portées ni de dégradés.
+- Logo (conteneur stylisé) : `components/Logo.tsx` et `build/icon.svg` ; icône Windows et images de
+  l'installateur dans `build/`.
+
 ## 8. Commandes
 
 ```bash
