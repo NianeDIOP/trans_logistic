@@ -45,7 +45,10 @@ export function validerPrestation(saisie: PrestationSaisie): Resultat<Prestation
   const erreurs: Erreurs<PrestationSaisie> = {}
   if (!v.libelle) erreurs.libelle = 'Le libellé est obligatoire.'
   if (!prixValide(v.prix)) erreurs.prix = 'Le prix doit être un montant entier positif.'
-  return resultat({ ...v, soumis_tva: Boolean(v.soumis_tva) }, erreurs)
+  return resultat(
+    { ...v, soumis_tva: Boolean(v.soumis_tva), par_conteneur: Boolean(v.par_conteneur), automatique: Boolean(v.automatique) },
+    erreurs
+  )
 }
 
 export function validerZone(saisie: ZoneSaisie): Resultat<ZoneSaisie> {

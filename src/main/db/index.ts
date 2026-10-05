@@ -8,10 +8,15 @@ export const DB_FILENAME = 'trans_logistic.db'
 let db: Database.Database | null = null
 let schemaVersion = 0
 
+/** Chemin du fichier de la base, dans le dossier userData. */
+export function cheminBase(): string {
+  return join(app.getPath('userData'), DB_FILENAME)
+}
+
 /** Ouvre (ou crée) la base dans le dossier userData et applique les migrations. */
 export function openDatabase(): Database.Database {
   if (db) return db
-  const file = join(app.getPath('userData'), DB_FILENAME)
+  const file = cheminBase()
   db = new Database(file)
   db.pragma('journal_mode = WAL')
   db.pragma('foreign_keys = ON')

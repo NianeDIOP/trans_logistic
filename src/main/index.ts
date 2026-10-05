@@ -6,6 +6,8 @@ import { closeDatabase, openDatabase } from './db'
 import { registerIpcHandlers } from './ipc'
 import { registerFacturesHandlers } from './ipc-factures'
 import { registerParametresHandlers } from './ipc-parametres'
+import { registerSauvegardeHandlers } from './ipc-sauvegarde'
+import { sauvegardeAutomatique } from './sauvegarde'
 
 function createWindow(): void {
   const win = new BrowserWindow({
@@ -65,7 +67,9 @@ app.whenReady().then(() => {
   registerIpcHandlers()
   registerParametresHandlers()
   registerFacturesHandlers()
+  registerSauvegardeHandlers()
   createWindow()
+  void sauvegardeAutomatique()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

@@ -11,11 +11,11 @@ import {
   type Icon
 } from '@phosphor-icons/react'
 import Confirmation from '../components/ui/Confirmation'
-import EnTeteSection from '../components/ui/EnTeteSection'
 import OngletClients from './parametres/OngletClients'
 import OngletEntreprise from './parametres/OngletEntreprise'
 import OngletListes from './parametres/OngletListes'
 import OngletPrestations from './parametres/OngletPrestations'
+import OngletSauvegarde from './parametres/OngletSauvegarde'
 import OngletZones from './parametres/OngletZones'
 
 type Onglet = 'entreprise' | 'clients' | 'zones' | 'prestations' | 'listes' | 'sauvegarde'
@@ -84,18 +84,7 @@ export default function Parametres({ onRetour }: Props): React.JSX.Element {
           {onglet === 'zones' && <OngletZones />}
           {onglet === 'prestations' && <OngletPrestations />}
           {onglet === 'listes' && <OngletListes />}
-          {onglet === 'sauvegarde' && (
-            <div className="onglet">
-              <EnTeteSection
-                titre="Sauvegarde et restauration"
-                description="Copie de la base de factures vers un dossier de votre choix (clé USB, disque externe…)."
-              />
-              <div className="carte vide">
-                <DatabaseIcon size={40} weight="duotone" />
-                <p>Cette fonction sera livrée à la phase 7 du projet.</p>
-              </div>
-            </div>
-          )}
+          {onglet === 'sauvegarde' && <OngletSauvegarde />}
         </div>
       </div>
 

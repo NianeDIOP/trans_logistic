@@ -16,7 +16,7 @@ const conteneur: LigneSaisie = {
   designation: '',
   montant_ht: 70000,
   soumis_tva: true,
-  prestation_id: null
+  quantite: 1, prestation_id: null
 }
 const debours = (designation: string, montant: number, prestation_id: number | null = null): LigneSaisie => ({
   num_conteneur: '',
@@ -26,6 +26,7 @@ const debours = (designation: string, montant: number, prestation_id: number | n
   designation,
   montant_ht: montant,
   soumis_tva: false,
+  quantite: 1,
   prestation_id
 })
 
@@ -154,7 +155,7 @@ describe('supprimerBrouillon et référentiels', () => {
 
   it('une prestation facturée est désactivée plutôt que supprimée', () => {
     F.enregistrerBrouillon(db, saisie())
-    P.modifierPrestation(db, 1, { libelle: 'AGS (aller)', prix: 1500, soumis_tva: false })
+    P.modifierPrestation(db, 1, { libelle: 'AGS (aller)', prix: 1500, soumis_tva: false, par_conteneur: false, automatique: false })
     expect(P.supprimerPrestation(db, 1)).toBe('desactive')
   })
 
@@ -195,5 +196,22 @@ describe('factureAAfficher', () => {
     const f = F.factureAAfficher(db, saisie({ id: v.id }))
     expect([f.taux_tva, f.total_tva, f.numero]).toEqual([18, 12600, '2M-2026-0001'])
     expect(F.factureAAfficher(db, saisie()).taux_tva).toBe(10)
+  })
+})
+
+describe('migration 4 : AGS par conteneur', () => {
+  it('AGS aller simple est facturée par conteneur et ajoutée d’office', () => {
+    const [agsP, imprime] = P.listerPrestations(db)
+    expect([agsP.par_conteneur, agsP.automatique]).toEqual([true, true])
+    expect([imprime.par_conteneur, imprime.automatique]).toEqual([false, false])
+  })
+
+  it('la quantité est enregistrée et recopiée dans l’avoir', () => {
+    const f = F.enregistrerEtValider(
+      db,
+      saisie({ lignes: [conteneur, { ...conteneur, num_conteneur: 'B' }, { ...debours('AGS aller simple', 3000, 1), quantite: 2 }] })
+    )
+    expect(f.lignes[2].quantite).toBe(2)
+    expect(f.total_ht).toBe(143000)
   })
 })

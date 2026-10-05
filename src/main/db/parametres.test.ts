@@ -131,9 +131,9 @@ describe('zones et tarifs', () => {
 
 describe('prestations', () => {
   it('crée, modifie et ordonne', () => {
-    const p = P.creerPrestation(db, { libelle: 'Manutention', prix: 5000, soumis_tva: true })
+    const p = P.creerPrestation(db, { libelle: 'Manutention', prix: 5000, soumis_tva: true, par_conteneur: false, automatique: false })
     expect(p.ordre).toBe(3)
-    expect(P.modifierPrestation(db, p.id, { libelle: 'Manutention', prix: 6000, soumis_tva: true }).prix).toBe(6000)
+    expect(P.modifierPrestation(db, p.id, { libelle: 'Manutention', prix: 6000, soumis_tva: true, par_conteneur: false, automatique: false }).prix).toBe(6000)
     expect(P.listerPrestations(db).map((x) => x.libelle)).toEqual(['AGS aller simple', 'Imprimé', 'Manutention'])
   })
 

@@ -1,6 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import type { FactureSaisie, LigneSaisie } from '../shared/factures'
-import { aujourdhui, dateValide, formatDate, ligneVide, nomFichierFacture, verifierFacture } from './facture'
+import {
+  appliquerPrestationsParConteneur,
+  aujourdhui,
+  dateValide,
+  formatDate,
+  lignesAutomatiques,
+  ligneVide,
+  nomFichierFacture,
+  nombreConteneurs,
+  verifierFacture
+} from './facture'
+import type { Prestation } from '../shared/parametres'
 
 const conteneur: LigneSaisie = {
   num_conteneur: 'MSCU 123456-7',
@@ -10,7 +21,7 @@ const conteneur: LigneSaisie = {
   designation: '',
   montant_ht: 70000,
   soumis_tva: true,
-  prestation_id: null
+  quantite: 1, prestation_id: null
 }
 const ags: LigneSaisie = {
   num_conteneur: '',
@@ -20,7 +31,7 @@ const ags: LigneSaisie = {
   designation: 'AGS aller simple',
   montant_ht: 1500,
   soumis_tva: false,
-  prestation_id: 1
+  quantite: 1, prestation_id: 1
 }
 const vide: LigneSaisie = { ...ags, designation: '', montant_ht: 0, prestation_id: null }
 const facture = (f: Partial<FactureSaisie> = {}): FactureSaisie => ({
@@ -99,5 +110,47 @@ describe('genre de ligne', () => {
 
   it('une ligne de conteneur avec seulement la nature préremplie est vide', () => {
     expect(ligneVide({ ...vide, genre: 'conteneur', nature: 'import' })).toBe(true)
+  })
+})
+
+describe('AGS aller simple : 1 500 par conteneur', () => {
+  const catalogue: Prestation[] = [
+    { id: 1, libelle: 'AGS aller simple', prix: 1500, soumis_tva: false, par_conteneur: true, automatique: true, actif: true, ordre: 1 },
+    { id: 2, libelle: 'Imprimé', prix: 1000, soumis_tva: false, par_conteneur: false, automatique: false, actif: true, ordre: 2 }
+  ]
+  const agsLigne = { ...ags, quantite: 0, montant_ht: 0 }
+  const imprime = { ...ags, designation: 'Imprimé', montant_ht: 1000, prestation_id: 2 }
+
+  it('quantité = nombre de conteneurs, montant = quantité × 1 500', () => {
+    const lignes = [conteneur, { ...conteneur, num_conteneur: 'TGHU 2', type_conteneur: '40' }, agsLigne, imprime]
+    const r = appliquerPrestationsParConteneur(lignes, catalogue)
+    expect(r[2]).toMatchObject({ quantite: 2, montant_ht: 3000 })
+    expect(r[3]).toBe(imprime)
+  })
+
+  it('cas obligatoire : 1 conteneur → AGS 1 500', () => {
+    const r = appliquerPrestationsParConteneur([conteneur, agsLigne, imprime], catalogue)
+    expect(r[1].montant_ht).toBe(1500)
+  })
+
+  it('les lignes de conteneur vides ne comptent pas ; rien ne change si déjà à jour', () => {
+    const lignes = [conteneur, { ...vide, genre: 'conteneur' as const }]
+    expect(nombreConteneurs(lignes)).toBe(1)
+    const ajour = [conteneur, { ...agsLigne, quantite: 1, montant_ht: 1500 }]
+    expect(appliquerPrestationsParConteneur(ajour, catalogue)).toBe(ajour)
+  })
+
+  it('prestation retirée du catalogue : garde le prix unitaire déjà appliqué', () => {
+    const r = appliquerPrestationsParConteneur(
+      [conteneur, conteneur, conteneur, { ...agsLigne, quantite: 2, montant_ht: 3000 }],
+      []
+    )
+    expect(r[3]).toMatchObject({ quantite: 3, montant_ht: 4500 })
+  })
+
+  it('lignes ajoutées d’office à une nouvelle facture', () => {
+    expect(lignesAutomatiques(catalogue)).toEqual([
+      expect.objectContaining({ designation: 'AGS aller simple', prestation_id: 1, soumis_tva: false, quantite: 0 })
+    ])
   })
 })

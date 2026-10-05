@@ -14,6 +14,8 @@ export interface LigneSaisie {
   designation: string
   montant_ht: number
   soumis_tva: boolean
+  /** Quantité (nombre de conteneurs pour une prestation par conteneur, 1 sinon). */
+  quantite: number
   /** Prestation du catalogue dont la ligne est issue. */
   prestation_id: number | null
   /**

@@ -8,7 +8,13 @@ import {
   TrashIcon
 } from '@phosphor-icons/react'
 import type { Facture, FactureSaisie, LigneSaisie, Referentiels } from '@shared/factures'
-import { aujourdhui, estLigneConteneur, ligneVide } from '../../../core/facture'
+import {
+  appliquerPrestationsParConteneur,
+  aujourdhui,
+  estLigneConteneur,
+  lignesAutomatiques,
+  ligneVide
+} from '../../../core/facture'
 import { calculerTotaux } from '../../../core/tva'
 import { Champ } from '../components/ui/Champ'
 import Confirmation from '../components/ui/Confirmation'
@@ -40,7 +46,11 @@ function saisieVierge(ref: Referentiels | null): FactureSaisie {
     date: aujourdhui(),
     num_bl: '',
     notes: '',
-    lignes: [{ ...LIGNE_CONTENEUR, nature: ref?.natures[0]?.code ?? null }]
+    // Un premier conteneur, et les prestations ajoutées d'office (AGS aller simple…).
+    lignes: appliquerPrestationsParConteneur(
+      [{ ...LIGNE_CONTENEUR, nature: ref?.natures[0]?.code ?? null }, ...lignesAutomatiques(ref?.prestations ?? [])],
+      ref?.prestations ?? []
+    )
   }
 }
 
@@ -60,6 +70,7 @@ function versSaisie(f: Facture): FactureSaisie {
       designation: l.designation,
       montant_ht: l.montant_ht,
       soumis_tva: l.soumis_tva,
+      quantite: l.quantite,
       prestation_id: l.prestation_id
     }))
   }

@@ -13,11 +13,11 @@ let b: number
 
 const tc = (type: string, zone: string, montant: number): LigneSaisie => ({
   num_conteneur: 'X', type_conteneur: type, zone, nature: 'import', designation: '',
-  montant_ht: montant, soumis_tva: true, prestation_id: null
+  montant_ht: montant, soumis_tva: true, quantite: 1, prestation_id: null
 })
 const ags: LigneSaisie = {
   num_conteneur: '', type_conteneur: null, zone: '', nature: null, designation: 'AGS',
-  montant_ht: 1500, soumis_tva: false, prestation_id: 1
+  montant_ht: 1500, soumis_tva: false, quantite: 1, prestation_id: 1
 }
 const facture = (client: number, date: string, lignes: LigneSaisie[]): FactureSaisie => ({
   id: null, client_id: client, date, num_bl: '', notes: '', lignes

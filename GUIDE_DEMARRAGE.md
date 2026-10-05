@@ -188,16 +188,60 @@ Si une erreur s'affiche dans PowerShell, **copiez le message d'erreur complet** 
 
 ---
 
+## Installer l'application sur un PC (fichier .exe)
+
+L'installateur Windows est fabriqué **automatiquement par GitHub** (GitHub Actions) à chaque mise à jour
+de la branche `main`. Vous n'avez rien à compiler.
+
+### Récupérer l'installateur
+
+- **Version officielle** : sur https://github.com/NianeDIOP/trans_logistic/releases, ouvrez la dernière
+  version et téléchargez `2M-Facturation-Setup-x.y.z.exe`.
+- **Dernière version de travail** : onglet **Actions** du dépôt → dernier passage vert de
+  « Tests et installateur Windows » → en bas de la page, section **Artifacts** →
+  `2M-Facturation-Setup` (fichier .zip contenant le .exe).
+
+### Installer
+
+1. Double-cliquez sur `2M-Facturation-Setup-x.y.z.exe`.
+2. Windows peut afficher « Windows a protégé votre ordinateur » : l'installateur n'est pas signé par un
+   certificat payant. Cliquez sur **Informations complémentaires** puis **Exécuter quand même**.
+3. Suivez l'assistant (choix du dossier, raccourci sur le Bureau et dans le menu Démarrer).
+
+Pour **mettre à jour**, installez simplement la nouvelle version par-dessus : les factures sont conservées.
+
+### Où sont les données ?
+
+- Base des factures : `%APPDATA%\2M Facturation\trans_logistic.db`
+- PDF des factures validées : `%APPDATA%\2M Facturation\factures\<année>\`
+- Sauvegardes automatiques (une par jour, 10 conservées) : `%APPDATA%\2M Facturation\sauvegardes\`
+
+Les données ne sont **pas supprimées** à la désinstallation.
+
+### Sauvegarder (important)
+
+Dans **Paramètres → Sauvegarde** :
+
+- **Choisir le dossier et sauvegarder** : copie complète vers une clé USB, un disque externe ou un dossier
+  Google Drive / OneDrive. À faire **chaque semaine** au minimum.
+- **Restaurer une sauvegarde** : remplace les données par celles d'une sauvegarde (une copie de sécurité
+  des données actuelles est faite avant), puis l'application redémarre.
+
+Pour installer l'application sur un **nouveau PC** : installez-la, puis restaurez la dernière sauvegarde.
+Le logo et le cachet personnalisés sont à choisir de nouveau dans Paramètres → Société.
+
+---
+
 ## Commandes utiles
 
 | Commande | Rôle |
 |---|---|
 | `git pull` | Récupérer les derniers changements depuis GitHub |
 | `git status` | Voir les fichiers modifiés localement |
-| `npm install` | Installer les dépendances |
+| `npm install` | Installer les dépendances (télécharge aussi Electron) |
 | `npm run dev` | Lancer l'application en mode développement |
 | `npm test` | Lancer les tests |
-| `npm run dist` | Créer l'installateur Windows (.exe) dans `release/` |
+| `npm run dist` | Créer l'installateur Windows (.exe) dans `release/` (fait automatiquement par GitHub) |
 
 ---
 
@@ -243,11 +287,11 @@ Faites toujours `git pull` **avant** de modifier, pour éviter les conflits avec
 
 Cochez au fur et à mesure (la même liste existe dans CLAUDE.md, que Claude met à jour) :
 
-- [ ] Étapes 1 à 5 : installation et connexion
-- [ ] Phase 1 — Squelette et écran d'accueil
-- [ ] Phase 2 — Calculs, montant en lettres, numérotation
-- [ ] Phase 3 — Paramètres
-- [ ] Phase 4 — Nouvelle facture et PDF
-- [ ] Phase 5 — Historique, paiements, avoirs
-- [ ] Phase 6 — Tableau de bord
-- [ ] Phase 7 — Sauvegarde, installateur, GitHub Actions
+- [x] Étapes 1 à 5 : installation et connexion
+- [x] Phase 1 — Squelette et écran d'accueil
+- [x] Phase 2 — Calculs, montant en lettres, numérotation
+- [x] Phase 3 — Paramètres
+- [x] Phase 4 — Nouvelle facture et PDF
+- [x] Phase 5 — Historique, paiements, avoirs
+- [x] Phase 6 — Tableau de bord
+- [x] Phase 7 — Sauvegarde, installateur, GitHub Actions

@@ -1,7 +1,7 @@
 {
   "name": "trans-logistic",
   "productName": "2M Facturation",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Facturation du transport de conteneurs — 2M Logistique et Transport",
   "private": true,
   "author": "2M Logistique et Transport",
@@ -13,7 +13,7 @@
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
     "test": "vitest run",
-    "dist": "npm run build && electron-builder --win"
+    "dist": "npm run build && electron-builder --win --publish never"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3"

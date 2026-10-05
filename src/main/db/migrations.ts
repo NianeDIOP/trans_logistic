@@ -269,6 +269,22 @@ export const MIGRATIONS: Migration[] = [
         UPDATE factures SET taux_tva = (SELECT taux_tva FROM entreprise WHERE id = 1);
       `)
     }
+  },
+  {
+    version: 4,
+    description: 'Prestations facturées par conteneur (AGS) et ajoutées automatiquement',
+    up: (db) => {
+      db.exec(`
+        -- par_conteneur : montant = prix unitaire × nombre de conteneurs de la facture.
+        ALTER TABLE prestations ADD COLUMN par_conteneur INTEGER NOT NULL DEFAULT 0 CHECK (par_conteneur IN (0, 1));
+        -- automatique : ajoutée d'office à chaque nouvelle facture.
+        ALTER TABLE prestations ADD COLUMN automatique INTEGER NOT NULL DEFAULT 0 CHECK (automatique IN (0, 1));
+        UPDATE prestations SET par_conteneur = 1, automatique = 1 WHERE libelle = 'AGS aller simple';
+
+        -- Quantité de la ligne (nombre de conteneurs pour une prestation par conteneur).
+        ALTER TABLE lignes ADD COLUMN quantite INTEGER NOT NULL DEFAULT 1;
+      `)
+    }
   }
 ]
 

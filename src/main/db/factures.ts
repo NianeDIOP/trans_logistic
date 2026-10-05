@@ -131,8 +131,8 @@ export function enregistrerBrouillon(db: SqlDatabase, saisie: FactureSaisie): Fa
 
     const inserer = db.prepare(
       `INSERT INTO lignes (facture_id, ordre, num_conteneur, type_conteneur, type_libelle, zone, nature,
-         nature_libelle, designation, montant_ht, soumis_tva, prestation_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+         nature_libelle, designation, montant_ht, soumis_tva, prestation_id, quantite)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     saisie.lignes
       .filter((l) => !ligneVide(l))
@@ -149,7 +149,8 @@ export function enregistrerBrouillon(db: SqlDatabase, saisie: FactureSaisie): Fa
           l.designation.trim(),
           l.montant_ht,
           l.soumis_tva ? 1 : 0,
-          l.prestation_id
+          l.prestation_id,
+          Number.isSafeInteger(l.quantite) && l.quantite >= 0 ? l.quantite : 1
         )
       })
 

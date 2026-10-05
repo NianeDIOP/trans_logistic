@@ -1,6 +1,6 @@
 import { PlusIcon, ShippingContainerIcon, TrashIcon } from '@phosphor-icons/react'
 import type { LigneSaisie, Referentiels } from '@shared/factures'
-import { estLigneConteneur } from '../../../../core/facture'
+import { appliquerPrestationsParConteneur, estLigneConteneur } from '../../../../core/facture'
 import { formatMontant } from '../../../../core/montants'
 import { SaisieMontant } from '../../components/ui/Champ'
 
@@ -13,6 +13,7 @@ export const LIGNE_CONTENEUR: LigneSaisie = {
   designation: '',
   montant_ht: 0,
   soumis_tva: true,
+  quantite: 1,
   prestation_id: null
 }
 
@@ -29,7 +30,12 @@ function prixGrille(ref: Referentiels, zone: string, type: string | null): numbe
   return ref.zones.find((z) => z.zone === zone)?.prix[type]
 }
 
-export default function TableauLignes({ lignes, referentiels, erreurs, onChange }: Props): React.JSX.Element {
+export default function TableauLignes({ lignes, referentiels, erreurs, onChange: transmettre }: Props): React.JSX.Element {
+  // Toute modification recalcule les prestations facturées par conteneur (AGS…).
+  const onChange = (suivantes: LigneSaisie[]): void =>
+    transmettre(appliquerPrestationsParConteneur(suivantes, referentiels.prestations))
+  const parConteneur = (l: LigneSaisie): boolean =>
+    l.prestation_id !== null && Boolean(referentiels.prestations.find((p) => p.id === l.prestation_id)?.par_conteneur)
   const maj = (index: number, modif: Partial<LigneSaisie>): void => {
     const suivante = { ...lignes[index], ...modif }
     // Préremplissage : zone + type connus dans la grille → prix HT, soumis à TVA.
@@ -63,6 +69,8 @@ export default function TableauLignes({ lignes, referentiels, erreurs, onChange 
   const ajouterPrestation = (id: number): void => {
     const p = referentiels.prestations.find((x) => x.id === id)
     if (!p) return
+    // Une prestation par conteneur couvre déjà tous les conteneurs : pas de doublon.
+    if (p.par_conteneur && lignes.some((l) => l.prestation_id === p.id)) return
     onChange([
       ...lignes,
       {
@@ -70,15 +78,16 @@ export default function TableauLignes({ lignes, referentiels, erreurs, onChange 
         genre: 'frais',
         type_conteneur: null,
         designation: p.libelle,
-        montant_ht: p.prix,
+        montant_ht: p.par_conteneur ? 0 : p.prix,
         soumis_tva: p.soumis_tva,
+        quantite: p.par_conteneur ? 0 : 1,
         prestation_id: p.id
       }
     ])
   }
 
   const ajouterLibre = (): void => {
-    onChange([...lignes, { ...LIGNE_CONTENEUR, genre: 'frais', type_conteneur: null, soumis_tva: true }])
+    onChange([...lignes, { ...LIGNE_CONTENEUR, genre: 'frais', type_conteneur: null, soumis_tva: true, quantite: 1 }])
     requestAnimationFrame(() => {
       const champs = document.querySelectorAll<HTMLInputElement>('.lignes-saisie .champ-designation')
       champs[champs.length - 1]?.focus()
@@ -189,16 +198,27 @@ export default function TableauLignes({ lignes, referentiels, erreurs, onChange 
                         onChange={(e) => maj(i, { designation: e.target.value })}
                         aria-label={`Désignation, ligne ${i + 1}`}
                       />
+                      {parConteneur(l) && (
+                        <span className="ligne-quantite" title="Calculé automatiquement : un montant par conteneur">
+                          × {l.quantite} conteneur{l.quantite > 1 ? 's' : ''}
+                        </span>
+                      )}
                     </div>
                   </td>
                 )}
                 <td>
+                  {parConteneur(l) ? (
+                    <div className="montant-calcule" title={`${l.quantite} × ${formatMontant(l.quantite ? l.montant_ht / l.quantite : 0)}`}>
+                      {formatMontant(l.montant_ht)} <span>FCFA</span>
+                    </div>
+                  ) : (
                   <SaisieMontant
                     valeur={l.montant_ht}
                     onChange={(v) => maj(i, { montant_ht: v ?? 0 })}
                     className="saisie-compacte"
                     aria-label={`Montant HT, ligne ${i + 1}`}
                   />
+                  )}
                 </td>
                 <td className="col-tva">
                   <input
@@ -244,10 +264,20 @@ export default function TableauLignes({ lignes, referentiels, erreurs, onChange 
         </button>
         <span className="lignes-ajout-sep" />
         {referentiels.prestations.map((p) => (
-          <button key={p.id} type="button" className="puce" onClick={() => ajouterPrestation(p.id)} title={p.soumis_tva ? 'Soumis à TVA' : 'Hors TVA'}>
+          <button
+            key={p.id}
+            type="button"
+            className="puce"
+            onClick={() => ajouterPrestation(p.id)}
+            disabled={p.par_conteneur && lignes.some((l) => l.prestation_id === p.id)}
+            title={`${p.soumis_tva ? 'Soumis à TVA' : 'Hors TVA'}${p.par_conteneur ? ' · par conteneur' : ''}`}
+          >
             <PlusIcon size={13} weight="bold" />
             {p.libelle}
-            <span className="puce-prix">{formatMontant(p.prix)}</span>
+            <span className="puce-prix">
+              {formatMontant(p.prix)}
+              {p.par_conteneur ? ' / TC' : ''}
+            </span>
           </button>
         ))}
         <button type="button" className="puce puce-discrete" onClick={ajouterLibre}>

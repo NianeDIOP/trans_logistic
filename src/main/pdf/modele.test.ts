@@ -24,7 +24,7 @@ const entreprise: Entreprise = {
 const ligne = {
   id: 1, ordre: 0, prestation_id: null, num_conteneur: 'MSCU 1234567', type_conteneur: '20',
   type_libelle: "20'", zone: 'Dakar Zone 1', nature: 'import', nature_libelle: 'Import',
-  designation: '', montant_ht: 70000, soumis_tva: true
+  designation: '', montant_ht: 70000, soumis_tva: true, quantite: 1
 }
 
 const facture: Facture = {
@@ -105,5 +105,13 @@ describe('avoir', () => {
     expect(html).toContain('Motif : Erreur de zone')
     expect(html).toContain('Montant de l’avoir')
     expect(html).toContain('Arrêté le présent avoir')
+  })
+})
+
+describe('prestation par conteneur', () => {
+  it('affiche le détail « N conteneurs × prix »', () => {
+    const f = { ...facture, lignes: [facture.lignes[0], { ...facture.lignes[1], quantite: 3, montant_ht: 4500 }] }
+    const html = modeleFacture(f, entreprise, ressources).html.replace(/&nbsp;/g, ' ')
+    expect(html).toContain('AGS aller simple <span class="quantite">— 3 conteneurs × 1 500</span>')
   })
 })
