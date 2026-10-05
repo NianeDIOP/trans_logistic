@@ -132,6 +132,120 @@ export const MIGRATIONS: Migration[] = [
         '2M'
       )
     }
+  },
+  {
+    version: 2,
+    description: 'Tables de paramétrage (prestations, listes) et désactivation',
+    up: (db) => {
+      db.exec(`
+        -- Référentiels paramétrables
+        CREATE TABLE prestations (
+          id         INTEGER PRIMARY KEY AUTOINCREMENT,
+          libelle    TEXT NOT NULL,
+          prix       INTEGER NOT NULL DEFAULT 0,
+          soumis_tva INTEGER NOT NULL DEFAULT 0 CHECK (soumis_tva IN (0, 1)),
+          actif      INTEGER NOT NULL DEFAULT 1 CHECK (actif IN (0, 1)),
+          ordre      INTEGER NOT NULL DEFAULT 0
+        );
+
+        CREATE TABLE types_conteneurs (
+          id      INTEGER PRIMARY KEY AUTOINCREMENT,
+          code    TEXT NOT NULL UNIQUE,
+          libelle TEXT NOT NULL,
+          actif   INTEGER NOT NULL DEFAULT 1 CHECK (actif IN (0, 1)),
+          ordre   INTEGER NOT NULL DEFAULT 0
+        );
+
+        CREATE TABLE natures (
+          id      INTEGER PRIMARY KEY AUTOINCREMENT,
+          code    TEXT NOT NULL UNIQUE,
+          libelle TEXT NOT NULL,
+          actif   INTEGER NOT NULL DEFAULT 1 CHECK (actif IN (0, 1)),
+          ordre   INTEGER NOT NULL DEFAULT 0
+        );
+
+        CREATE TABLE modes_paiement (
+          id      INTEGER PRIMARY KEY AUTOINCREMENT,
+          code    TEXT NOT NULL UNIQUE,
+          libelle TEXT NOT NULL,
+          actif   INTEGER NOT NULL DEFAULT 1 CHECK (actif IN (0, 1)),
+          ordre   INTEGER NOT NULL DEFAULT 0
+        );
+
+        INSERT INTO prestations (libelle, prix, soumis_tva, ordre) VALUES
+          ('AGS aller simple', 1500, 0, 1),
+          ('Imprimé', 1000, 0, 2);
+
+        INSERT INTO types_conteneurs (code, libelle, ordre) VALUES
+          ('20', '20''', 1),
+          ('40', '40''', 2);
+
+        INSERT INTO natures (code, libelle, ordre) VALUES
+          ('import', 'Import', 1),
+          ('export', 'Export', 2);
+
+        INSERT INTO modes_paiement (code, libelle, ordre) VALUES
+          ('especes', 'Espèces', 1),
+          ('cheque', 'Chèque', 2),
+          ('virement', 'Virement', 3),
+          ('wave', 'Wave', 4),
+          ('orange_money', 'Orange Money', 5);
+
+        -- Désactivation au lieu de suppression
+        ALTER TABLE clients ADD COLUMN actif INTEGER NOT NULL DEFAULT 1 CHECK (actif IN (0, 1));
+
+        -- Mentions de bas de facture
+        ALTER TABLE entreprise ADD COLUMN mentions TEXT NOT NULL DEFAULT '';
+
+        -- Les types, natures et modes deviennent paramétrables : on retire les listes figées (CHECK)
+        -- en reconstruisant les tables concernées (aucune autre table ne les référence).
+        CREATE TABLE zones_tarifs_v2 (
+          id             INTEGER PRIMARY KEY AUTOINCREMENT,
+          zone           TEXT NOT NULL,
+          type_conteneur TEXT NOT NULL,
+          prix           INTEGER NOT NULL,
+          actif          INTEGER NOT NULL DEFAULT 1 CHECK (actif IN (0, 1)),
+          UNIQUE (zone, type_conteneur)
+        );
+        INSERT INTO zones_tarifs_v2 (id, zone, type_conteneur, prix)
+          SELECT id, zone, type_conteneur, prix FROM zones_tarifs;
+        DROP TABLE zones_tarifs;
+        ALTER TABLE zones_tarifs_v2 RENAME TO zones_tarifs;
+
+        CREATE TABLE lignes_v2 (
+          id             INTEGER PRIMARY KEY AUTOINCREMENT,
+          facture_id     INTEGER NOT NULL REFERENCES factures(id) ON DELETE CASCADE,
+          ordre          INTEGER NOT NULL DEFAULT 0,
+          num_conteneur  TEXT NOT NULL DEFAULT '',
+          type_conteneur TEXT,
+          zone           TEXT NOT NULL DEFAULT '',
+          nature         TEXT,
+          designation    TEXT NOT NULL DEFAULT '',
+          montant_ht     INTEGER NOT NULL DEFAULT 0,
+          soumis_tva     INTEGER NOT NULL DEFAULT 1 CHECK (soumis_tva IN (0, 1))
+        );
+        INSERT INTO lignes_v2 SELECT * FROM lignes;
+        DROP TABLE lignes;
+        ALTER TABLE lignes_v2 RENAME TO lignes;
+        CREATE INDEX idx_lignes_facture ON lignes(facture_id);
+
+        CREATE TABLE paiements_v2 (
+          id         INTEGER PRIMARY KEY AUTOINCREMENT,
+          facture_id INTEGER NOT NULL REFERENCES factures(id),
+          date       TEXT NOT NULL,
+          montant    INTEGER NOT NULL,
+          mode       TEXT NOT NULL,
+          reference  TEXT NOT NULL DEFAULT ''
+        );
+        INSERT INTO paiements_v2 SELECT * FROM paiements;
+        DROP TABLE paiements;
+        ALTER TABLE paiements_v2 RENAME TO paiements;
+        CREATE INDEX idx_paiements_facture ON paiements(facture_id);
+
+        -- Exemple de tarif du cahier des charges (modifiable)
+        INSERT OR IGNORE INTO zones_tarifs (zone, type_conteneur, prix) VALUES ('Dakar Zone 1', '20', 70000);
+      `)
+    }
   }
 ]
 

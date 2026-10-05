@@ -575,3 +575,873 @@ kbd {
   font-size: 13px;
   color: var(--texte-3) !important;
 }
+
+/* =====================================================================
+ * Composants de formulaire et Paramètres
+ * ===================================================================== */
+
+/* ---------- Boutons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-family: var(--police-titre);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s,
+    opacity 0.15s;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.btn-primaire {
+  background: var(--degrade-bleu);
+  color: #fff;
+  box-shadow: 0 2px 6px rgb(18 56 154 / 25%);
+}
+
+.btn-primaire:not(:disabled):hover {
+  box-shadow: 0 4px 12px rgb(18 56 154 / 35%);
+}
+
+.btn-secondaire {
+  border-color: var(--filet);
+  background: var(--blanc);
+  color: var(--bleu);
+}
+
+.btn-secondaire:not(:disabled):hover {
+  border-color: var(--bleu-roi);
+  background: var(--bleu-pale);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: #951f19;
+}
+
+.btn-fantome {
+  background: transparent;
+  color: var(--texte-2);
+}
+
+.btn-fantome:hover {
+  color: var(--danger);
+}
+
+.btn-icone {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--texte-2);
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.btn-icone:hover {
+  background: var(--bleu-pale);
+  color: var(--bleu-roi);
+}
+
+.btn-icone-danger:hover {
+  background: #fbeceb;
+  color: var(--danger);
+}
+
+/* ---------- Champs ---------- */
+
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.champ label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texte);
+}
+
+.champ-obligatoire {
+  color: var(--or-fonce);
+}
+
+.saisie {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--filet);
+  border-radius: 8px;
+  background: var(--blanc);
+  font: inherit;
+  font-size: 14.5px;
+  color: var(--texte);
+  user-select: text;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+textarea.saisie {
+  height: auto;
+  padding: 10px 12px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.saisie::placeholder {
+  color: var(--texte-3);
+}
+
+.saisie:hover {
+  border-color: #c3cde3;
+}
+
+.saisie:focus {
+  border-color: var(--bleu-roi);
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(31 86 207 / 15%);
+}
+
+.champ-erreur .saisie,
+.saisie-invalide {
+  border-color: var(--danger);
+}
+
+.champ-erreur .saisie:focus {
+  box-shadow: 0 0 0 3px rgb(179 38 30 / 12%);
+}
+
+.champ-message {
+  font-size: 12.5px;
+  color: var(--danger);
+}
+
+.champ-aide {
+  font-size: 12.5px;
+  color: var(--texte-3);
+}
+
+.saisie-montant {
+  position: relative;
+}
+
+.saisie-montant .saisie {
+  padding-right: 56px;
+  text-align: right;
+}
+
+.saisie-unite {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--texte-3);
+  pointer-events: none;
+}
+
+.grille-champs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+}
+
+.grille-une-colonne {
+  grid-template-columns: 1fr;
+}
+
+.pleine-largeur {
+  grid-column: 1 / -1;
+}
+
+.interrupteur {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--texte-2);
+  cursor: pointer;
+}
+
+.interrupteur input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--bleu-roi);
+}
+
+/* Choix du régime de TVA */
+.choix-tva {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.choix-tva button {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--filet);
+  border-radius: 10px;
+  background: var(--blanc);
+  text-align: left;
+}
+
+.choix-tva button strong {
+  font-family: var(--police-titre);
+  font-size: 13.5px;
+  color: var(--bleu-marine);
+}
+
+.choix-tva button span {
+  font-size: 12.5px;
+  color: var(--texte-3);
+}
+
+.choix-tva button.actif {
+  border-color: var(--bleu-roi);
+  background: var(--bleu-pale);
+  box-shadow: 0 0 0 3px rgb(31 86 207 / 10%);
+}
+
+/* ---------- Divers ---------- */
+
+.texte-discret {
+  font-size: 13px;
+  color: var(--texte-3);
+}
+
+.texte-modifie {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--or-fonce);
+}
+
+.chargement {
+  padding: 40px;
+  color: var(--texte-3);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 11px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-actif,
+.badge-tva {
+  background: var(--bleu-pale);
+  color: var(--bleu);
+}
+
+.badge-hors-tva {
+  background: #fdf3dc;
+  color: #8a5d00;
+}
+
+.badge-inactif {
+  background: #eef0f4;
+  color: var(--texte-3);
+}
+
+.pastille {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--degrade-bleu);
+  color: var(--or);
+}
+
+/* ---------- Écran Paramètres ---------- */
+
+.parametres {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+}
+
+.parametres-nav {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  min-height: calc(100vh - var(--barre-titre) - 73px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 24px 16px;
+  border-right: 1px solid var(--filet);
+  background: var(--blanc);
+}
+
+.parametres-lien {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font-family: var(--police-titre);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--texte-2);
+  text-align: left;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.parametres-lien svg {
+  color: var(--texte-3);
+}
+
+.parametres-lien:hover {
+  background: var(--fond);
+  color: var(--bleu-marine);
+}
+
+.parametres-lien.actif {
+  position: relative;
+  background: var(--bleu-pale);
+  color: var(--bleu-marine);
+}
+
+.parametres-lien.actif svg {
+  color: var(--bleu-roi);
+}
+
+.parametres-lien.actif::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--degrade-or);
+}
+
+.parametres-contenu {
+  min-width: 0;
+  padding: 28px 40px 48px;
+}
+
+.onglet {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1040px;
+}
+
+.section-entete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.section-entete h2 {
+  font-family: var(--police-titre);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--bleu-marine);
+}
+
+.section-entete p {
+  max-width: 64ch;
+  margin-top: 4px;
+  color: var(--texte-2);
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.carte {
+  padding: 22px 24px;
+  border: 1px solid var(--filet);
+  border-radius: var(--rayon);
+  background: var(--blanc);
+  box-shadow: var(--ombre);
+}
+
+.carte-titre {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 18px;
+  font-family: var(--police-titre);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bleu-marine);
+}
+
+.carte-titre::before {
+  content: '';
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--degrade-or);
+}
+
+.carte-tableau {
+  padding: 0;
+  overflow: hidden;
+}
+
+.barre-outils {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.recherche {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  max-width: 460px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--filet);
+  border-radius: 8px;
+  background: var(--blanc);
+  color: var(--texte-3);
+}
+
+.recherche:focus-within {
+  border-color: var(--bleu-roi);
+  box-shadow: 0 0 0 3px rgb(31 86 207 / 15%);
+}
+
+.recherche input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  color: var(--texte);
+  user-select: text;
+}
+
+/* Tableaux */
+
+.tableau {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.tableau th {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--filet);
+  background: #f7f9fd;
+  font-family: var(--police-titre);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texte-2);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tableau td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eef1f7;
+  vertical-align: middle;
+  color: var(--texte-2);
+}
+
+.tableau td strong {
+  font-weight: 600;
+  color: var(--texte);
+}
+
+.tableau tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.tableau tbody tr {
+  transition: background-color 0.1s;
+}
+
+.tableau tbody tr:hover {
+  background: #f7f9fd;
+}
+
+.sous-ligne {
+  display: block;
+  font-size: 12.5px;
+  color: var(--texte-3);
+}
+
+.col-montant {
+  text-align: right !important;
+  white-space: nowrap;
+}
+
+.col-montant .unite {
+  font-size: 11.5px;
+  color: var(--texte-3);
+}
+
+.col-actions {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.col-actions .badge {
+  margin-right: 8px;
+}
+
+.ligne-inactive td,
+.ligne-inactive .liste-libelle {
+  opacity: 0.55;
+}
+
+.vide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 24px;
+  color: var(--texte-3);
+  text-align: center;
+}
+
+.vide svg {
+  color: var(--bleu-roi);
+}
+
+/* Logo et cachet */
+
+.grille-images {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 14px;
+}
+
+.bloc-image {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.bloc-image-apercu {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 150px;
+  height: 100px;
+  padding: 8px;
+  border: 1px dashed #c3cde3;
+  border-radius: 10px;
+  background:
+    repeating-conic-gradient(#f4f6fa 0% 25%, #fff 0% 50%) 50% / 16px 16px;
+}
+
+.bloc-image-apercu img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.image-defaut {
+  opacity: 0.85;
+}
+
+.bloc-image-vide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--texte-3);
+}
+
+.bloc-image-infos {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bloc-image-infos strong {
+  font-family: var(--police-titre);
+  font-size: 14px;
+  color: var(--bleu-marine);
+}
+
+.bloc-image-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.bloc-image-actions .btn {
+  height: 34px;
+  padding: 0 12px;
+}
+
+/* Listes */
+
+.grille-listes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1250px) {
+  .grille-listes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.carte-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+}
+
+.carte-liste-entete {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.carte-liste-entete h3 {
+  margin: 0;
+  font-family: var(--police-titre);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--bleu-marine);
+}
+
+.liste-elements {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #eef1f7;
+}
+
+.liste-elements li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 4px 0 4px 4px;
+  border-bottom: 1px solid #eef1f7;
+}
+
+.liste-libelle {
+  flex: 1;
+  font-weight: 600;
+}
+
+.liste-actions {
+  display: flex;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.liste-elements li:hover .liste-actions,
+.liste-actions:focus-within {
+  opacity: 1;
+}
+
+.liste-ajout {
+  display: flex;
+  gap: 8px;
+}
+
+.liste-ajout .btn {
+  height: 40px;
+}
+
+/* ---------- Fenêtre modale ---------- */
+
+.modale-fond {
+  position: fixed;
+  inset: var(--barre-titre) 0 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(6 22 64 / 45%);
+  animation: apparition 0.15s ease-out;
+}
+
+.modale {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 14px;
+  background: var(--blanc);
+  box-shadow: 0 24px 64px rgb(6 22 64 / 35%);
+  animation: montee 0.18s ease-out;
+}
+
+.modale-entete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px 4px;
+}
+
+.modale-entete h2 {
+  font-family: var(--police-titre);
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--bleu-marine);
+}
+
+.modale-entete p {
+  margin-top: 4px;
+  font-size: 13.5px;
+  color: var(--texte-2);
+}
+
+.modale-corps {
+  padding: 18px 24px 22px;
+  overflow: auto;
+}
+
+.modale-pied {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid #eef1f7;
+  border-radius: 0 0 14px 14px;
+  background: #f9fafd;
+}
+
+.confirmation-texte {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--texte-2);
+}
+
+@keyframes apparition {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes montee {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+/* ---------- Notifications ---------- */
+
+.notifications {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 300px;
+  max-width: 440px;
+  padding: 12px 12px 12px 16px;
+  border-left: 4px solid var(--bleu-roi);
+  border-radius: 10px;
+  background: var(--bleu-nuit);
+  color: #fff;
+  font-size: 14px;
+  box-shadow: 0 12px 32px rgb(6 22 64 / 30%);
+  animation: montee 0.2s ease-out;
+}
+
+.notification span {
+  flex: 1;
+}
+
+.notification-succes {
+  border-left-color: var(--or);
+}
+
+.notification-succes svg {
+  color: var(--or);
+}
+
+.notification-erreur {
+  border-left-color: #ff6b5f;
+}
+
+.notification-erreur svg {
+  color: #ff8a80;
+}
+
+.notification-fermer {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: rgb(255 255 255 / 60%);
+}
+
+.notification-fermer:hover {
+  background: rgb(255 255 255 / 12%);
+  color: #fff;
+}

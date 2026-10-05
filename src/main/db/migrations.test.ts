@@ -82,4 +82,29 @@ describe('runMigrations', () => {
       )
     ).toThrow()
   })
+
+  it('la migration 2 conserve les données existantes', () => {
+    const db = newDb()
+    runMigrations(db, MIGRATIONS.filter((m) => m.version === 1))
+    db.exec(`
+      INSERT INTO clients (id, raison_sociale) VALUES (1, 'Client');
+      INSERT INTO factures (id, date, client_id) VALUES (1, '2026-01-01', 1);
+      INSERT INTO lignes (facture_id, type_conteneur, nature, montant_ht) VALUES (1, '20', 'import', 70000);
+      INSERT INTO paiements (facture_id, date, montant, mode) VALUES (1, '2026-01-02', 85100, 'wave');
+      INSERT INTO zones_tarifs (zone, type_conteneur, prix) VALUES ('Thiès', '40', 150000);
+    `)
+
+    expect(runMigrations(db)).toBe(2)
+    expect(db.prepare('SELECT montant_ht, nature FROM lignes').get()).toEqual({
+      montant_ht: 70000,
+      nature: 'import'
+    })
+    expect(db.prepare('SELECT montant, mode FROM paiements').get()).toEqual({ montant: 85100, mode: 'wave' })
+    expect(db.prepare("SELECT prix, actif FROM zones_tarifs WHERE zone = 'Thiès'").get()).toEqual({
+      prix: 150000,
+      actif: 1
+    })
+    expect(db.prepare('SELECT actif FROM clients').get()).toEqual({ actif: 1 })
+    expect(db.prepare('PRAGMA foreign_key_check').all()).toEqual([])
+  })
 })
