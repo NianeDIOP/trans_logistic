@@ -11,6 +11,7 @@
 
 export interface SqlStatement {
   get(...params: unknown[]): unknown
+  all(...params: unknown[]): unknown[]
   run(...params: unknown[]): unknown
 }
 
