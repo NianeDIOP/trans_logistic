@@ -223,7 +223,17 @@ npm run dist       # générer l'installateur Windows
   - Avoirs : séquence propre, format `AV-2M-2026-0001`. L'année est celle de la date de la facture.
   - `src/main/db/numerotation.ts` : `validerFacture` attribue le numéro dans une transaction
     `BEGIN IMMEDIATE` et passe la facture en « emise ».
-- [ ] Phase 3 — Paramètres (entreprise, clients, zones/tarifs, prestations, listes) — voir « principe d'automatisation »
+- [x] Phase 3 — Paramètres (entreprise, clients, zones/tarifs, prestations, listes) — voir « principe d'automatisation »
+  - Migration 2 : tables `prestations`, `types_conteneurs`, `natures`, `modes_paiement` (valeurs de départ),
+    colonnes `actif` (clients, zones_tarifs) et `entreprise.mentions` ; les CHECK figés sur type, nature et
+    mode sont retirés (tables `lignes`, `zones_tarifs`, `paiements` reconstruites).
+  - Validation des saisies : `src/core/parametres.ts`. Accès base : `src/main/db/parametres.ts`
+    (suppression → désactivation si la donnée figure déjà sur une facture).
+  - IPC : canaux `parametres:<groupe>:<action>` (`CANAUX_PARAMETRES` dans `src/shared/types.ts`), réponses
+    `{ ok, data } | { ok: false, message, erreurs }` ; côté renderer, `appel()` dans `lib/appel.ts`.
+  - Logo et cachet copiés dans `userData/images/` ; sans logo personnalisé, le logo officiel 2M s'applique.
+  - Composants réutilisables : `components/ui/` (Modale, Confirmation, Champ, ChampMontant, Notifications…).
+  - L'onglet Sauvegarde est un écran provisoire (Phase 7).
 - [ ] Phase 4 — Nouvelle facture + PDF
 - [ ] Phase 5 — Historique, statuts, paiements, avoirs
 - [ ] Phase 6 — Tableau de bord

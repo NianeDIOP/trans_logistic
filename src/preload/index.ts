@@ -1,5 +1,18 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
-import { IPC, type Api } from '../shared/types'
+import { CANAUX_PARAMETRES, IPC, type Api, type ParametresApi } from '../shared/types'
+
+/** Construit l'API des Paramètres : chaque méthode appelle le canal « parametres:<groupe>:<action> ». */
+function apiParametres(): ParametresApi {
+  const api: Record<string, Record<string, unknown>> = {}
+  for (const [groupe, actions] of Object.entries(CANAUX_PARAMETRES)) {
+    api[groupe] = {}
+    for (const action of actions) {
+      api[groupe][action] = (...args: unknown[]) =>
+        ipcRenderer.invoke(`parametres:${groupe}:${action}`, ...args)
+    }
+  }
+  return api as unknown as ParametresApi
+}
 
 const api: Api = {
   getAppInfo: () => ipcRenderer.invoke(IPC.appInfo),
@@ -14,7 +27,8 @@ const api: Api = {
       ipcRenderer.on(IPC.windowMaximizedChanged, listener)
       return () => ipcRenderer.removeListener(IPC.windowMaximizedChanged, listener)
     }
-  }
+  },
+  parametres: apiParametres()
 }
 
 contextBridge.exposeInMainWorld('api', api)

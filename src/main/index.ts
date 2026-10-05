@@ -4,6 +4,7 @@ import icon from '../../resources/icon.png?asset'
 import { IPC } from '../shared/types'
 import { closeDatabase, openDatabase } from './db'
 import { registerIpcHandlers } from './ipc'
+import { registerParametresHandlers } from './ipc-parametres'
 
 function createWindow(): void {
   const win = new BrowserWindow({
@@ -58,6 +59,7 @@ app.whenReady().then(() => {
   }
 
   registerIpcHandlers()
+  registerParametresHandlers()
   createWindow()
 
   app.on('activate', () => {
