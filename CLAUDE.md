@@ -157,7 +157,12 @@ npm run dist       # générer l'installateur Windows
 
 ## 10. Avancement
 
-- [ ] Phase 1 — Squelette Electron/React/SQLite, écran d'accueil 4 boutons
+- [x] Phase 1 — Squelette Electron/React/SQLite, écran d'accueil 4 boutons
+  - electron-vite (sortie dans `out/`), base `trans_logistic.db` dans `userData`.
+  - Migrations dans `src/main/db/migrations.ts` (table `schema_version`), testées avec `node:sqlite`
+    pour ne pas dépendre du binaire better-sqlite3 compilé pour Electron.
+  - Electron 43 (pas 44) : better-sqlite3 13 fournit des binaires précompilés pour cette version.
+  - Taux de TVA stocké en pourcentage entier (`18`).
 - [ ] Phase 2 — `src/core` : calculs TVA, montant en lettres, numérotation + tests
 - [ ] Phase 3 — Paramètres (entreprise, clients, zones/tarifs)
 - [ ] Phase 4 — Nouvelle facture + PDF

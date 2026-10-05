@@ -1,0 +1,155 @@
+:root {
+  --bleu: #0b3d6e;
+  --bleu-clair: #e8f0f8;
+  --orange: #e07b00;
+  --texte: #1f2933;
+  --gris: #6b7785;
+  --fond: #f4f6f9;
+  --blanc: #ffffff;
+  --rouge: #b42318;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: var(--texte);
+  background: var(--fond);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--fond);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Accueil */
+.accueil {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px 24px;
+}
+
+.accueil-entete {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.accueil-entete h1 {
+  margin: 0;
+  color: var(--bleu);
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+}
+
+.sous-titre {
+  margin: 8px 0 0;
+  color: var(--gris);
+}
+
+.menu-grille {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(240px, 320px));
+  gap: 24px;
+}
+
+.menu-bouton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 24px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: var(--blanc);
+  box-shadow: 0 2px 8px rgba(11, 61, 110, 0.08);
+  transition:
+    border-color 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+
+.menu-bouton:hover,
+.menu-bouton:focus-visible {
+  border-color: var(--bleu);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(11, 61, 110, 0.15);
+  outline: none;
+}
+
+.menu-icone {
+  font-size: 2.5rem;
+}
+
+.menu-titre {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--bleu);
+}
+
+.menu-description {
+  font-size: 0.9rem;
+  color: var(--gris);
+  text-align: center;
+}
+
+.accueil-pied {
+  margin-top: auto;
+  padding-top: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--gris);
+}
+
+.erreur {
+  color: var(--rouge);
+}
+
+/* Écrans */
+.ecran {
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.ecran-entete {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.ecran-entete h1 {
+  margin: 0;
+  color: var(--bleu);
+}
+
+.bouton-retour {
+  padding: 8px 16px;
+  border: 1px solid var(--bleu);
+  border-radius: 8px;
+  background: var(--blanc);
+  color: var(--bleu);
+}
+
+.bouton-retour:hover {
+  background: var(--bleu-clair);
+}
+
+.a-venir {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 64px 24px;
+  border-radius: 12px;
+  background: var(--blanc);
+  color: var(--gris);
+}
