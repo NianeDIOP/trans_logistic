@@ -15,6 +15,7 @@ import type {
 import type { Facture, FactureSaisie, Referentiels } from './factures'
 import type { FiltresHistorique, PageHistorique, Paiement, PaiementSaisie } from './historique'
 import type { TableauDeBord } from './tableau'
+import type { ApercuSauvegarde, InfosSauvegarde } from './sauvegarde'
 
 export interface Entreprise {
   id: number
@@ -148,7 +149,24 @@ export interface Api {
   parametres: ParametresApi
   factures: FacturesApi
   tableauDeBord(filtre: { du?: string; au?: string }): R<TableauDeBord>
+  sauvegarde: SauvegardeApi
 }
+
+export interface SauvegardeApi {
+  infos(): R<InfosSauvegarde>
+  /** Sauvegarde vers un dossier choisi ; chemin du fichier créé, ou null si annulé. */
+  sauvegarder(): R<string | null>
+  /** Choix d'un fichier à restaurer ; aperçu de son contenu, ou null si annulé. */
+  choisir(): R<ApercuSauvegarde | null>
+  examiner(chemin: string): R<ApercuSauvegarde>
+  /** Remplace la base et redémarre l'application. */
+  restaurer(chemin: string): R<null>
+  ouvrirDossier(): R<null>
+}
+
+export const CANAUX_SAUVEGARDE = [
+  'infos', 'sauvegarder', 'choisir', 'examiner', 'restaurer', 'ouvrirDossier'
+] as const satisfies readonly (keyof SauvegardeApi)[]
 
 /** Noms des canaux IPC. */
 export const IPC = {

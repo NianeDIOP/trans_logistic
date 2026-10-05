@@ -1,0 +1,60 @@
+name: Tests et installateur Windows
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Tests et compilation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+  installateur:
+    name: Installateur Windows (.exe)
+    needs: tests
+    if: github.event_name != 'pull_request'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Construire l'installateur
+        run: npm run dist
+        env:
+          # Pas de certificat de signature : l'installateur n'est pas signé.
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+      - name: Publier l'installateur comme artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: 2M-Facturation-Setup
+          path: release/*.exe
+          if-no-files-found: error
+          retention-days: 30
+      - name: Joindre l'installateur à la version (tag v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*.exe
+          generate_release_notes: true

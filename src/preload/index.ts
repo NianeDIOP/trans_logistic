@@ -1,11 +1,13 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import {
   CANAUX_FACTURES,
+  CANAUX_SAUVEGARDE,
   CANAUX_PARAMETRES,
   IPC,
   type Api,
   type FacturesApi,
-  type ParametresApi
+  type ParametresApi,
+  type SauvegardeApi
 } from '../shared/types'
 
 /** Construit l'API des Paramètres : chaque méthode appelle le canal « parametres:<groupe>:<action> ». */
@@ -29,6 +31,14 @@ function apiFactures(): FacturesApi {
   return api as unknown as FacturesApi
 }
 
+function apiSauvegarde(): SauvegardeApi {
+  const api: Record<string, unknown> = {}
+  for (const action of CANAUX_SAUVEGARDE) {
+    api[action] = (...args: unknown[]) => ipcRenderer.invoke(`sauvegarde:${action}`, ...args)
+  }
+  return api as unknown as SauvegardeApi
+}
+
 const api: Api = {
   getAppInfo: () => ipcRenderer.invoke(IPC.appInfo),
   getEntreprise: () => ipcRenderer.invoke(IPC.entrepriseGet),
@@ -45,7 +55,8 @@ const api: Api = {
   },
   parametres: apiParametres(),
   factures: apiFactures(),
-  tableauDeBord: (filtre) => ipcRenderer.invoke(IPC.tableauDeBord, filtre)
+  tableauDeBord: (filtre) => ipcRenderer.invoke(IPC.tableauDeBord, filtre),
+  sauvegarde: apiSauvegarde()
 }
 
 contextBridge.exposeInMainWorld('api', api)

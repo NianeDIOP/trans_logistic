@@ -267,4 +267,14 @@ npm run dist       # générer l'installateur Windows
     échelle, infobulle, vue tableau), barres horizontales en HTML, liste des impayés cliquable.
   - Couleurs des séries validées (script dataviz, fond blanc) : HT `#1f56cf`, TVA `#c48a0c`
     (l'or clair `#f2b51d` est trop pâle pour une série).
-- [ ] Phase 7 — Sauvegarde/restauration, packaging .exe, GitHub Actions
+- [x] Phase 7 — Sauvegarde/restauration, packaging .exe, GitHub Actions
+  - `src/main/sauvegarde.ts` : sauvegarde cohérente (`db.backup`) vers un dossier choisi ; sauvegarde
+    automatique au démarrage toutes les 24 h dans `userData/sauvegardes` (10 conservées) ; restauration
+    après vérification du fichier (`src/main/db/verification.ts`), copie de sécurité « avant-restauration »,
+    remplacement de la base puis redémarrage. Règles pures : `src/core/sauvegarde.ts`.
+  - Onglet Paramètres → Sauvegarde.
+  - `.github/workflows/installateur.yml` : tests + build sur Ubuntu à chaque push / PR ; installateur NSIS
+    construit sur `windows-latest` (artefact `2M-Facturation-Setup`) après chaque push sur `main`, et joint
+    à la Release GitHub pour un tag `v*`. Installateur non signé (avertissement SmartScreen).
+  - L'installateur ne se construit pas depuis Linux (module natif better-sqlite3) : passer par la CI.
+  - Version 1.0.0.
