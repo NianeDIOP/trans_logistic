@@ -1,10 +1,10 @@
-import type { ComponentType } from 'react'
 import {
-  IconHistorique,
-  IconNouvelleFacture,
-  IconParametres,
-  IconTableauDeBord
-} from './components/icons'
+  ChartLineUpIcon,
+  ClockCounterClockwiseIcon,
+  FilePlusIcon,
+  GearSixIcon,
+  type Icon
+} from '@phosphor-icons/react'
 
 export type Ecran = 'accueil' | 'nouvelle-facture' | 'historique' | 'tableau-de-bord' | 'parametres'
 
@@ -12,7 +12,7 @@ export interface EntreeMenu {
   ecran: Exclude<Ecran, 'accueil'>
   titre: string
   description: string
-  Icone: ComponentType<{ size?: number }>
+  Icone: Icon
   /** Touche utilisée avec Ctrl pour ouvrir l'écran depuis n'importe où. */
   touche: string
   phase: number
@@ -24,7 +24,7 @@ export const MENU: EntreeMenu[] = [
     ecran: 'nouvelle-facture',
     titre: 'Nouvelle facture',
     description: 'Établir une facture de transport : client, conteneurs, zones et montants.',
-    Icone: IconNouvelleFacture,
+    Icone: FilePlusIcon,
     touche: 'N',
     phase: 4
   },
@@ -32,7 +32,7 @@ export const MENU: EntreeMenu[] = [
     ecran: 'historique',
     titre: 'Historique',
     description: 'Retrouver une facture, suivre les règlements, émettre un avoir.',
-    Icone: IconHistorique,
+    Icone: ClockCounterClockwiseIcon,
     touche: 'H',
     phase: 5
   },
@@ -40,7 +40,7 @@ export const MENU: EntreeMenu[] = [
     ecran: 'tableau-de-bord',
     titre: 'Tableau de bord',
     description: "Chiffre d'affaires, TVA collectée, impayés et activité par zone.",
-    Icone: IconTableauDeBord,
+    Icone: ChartLineUpIcon,
     touche: 'T',
     phase: 6
   },
@@ -48,7 +48,7 @@ export const MENU: EntreeMenu[] = [
     ecran: 'parametres',
     titre: 'Paramètres',
     description: 'Société, clients, grille des tarifs par zone et sauvegardes.',
-    Icone: IconParametres,
+    Icone: GearSixIcon,
     touche: ',',
     phase: 3
   }

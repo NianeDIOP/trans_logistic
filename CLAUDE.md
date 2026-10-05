@@ -140,15 +140,18 @@ Gérer les migrations de schéma avec une table `schema_version`.
 - Ne jamais committer : `node_modules/`, `dist/`, `release/`, `*.db`, `.env`.
 
 ### Identité visuelle (à respecter dans tous les écrans)
-- **Aucun emoji** dans l'interface. Icônes SVG maison uniquement (`src/renderer/src/components/icons.tsx` :
-  grille 24 px, trait 1,5 px, `currentColor`). Ajouter les nouvelles icônes dans ce fichier, même style.
-- Fenêtre **sans cadre** (`frame: false`) : barre de titre et boutons Réduire / Agrandir / Fermer
-  dessinés par l'application (`TitleBar.tsx`).
-- Polices embarquées (hors ligne) : IBM Plex Sans (texte), IBM Plex Mono (numéros, montants, références).
-- Palette définie dans `styles.css` (`--encre`, `--papier`, `--signal`…) : pas de couleur en dur ailleurs.
-- Style sobre : filets fins, angles de 2 px, pas d'ombres portées ni de dégradés.
-- Logo (conteneur stylisé) : `components/Logo.tsx` et `build/icon.svg` ; icône Windows et images de
-  l'installateur dans `build/`.
+- Charte issue du **logo officiel** (`src/renderer/src/assets/logo-2m.png`, fond transparent) :
+  **bleu roi et or**. Variables dans `styles.css` (`--bleu-marine`, `--bleu-roi`, `--or`, `--degrade-or`…),
+  pas de couleur en dur ailleurs.
+- Polices embarquées (hors ligne) : **Montserrat** pour les titres (800 italique pour les grands titres,
+  comme le logo), **Source Sans 3** pour les textes et chiffres (chiffres tabulaires).
+- Icônes : **Phosphor** (`@phosphor-icons/react`, noms suffixés `Icon`, poids `duotone`), en or sur
+  pastille bleue dans les cartes et en-têtes. **Aucun emoji.**
+- Fenêtre **sans cadre** (`frame: false`) : barre de titre et boutons Réduire / Agrandir / Fermer dessinés
+  par l'application (`TitleBar.tsx`, glyphes dans `components/icons.tsx`).
+- Cartes blanches arrondies (10 px), ombre légère, filet or au survol.
+- Emblème compact « 2M » (`components/Emblem.tsx`, `build/icon.svg`) pour la barre de titre et l'icône
+  Windows ; images de l'installateur NSIS dans `build/`.
 
 ## 8. Commandes
 

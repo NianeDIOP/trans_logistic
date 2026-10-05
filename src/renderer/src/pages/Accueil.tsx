@@ -1,7 +1,14 @@
 import { useEffect, useState } from 'react'
+import {
+  ArrowRightIcon,
+  CalendarBlankIcon,
+  DatabaseIcon,
+  EnvelopeSimpleIcon,
+  MapPinIcon,
+  PhoneIcon
+} from '@phosphor-icons/react'
 import type { AppInfo, Entreprise } from '@shared/types'
-import Logo from '../components/Logo'
-import { IconBaseLocale, IconFlecheDroite } from '../components/icons'
+import logo from '../assets/logo-2m.png'
 import { MENU, type Ecran } from '../navigation'
 
 interface Props {
@@ -31,81 +38,84 @@ export default function Accueil({ onOuvrir }: Props): React.JSX.Element {
 
   return (
     <div className="accueil">
-      <aside className="identite">
-        <div className="identite-haut">
-          <Logo size={56} variante="trait" />
-          <p className="identite-raison">{entreprise?.raison_sociale ?? '2M Logistique et Transport'}</p>
-          <p className="identite-activite">Transport et logistique de conteneurs</p>
-        </div>
+      <section className="bandeau">
+        <img className="bandeau-logo" src={logo} alt="2M Logistique Transport" draggable={false} />
 
-        <p className="identite-date">{formatDate.format(new Date())}</p>
-
-        {entreprise && (
-          <dl className="identite-legal">
-            <div>
-              <dt>RC</dt>
-              <dd>{entreprise.rc}</dd>
-            </div>
-            <div>
-              <dt>NINEA</dt>
-              <dd>{entreprise.ninea}</dd>
-            </div>
-            <div>
-              <dt>Siège</dt>
-              <dd>{entreprise.siege}</dd>
-            </div>
-            <div>
-              <dt>Tél.</dt>
-              <dd>{entreprise.tel}</dd>
-            </div>
-          </dl>
-        )}
-      </aside>
-
-      <section className="espace">
-        <header className="espace-entete">
-          <p className="surtitre">Espace de travail</p>
+        <div className="bandeau-infos">
+          <p className="bandeau-date">
+            <CalendarBlankIcon size={18} weight="duotone" />
+            <span>{formatDate.format(new Date())}</span>
+          </p>
           <h1>Facturation</h1>
-        </header>
+          <p className="bandeau-accroche">Transport et logistique de conteneurs</p>
 
+          {entreprise && (
+            <ul className="bandeau-contacts">
+              <li>
+                <MapPinIcon size={16} weight="duotone" />
+                {entreprise.adresse} · Siège opérationnel : {entreprise.siege}
+              </li>
+              <li>
+                <PhoneIcon size={16} weight="duotone" />
+                {entreprise.tel}
+              </li>
+              <li>
+                <EnvelopeSimpleIcon size={16} weight="duotone" />
+                {entreprise.email}
+              </li>
+            </ul>
+          )}
+        </div>
+      </section>
+
+      <div className="accueil-corps">
         {erreur && (
           <p className="alerte" role="alert">
             Impossible de lire la base de données : {erreur}
           </p>
         )}
 
+        <h2 className="titre-section">Modules</h2>
+
         <nav className="modules" aria-label="Modules">
-          {MENU.map((m, i) => (
+          {MENU.map((m) => (
             <button key={m.ecran} className="module" onClick={() => onOuvrir(m.ecran)}>
-              <span className="module-haut">
-                <span className="module-icone">
-                  <m.Icone size={28} />
-                </span>
-                <span className="module-numero">{String(i + 1).padStart(2, '0')}</span>
+              <span className="module-icone">
+                <m.Icone size={30} weight="duotone" />
               </span>
               <span className="module-titre">{m.titre}</span>
               <span className="module-description">{m.description}</span>
               <span className="module-bas">
-                <kbd>Ctrl</kbd>
-                <kbd>{m.touche}</kbd>
-                <IconFlecheDroite size={18} className="module-fleche" />
+                <span className="module-ouvrir">
+                  Ouvrir
+                  <ArrowRightIcon size={16} weight="bold" className="module-fleche" />
+                </span>
+                <span className="module-raccourci">
+                  <kbd>Ctrl</kbd>
+                  <kbd>{m.touche}</kbd>
+                </span>
               </span>
             </button>
           ))}
         </nav>
+      </div>
 
-        <footer className="statut">
-          <span className="statut-base">
-            <IconBaseLocale size={14} />
-            Données enregistrées sur cet ordinateur
+      <footer className="statut">
+        <span className="statut-base">
+          <DatabaseIcon size={15} weight="duotone" />
+          Données enregistrées sur cet ordinateur
+        </span>
+        {entreprise && (
+          <span>
+            RC {entreprise.rc} · NINEA {entreprise.ninea}
           </span>
-          {info && (
-            <span className="statut-version">
-              v{info.version} · schéma {info.schemaVersion}
-            </span>
-          )}
-        </footer>
-      </section>
+        )}
+        {info && (
+          <span>
+            Version {info.version} · schéma {info.schemaVersion}
+          </span>
+        )}
+      </footer>
     </div>
   )
 }

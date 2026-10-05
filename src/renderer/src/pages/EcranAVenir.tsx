@@ -1,4 +1,4 @@
-import { IconChevronGauche } from '../components/icons'
+import { CaretLeftIcon } from '@phosphor-icons/react'
 import type { EntreeMenu } from '../navigation'
 
 interface Props {
@@ -12,15 +12,18 @@ export default function EcranAVenir({ entree, onRetour }: Props): React.JSX.Elem
     <div className="ecran">
       <header className="ecran-entete">
         <button className="bouton-retour" onClick={onRetour}>
-          <IconChevronGauche size={16} />
+          <CaretLeftIcon size={16} weight="bold" />
           Accueil
         </button>
+        <span className="ecran-entete-icone">
+          <entree.Icone size={22} weight="duotone" />
+        </span>
         <h1>{entree.titre}</h1>
       </header>
 
       <div className="ecran-vide">
-        <span className="ecran-vide-icone">
-          <entree.Icone size={40} />
+        <span className="module-icone module-icone-grande">
+          <entree.Icone size={44} weight="duotone" />
         </span>
         <h2>Module en préparation</h2>
         <p>

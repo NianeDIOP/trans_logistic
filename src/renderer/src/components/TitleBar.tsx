@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import Logo from './Logo'
+import Emblem from './Emblem'
 import { GlyphAgrandir, GlyphFermer, GlyphReduire, GlyphRestaurer } from './icons'
 
 interface Props {
@@ -19,8 +19,11 @@ export default function TitleBar({ contexte }: Props): React.JSX.Element {
   return (
     <header className="titlebar" onDoubleClick={() => window.api.window.toggleMaximize()}>
       <div className="titlebar-marque">
-        <Logo size={18} variante="trait" />
-        <span className="titlebar-nom">2M Facturation</span>
+        <Emblem size={20} />
+        <span className="titlebar-nom">
+          2M Logistique et Transport
+          <span className="titlebar-module"> · Facturation</span>
+        </span>
         {contexte && (
           <>
             <span className="titlebar-sep" aria-hidden="true">
