@@ -313,7 +313,9 @@ export function modifierPrestation(db: SqlDatabase, id: number, saisie: Prestati
 
 export function supprimerPrestation(db: SqlDatabase, id: number): ResultatSuppression {
   const p = prestationParId(db, id)
-  if (compter(db, 'SELECT COUNT(*) AS n FROM lignes WHERE designation = ?', p.libelle) > 0) {
+  if (
+    compter(db, 'SELECT COUNT(*) AS n FROM lignes WHERE prestation_id = ? OR designation = ?', id, p.libelle) > 0
+  ) {
     db.prepare('UPDATE prestations SET actif = 0 WHERE id = ?').run(id)
     return 'desactive'
   }

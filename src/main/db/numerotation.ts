@@ -1,4 +1,5 @@
 import { prefixeDocument, prochainNumero, type TypeDocument } from '../../core/numerotation'
+import { rafraichirInstantanes } from './instantanes'
 import type { SqlDatabase } from './migrations'
 
 interface FactureAValider {
@@ -13,6 +14,7 @@ interface FactureAValider {
  * Valide un brouillon : lui attribue le numéro suivant de sa séquence (type + préfixe + année
  * de la date de facture) et le passe au statut « emise ».
  *
+ * Les valeurs recopiées (taux, client, totaux) sont mises à jour une dernière fois.
  * Le tout se fait dans une transaction `BEGIN IMMEDIATE`, qui verrouille la base en écriture :
  * deux validations simultanées ne peuvent pas obtenir le même numéro, et un échec n'en consomme aucun.
  */
@@ -26,6 +28,9 @@ export function validerFacture(db: SqlDatabase, factureId: number, valideLe = ne
     if (facture.statut !== 'brouillon' || facture.numero !== null) {
       throw new Error('Seul un brouillon peut être validé')
     }
+
+    // Dernière mise à jour des valeurs recopiées (taux, client, totaux) avant de figer la facture.
+    rafraichirInstantanes(db, factureId)
 
     const entreprise = db.prepare('SELECT prefixe_facture FROM entreprise WHERE id = 1').get() as
       | { prefixe_facture: string }

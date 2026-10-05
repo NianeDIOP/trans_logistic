@@ -4,6 +4,7 @@ import icon from '../../resources/icon.png?asset'
 import { IPC } from '../shared/types'
 import { closeDatabase, openDatabase } from './db'
 import { registerIpcHandlers } from './ipc'
+import { registerFacturesHandlers } from './ipc-factures'
 import { registerParametresHandlers } from './ipc-parametres'
 
 function createWindow(): void {
@@ -46,6 +47,9 @@ function createWindow(): void {
   }
 }
 
+// Interface en français (calendriers, formats de date) quelle que soit la langue de Windows.
+app.commandLine.appendSwitch('lang', 'fr-FR')
+
 app.whenReady().then(() => {
   try {
     openDatabase()
@@ -60,6 +64,7 @@ app.whenReady().then(() => {
 
   registerIpcHandlers()
   registerParametresHandlers()
+  registerFacturesHandlers()
   createWindow()
 
   app.on('activate', () => {

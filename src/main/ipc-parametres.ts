@@ -1,27 +1,9 @@
-import { BrowserWindow, ipcMain } from 'electron'
-import type { Reponse } from '../shared/types'
+import { BrowserWindow } from 'electron'
 import type { TypeImage } from '../shared/parametres'
 import { getDatabase } from './db'
 import * as P from './db/parametres'
 import { choisirEtCopierImage, imageEnDataUrl, supprimerImage } from './images'
-
-type Gestionnaire = (event: Electron.IpcMainInvokeEvent, ...args: never[]) => unknown
-
-/** Enregistre un canal : le résultat (ou l'erreur) est converti en `Reponse`. */
-function canal(nom: string, fn: Gestionnaire): void {
-  ipcMain.handle(nom, async (event, ...args): Promise<Reponse<unknown>> => {
-    try {
-      const data = await fn(event, ...(args as never[]))
-      return { ok: true, data: data === undefined ? null : data }
-    } catch (err) {
-      if (err instanceof P.ErreurValidation) {
-        return { ok: false, message: err.message, erreurs: err.erreurs }
-      }
-      console.error(`[${nom}]`, err)
-      return { ok: false, message: (err as Error).message || 'Erreur inattendue.' }
-    }
-  })
-}
+import { canal } from './ipc-commun'
 
 function verifierTypeImage(type: TypeImage): TypeImage {
   if (type !== 'logo' && type !== 'cachet') throw new Error("Type d'image inconnu")

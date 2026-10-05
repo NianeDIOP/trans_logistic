@@ -246,6 +246,29 @@ export const MIGRATIONS: Migration[] = [
         INSERT OR IGNORE INTO zones_tarifs (zone, type_conteneur, prix) VALUES ('Dakar Zone 1', '20', 70000);
       `)
     }
+  },
+  {
+    version: 3,
+    description: 'Instantanés de facture (client, taux, libellés) et chemin du PDF',
+    up: (db) => {
+      db.exec(`
+        -- Une facture garde les valeurs du moment où elle a été établie.
+        ALTER TABLE factures ADD COLUMN taux_tva INTEGER NOT NULL DEFAULT 18;
+        ALTER TABLE factures ADD COLUMN client_raison_sociale TEXT NOT NULL DEFAULT '';
+        ALTER TABLE factures ADD COLUMN client_adresse TEXT NOT NULL DEFAULT '';
+        ALTER TABLE factures ADD COLUMN client_ninea TEXT NOT NULL DEFAULT '';
+        ALTER TABLE factures ADD COLUMN client_tel TEXT NOT NULL DEFAULT '';
+        ALTER TABLE factures ADD COLUMN client_email TEXT NOT NULL DEFAULT '';
+        -- PDF archivé à la validation (dossier de l'application).
+        ALTER TABLE factures ADD COLUMN pdf_path TEXT;
+
+        ALTER TABLE lignes ADD COLUMN type_libelle TEXT NOT NULL DEFAULT '';
+        ALTER TABLE lignes ADD COLUMN nature_libelle TEXT NOT NULL DEFAULT '';
+        ALTER TABLE lignes ADD COLUMN prestation_id INTEGER;
+
+        UPDATE factures SET taux_tva = (SELECT taux_tva FROM entreprise WHERE id = 1);
+      `)
+    }
   }
 ]
 

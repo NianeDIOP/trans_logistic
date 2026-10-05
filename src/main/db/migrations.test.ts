@@ -94,7 +94,7 @@ describe('runMigrations', () => {
       INSERT INTO zones_tarifs (zone, type_conteneur, prix) VALUES ('Thiès', '40', 150000);
     `)
 
-    expect(runMigrations(db)).toBe(2)
+    expect(runMigrations(db)).toBe(MIGRATIONS.length)
     expect(db.prepare('SELECT montant_ht, nature FROM lignes').get()).toEqual({
       montant_ht: 70000,
       nature: 'import'

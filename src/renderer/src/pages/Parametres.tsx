@@ -46,7 +46,7 @@ export default function Parametres({ onRetour }: Props): React.JSX.Element {
   }
 
   return (
-    <div className="ecran">
+    <div className="ecran" data-saisie-protegee>
       <header className="ecran-entete">
         <button className="bouton-retour" onClick={() => quitter(onRetour)}>
           <CaretLeftIcon size={16} weight="bold" />

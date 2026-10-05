@@ -176,7 +176,7 @@ modes de paiement) sont insérées par la migration, puis restent modifiables.
 - Ne jamais committer : `node_modules/`, `dist/`, `release/`, `*.db`, `.env`.
 
 ### Identité visuelle (à respecter dans tous les écrans)
-- Charte issue du **logo officiel** (`src/renderer/src/assets/logo-2m.png`, fond transparent) :
+- Charte issue du **logo officiel** (`resources/logo-2m.png`, fond transparent) :
   **bleu roi et or**. Variables dans `styles.css` (`--bleu-marine`, `--bleu-roi`, `--or`, `--degrade-or`…),
   pas de couleur en dur ailleurs.
 - Polices embarquées (hors ligne) : **Montserrat** pour les titres (800 italique pour les grands titres,
@@ -234,7 +234,21 @@ npm run dist       # générer l'installateur Windows
   - Logo et cachet copiés dans `userData/images/` ; sans logo personnalisé, le logo officiel 2M s'applique.
   - Composants réutilisables : `components/ui/` (Modale, Confirmation, Champ, ChampMontant, Notifications…).
   - L'onglet Sauvegarde est un écran provisoire (Phase 7).
-- [ ] Phase 4 — Nouvelle facture + PDF
+- [x] Phase 4 — Nouvelle facture + PDF
+  - Migration 3 : instantanés dans `factures` (taux, client) et `lignes` (libellés type/nature,
+    `prestation_id`), `pdf_path`. `rafraichirInstantanes` les met à jour à chaque enregistrement et à la
+    validation ; ensuite la facture est figée.
+  - `src/core/facture.ts` : règles de saisie (`verifierFacture`, brouillon vs validation), nom du fichier PDF.
+    `LigneSaisie.genre` (conteneur / frais) n'existe qu'à l'écran.
+  - `src/main/db/factures.ts` : brouillon, `enregistrerEtValider`, `factureProvisoire` (aperçu sans écriture).
+  - PDF : modèle pur `src/main/pdf/modele.ts` (modes `pdf` / `impression` / `ecran`), rendu par
+    `printToPDF` dans une fenêtre invisible (`src/main/pdf/generer.ts`), pied de page Chromium paginé.
+    Polices et logo par défaut dans `resources/`. PDF archivé à la validation dans
+    `userData/factures/<année>/` puis ouvert, copié ou imprimé depuis l'archive.
+  - Écran : `pages/NouvelleFacture.tsx` (+ `pages/facture/`). Client avec recherche et création rapide,
+    prix prérempli depuis la grille, prestations en un clic, totaux et lettres en direct, Ctrl+S,
+    aperçu A4, confirmation avant validation, vue « facture émise ».
+  - Interface forcée en français (`--lang=fr-FR`) pour le format des dates.
 - [ ] Phase 5 — Historique, statuts, paiements, avoirs
 - [ ] Phase 6 — Tableau de bord
 - [ ] Phase 7 — Sauvegarde/restauration, packaging .exe, GitHub Actions
