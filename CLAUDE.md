@@ -97,6 +97,20 @@ paiements    (id, facture_id, date, montant, mode /*especes|cheque|virement|wave
 
 Gérer les migrations de schéma avec une table `schema_version`.
 
+Tables de paramétrage à ajouter en Phase 3, par une **nouvelle migration** (ne jamais modifier la migration 1) :
+
+```sql
+prestations      (id, libelle, prix, soumis_tva, actif, ordre)   -- frais et débours : AGS, imprimé, etc.
+types_conteneurs (id, code, libelle, actif, ordre)               -- 20', 40', 40' HC…
+natures          (id, code, libelle, actif, ordre)               -- import, export…
+modes_paiement   (id, code, libelle, actif, ordre)               -- espèces, chèque, virement, Wave, Orange Money
+```
+- Ajouter aussi `actif` à `clients` et `zones_tarifs`.
+- `entreprise` reçoit les mentions de bas de facture (conditions de paiement, délai).
+- Une donnée déjà utilisée par une facture n'est **jamais supprimée** : on la désactive (`actif = 0`).
+- Les lignes de facture **recopient** les libellés et les montants au moment de la saisie (instantané). Une
+  modification des Paramètres ne change donc jamais une facture existante.
+
 ## 6. Écrans
 
 ### Nouvelle facture
@@ -126,10 +140,32 @@ Gérer les migrations de schéma avec une table `schema_version`.
 - Impayés (montant + liste), top 5 clients, conteneurs par type et par zone.
 - Filtre par période.
 
-### Paramètres
-- Infos entreprise, logo, cachet, taux de TVA, préfixe.
-- Gestion des clients et de la grille zones/tarifs.
+### Paramètres — principe d'automatisation (IMPORTANT)
+**Toute donnée qui entre dans une facture provient des Paramètres.** La saisie d'une facture se fait
+par **sélection dans des listes**, avec **préremplissage automatique** ; la saisie libre n'est qu'un
+complément exceptionnel.
+
+| Entrée de la facture | Référentiel dans Paramètres | Automatisme à la saisie |
+|---|---|---|
+| Client | Clients (raison sociale, adresse, NINEA, tél., email) | Recherche + création rapide ; bloc client du PDF rempli tout seul |
+| Zone + type de conteneur | Grille zones/tarifs × types de conteneurs | Prix HT prérempli, ligne soumise à TVA |
+| Nature | Natures (import/export…) | Liste déroulante |
+| Frais et débours (AGS, imprimé…) | Prestations (libellé, prix, soumis à TVA) | Ajout en un clic, prix et case TVA préremplis |
+| Taux de TVA | Entreprise (18 % par défaut) | Appliqué aux lignes cochées |
+| Numéro de facture | Entreprise (préfixe) + séquence | Attribué à la validation |
+| En-tête, pied, logo, cachet, banque | Entreprise | Repris sur le PDF |
+| Mode de paiement | Modes de paiement | Liste déroulante (Phase 5) |
+
+Écrans des Paramètres (onglets) :
+- Entreprise : infos, logo, cachet, banque, taux de TVA, préfixe, mentions de bas de facture.
+- Clients.
+- Zones et tarifs.
+- Prestations et débours.
+- Listes : types de conteneurs, natures, modes de paiement.
 - Sauvegarde (copie du fichier .db vers un dossier choisi) et restauration.
+
+Les valeurs de départ (prestations AGS 1 500 et imprimé 1 000 hors TVA, types 20' et 40', import/export,
+modes de paiement) sont insérées par la migration, puis restent modifiables.
 
 ## 7. Conventions
 
@@ -179,7 +215,7 @@ npm run dist       # générer l'installateur Windows
   - Electron 43 ne télécharge plus son binaire tout seul : le `postinstall` lance `install-electron`.
   - Taux de TVA stocké en pourcentage entier (`18`).
 - [ ] Phase 2 — `src/core` : calculs TVA, montant en lettres, numérotation + tests
-- [ ] Phase 3 — Paramètres (entreprise, clients, zones/tarifs)
+- [ ] Phase 3 — Paramètres (entreprise, clients, zones/tarifs, prestations, listes) — voir « principe d'automatisation »
 - [ ] Phase 4 — Nouvelle facture + PDF
 - [ ] Phase 5 — Historique, statuts, paiements, avoirs
 - [ ] Phase 6 — Tableau de bord
