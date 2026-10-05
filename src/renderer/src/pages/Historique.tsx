@@ -9,7 +9,8 @@ import {
   XIcon
 } from '@phosphor-icons/react'
 import type { FiltresHistorique, PageHistorique } from '@shared/historique'
-import { aujourdhui, formatDate } from '../../../core/facture'
+import { formatDate } from '../../../core/facture'
+import { bornesPeriode, type Periode } from '../../../core/periodes'
 import { formatMontant } from '../../../core/montants'
 import BadgeStatut from '../components/BadgeStatut'
 import { useNotifier } from '../components/ui/Notifications'
@@ -19,27 +20,6 @@ interface Props {
   onRetour: () => void
   onOuvrir: (factureId: number) => void
   onDupliquer: (factureId: number) => void
-}
-
-type Periode = 'tout' | 'mois' | 'mois-precedent' | 'annee' | 'perso'
-
-function bornes(periode: Periode): { du?: string; au?: string } {
-  const j = aujourdhui()
-  const [a, m] = j.split('-').map(Number)
-  const p = (n: number): string => String(n).padStart(2, '0')
-  const finMois = (an: number, mois: number): string => `${an}-${p(mois)}-${p(new Date(an, mois, 0).getDate())}`
-  switch (periode) {
-    case 'mois':
-      return { du: `${a}-${p(m)}-01`, au: finMois(a, m) }
-    case 'mois-precedent': {
-      const [ap, mp] = m === 1 ? [a - 1, 12] : [a, m - 1]
-      return { du: `${ap}-${p(mp)}-01`, au: finMois(ap, mp) }
-    }
-    case 'annee':
-      return { du: `${a}-01-01`, au: `${a}-12-31` }
-    default:
-      return {}
-  }
 }
 
 const PERIODES: { id: Periode; libelle: string }[] = [
@@ -85,7 +65,7 @@ export default function Historique({ onRetour, onOuvrir, onDupliquer }: Props): 
   }, [recherche])
 
   const charger = useCallback(() => {
-    const b = periode === 'perso' ? { du: du || undefined, au: au || undefined } : bornes(periode)
+    const b = periode === 'perso' ? { du: du || undefined, au: au || undefined } : bornesPeriode(periode)
     appel(
       window.api.factures.lister({
         recherche: rechercheEffective,

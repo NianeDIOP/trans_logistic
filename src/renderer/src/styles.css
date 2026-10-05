@@ -2305,3 +2305,338 @@ select.saisie {
 .avoir-explication {
   margin-bottom: 18px;
 }
+
+/* =====================================================================
+ * Tableau de bord
+ * ===================================================================== */
+
+.entete-filtre {
+  margin-left: auto;
+}
+
+.tableau-bord {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px 40px 40px;
+}
+
+.indicateurs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.indicateur {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 20px;
+  border: 1px solid var(--filet);
+  border-radius: var(--rayon);
+  background: var(--blanc);
+  box-shadow: var(--ombre);
+}
+
+.indicateur-icone {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 8px;
+  border-radius: 9px;
+  background: var(--degrade-bleu);
+  color: var(--or);
+}
+
+.indicateur-libelle {
+  font-size: 13px;
+  color: var(--texte-2);
+}
+
+.indicateur-valeur {
+  font-family: var(--police-titre);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  color: var(--bleu-marine);
+}
+
+.indicateur-valeur span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--texte-3);
+}
+
+.indicateur-detail {
+  font-size: 12.5px;
+  color: var(--texte-3);
+}
+
+.indicateur-alerte .indicateur-icone {
+  background: linear-gradient(160deg, #d4960f 0%, #a06e08 100%);
+  color: #fff;
+}
+
+.indicateur-alerte .indicateur-valeur {
+  color: #8a5d00;
+}
+
+/* Graphique mensuel */
+
+.graphique {
+  padding-bottom: 12px;
+}
+
+.graphique-entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.graphique-entete h2 {
+  font-family: var(--police-titre);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--bleu-marine);
+}
+
+.graphique-outils {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.legende {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--texte-2);
+}
+
+.legende li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.pastille-serie {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.btn-icone.actif {
+  background: var(--bleu-pale);
+  color: var(--bleu-roi);
+}
+
+.graphique-zone {
+  margin: 0 -8px;
+}
+
+.graphique-tableau {
+  max-height: 300px;
+  overflow: auto;
+}
+
+.infobulle {
+  min-width: 190px;
+  padding: 10px 12px;
+  border: 1px solid var(--filet);
+  border-radius: 8px;
+  background: var(--blanc);
+  box-shadow: var(--ombre-forte);
+  font-size: 13px;
+}
+
+.infobulle p {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 4px;
+  color: var(--texte-2);
+}
+
+.infobulle strong {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  color: var(--texte);
+}
+
+.infobulle-titre {
+  margin: 0 0 6px !important;
+  font-family: var(--police-titre);
+  font-weight: 700;
+  color: var(--bleu-marine) !important;
+}
+
+.infobulle-titre::first-letter {
+  text-transform: uppercase;
+}
+
+.infobulle-total {
+  margin-top: 8px !important;
+  padding-top: 6px;
+  border-top: 1px solid #eef1f7;
+}
+
+/* Cartes de répartition */
+
+.grille-tableau-bord {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.carte-titre-suite {
+  margin-top: 26px;
+}
+
+.carte-titre-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  font-family: var(--police);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--texte-3);
+}
+
+.graphique-vide {
+  padding: 12px 0;
+}
+
+.liste-barres {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.liste-barres-ligne {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 6px;
+  font-size: 13.5px;
+}
+
+.liste-barres-libelle {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-weight: 600;
+  color: var(--texte);
+}
+
+.liste-barres-libelle span {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--texte-3);
+}
+
+.liste-barres-valeur {
+  flex-shrink: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--texte);
+}
+
+.liste-barres-valeur span {
+  margin-left: 2px;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--texte-3);
+}
+
+.liste-barres-piste {
+  height: 8px;
+  border-radius: 4px;
+  background: #eef1f7;
+}
+
+.liste-barres-barre {
+  height: 100%;
+  min-width: 4px;
+  border-radius: 4px;
+  background: #1f56cf;
+}
+
+.liste-impayes {
+  display: flex;
+  flex-direction: column;
+  margin: -6px -10px 0;
+}
+
+.liste-impayes button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  text-align: left;
+}
+
+.liste-impayes button:hover {
+  background: var(--bleu-pale);
+}
+
+.impaye-principal,
+.impaye-montant {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.impaye-principal strong {
+  font-family: var(--police-titre);
+  font-size: 13px;
+  color: var(--bleu-marine);
+}
+
+.impaye-principal span,
+.impaye-montant span {
+  overflow: hidden;
+  font-size: 12px;
+  color: var(--texte-3);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.impaye-montant {
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.impaye-montant strong {
+  font-variant-numeric: tabular-nums;
+  color: #8a5d00;
+}
+
+.impaye-montant .retard {
+  font-weight: 600;
+  color: var(--danger);
+}
+
+.tableau-bord-vide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}

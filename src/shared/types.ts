@@ -14,6 +14,7 @@ import type {
 } from './parametres'
 import type { Facture, FactureSaisie, Referentiels } from './factures'
 import type { FiltresHistorique, PageHistorique, Paiement, PaiementSaisie } from './historique'
+import type { TableauDeBord } from './tableau'
 
 export interface Entreprise {
   id: number
@@ -146,12 +147,14 @@ export interface Api {
   window: WindowApi
   parametres: ParametresApi
   factures: FacturesApi
+  tableauDeBord(filtre: { du?: string; au?: string }): R<TableauDeBord>
 }
 
 /** Noms des canaux IPC. */
 export const IPC = {
   appInfo: 'app:info',
   entrepriseGet: 'entreprise:get',
+  tableauDeBord: 'tableau:lire',
   windowMinimize: 'window:minimize',
   windowToggleMaximize: 'window:toggle-maximize',
   windowClose: 'window:close',
