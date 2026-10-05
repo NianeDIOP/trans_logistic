@@ -1,0 +1,22 @@
+# Dépendances et compilation
+node_modules/
+dist/
+dist-electron/
+release/
+out/
+
+# Données (JAMAIS sur GitHub)
+*.db
+*.db-journal
+*.sqlite
+sauvegardes/
+
+# Secrets et système
+.env
+.env.*
+.DS_Store
+Thumbs.db
+
+# Éditeur et journaux
+.vscode/
+*.log
