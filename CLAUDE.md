@@ -214,7 +214,15 @@ npm run dist       # générer l'installateur Windows
   - Electron 43 (pas 44) : better-sqlite3 13 fournit des binaires précompilés pour cette version.
   - Electron 43 ne télécharge plus son binaire tout seul : le `postinstall` lance `install-electron`.
   - Taux de TVA stocké en pourcentage entier (`18`).
-- [ ] Phase 2 — `src/core` : calculs TVA, montant en lettres, numérotation + tests
+- [x] Phase 2 — `src/core` : calculs TVA, montant en lettres, numérotation + tests
+  - `src/core/` : `montants.ts` (format « 85 100 », lecture de saisie), `tva.ts` (`calculerTotaux`),
+    `lettres.ts` (`nombreEnLettres`, `montantEnLettres`), `numerotation.ts` (format, prochain numéro).
+  - TVA : arrondi à l'entier le plus proche, demis éloignés de zéro (symétrique pour les avoirs).
+  - Lettres : orthographe traditionnelle (« quatre-vingt mille », « quatre-vingts millions »,
+    « deux millions de francs CFA »).
+  - Avoirs : séquence propre, format `AV-2M-2026-0001`. L'année est celle de la date de la facture.
+  - `src/main/db/numerotation.ts` : `validerFacture` attribue le numéro dans une transaction
+    `BEGIN IMMEDIATE` et passe la facture en « emise ».
 - [ ] Phase 3 — Paramètres (entreprise, clients, zones/tarifs, prestations, listes) — voir « principe d'automatisation »
 - [ ] Phase 4 — Nouvelle facture + PDF
 - [ ] Phase 5 — Historique, statuts, paiements, avoirs
