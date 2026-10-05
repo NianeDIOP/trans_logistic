@@ -9,6 +9,7 @@ import {
   ligneVide,
   nomFichierFacture,
   nombreConteneurs,
+  regimeTvaImpose,
   verifierFacture
 } from './facture'
 import type { Prestation } from '../shared/parametres'
@@ -152,5 +153,18 @@ describe('AGS aller simple : 1 500 par conteneur', () => {
     expect(lignesAutomatiques(catalogue)).toEqual([
       expect.objectContaining({ designation: 'AGS aller simple', prestation_id: 1, soumis_tva: false, quantite: 0 })
     ])
+  })
+})
+
+describe('TVA : seulement sur les conteneurs', () => {
+  const catalogue: Prestation[] = [
+    { id: 1, libelle: 'AGS aller simple', prix: 1500, soumis_tva: false, par_conteneur: true, automatique: true, actif: true, ordre: 1 },
+    { id: 2, libelle: 'Imprimé', prix: 1000, soumis_tva: false, par_conteneur: false, automatique: false, actif: true, ordre: 2 }
+  ]
+  it('conteneur toujours soumis, AGS et Imprimé hors TVA, ligne libre au choix', () => {
+    expect(regimeTvaImpose(conteneur, catalogue)).toBe(true)
+    expect(regimeTvaImpose({ ...ags, prestation_id: 1, soumis_tva: true }, catalogue)).toBe(false)
+    expect(regimeTvaImpose({ ...ags, designation: 'Imprimé', prestation_id: 2 }, catalogue)).toBe(false)
+    expect(regimeTvaImpose({ ...ags, designation: 'Divers', prestation_id: null }, catalogue)).toBeNull()
   })
 })

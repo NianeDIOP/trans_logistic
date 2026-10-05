@@ -350,8 +350,8 @@ export default function NouvelleFacture({
       )}
 
       {apercu && (
-        <Modale titre="Aperçu" sousTitre="Rendu de la facture telle qu'elle sera imprimée." onFermer={() => setApercu(null)} largeur={900}>
-          <ApercuDocument html={apercu} />
+        <Modale titre="Aperçu" sousTitre="Rendu de la facture telle qu'elle sera imprimée." onFermer={() => setApercu(null)} largeur={980}>
+          <ApercuDocument html={apercu} zoom />
         </Modale>
       )}
 

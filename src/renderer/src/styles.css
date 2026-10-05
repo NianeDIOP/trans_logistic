@@ -1317,6 +1317,7 @@ textarea.saisie {
 
 .modale {
   outline: none;
+  max-width: calc(100vw - 32px) !important;
   display: flex;
   flex-direction: column;
   max-width: 100%;
@@ -1885,12 +1886,28 @@ select.saisie {
   background: #e7ebf3;
 }
 
-.apercu-feuille iframe {
-  width: 210mm;
-  min-height: 297mm;
-  border: 0;
+.apercu-mesure {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.apercu-page {
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
   background: #fff;
   box-shadow: 0 4px 24px rgb(6 22 64 / 18%);
+}
+
+.apercu-page iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 0;
+  background: #fff;
+  transform-origin: top left;
 }
 
 .modale .apercu-feuille {
@@ -1898,11 +1915,35 @@ select.saisie {
   overflow: auto;
 }
 
+/* Aperçu zoomable : boutons de zoom au-dessus, zone de hauteur fixe où la page défile ou s'ajuste. */
+.apercu-zoomable {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: calc(100vh - 270px);
+}
+
+.apercu-barre {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.apercu-barre button {
+  height: 28px;
+  font-size: 12.5px;
+}
+
+.modale .apercu-zoomable .apercu-feuille {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+}
+
 /* Facture validée */
 
 .vue-facture {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
   gap: 24px;
   align-items: start;
   width: 100%;
@@ -1911,8 +1952,12 @@ select.saisie {
   padding: 24px 40px 40px;
 }
 
+.vue-facture-apercu {
+  min-width: 0;
+}
+
 .vue-facture-apercu .apercu-feuille {
-  overflow: auto;
+  padding: 16px;
 }
 
 .vue-facture-panneau {
@@ -2785,4 +2830,23 @@ select.saisie {
 .option strong {
   font-size: 13.5px;
   color: var(--texte);
+}
+
+/* Régime de TVA imposé sur une ligne */
+.tva-fixe {
+  display: inline-block;
+  min-width: 40px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: #eef0f4;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--texte-3);
+  text-align: center;
+  cursor: help;
+}
+
+.tva-fixe.tva-oui {
+  background: var(--bleu-pale);
+  color: var(--bleu);
 }

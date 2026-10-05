@@ -72,6 +72,10 @@ en lettres : « Quatre-vingt-cinq mille cent francs CFA ».
   automatiquement (prestation « par conteneur » + « automatique », migration 4). Sur le PDF :
   « AGS aller simple — 3 conteneurs × 1 500 ».
 - Imprimé : 1 000 FCFA par facture, hors TVA.
+- **La TVA (18 %) ne porte que sur les conteneurs** (transport). À la saisie, le régime est imposé
+  (`regimeTvaImpose` dans `src/core/facture.ts`) : conteneur toujours soumis, prestation du catalogue selon
+  Paramètres → Prestations (AGS, Imprimé : hors TVA) ; seule une ligne « Autre » se coche à la main
+  (hors TVA par défaut).
 
 ### Montant en lettres
 - Fonction `nombreEnLettres(n)` en français, avec tests unitaires.
