@@ -5,6 +5,8 @@ import type { Facture, FactureSaisie } from '../shared/factures'
 import { getDatabase } from './db'
 import * as F from './db/factures'
 import * as H from './db/historique'
+import { tableauDeBord } from './db/statistiques'
+import { IPC } from '../shared/types'
 import { lireEntreprise, listerListe } from './db/parametres'
 import { canal } from './ipc-commun'
 import { archiverPdf, documentFacture, imprimer, pdfExiste } from './pdf/generer'
@@ -70,6 +72,8 @@ export function registerFacturesHandlers(): void {
   })
 
   canal('factures:supprimerBrouillon', (_e, id: number) => F.supprimerBrouillon(db(), id))
+
+  canal(IPC.tableauDeBord, (_e, filtre) => tableauDeBord(db(), filtre))
 
   // Historique, règlements, avoirs
   canal('factures:lister', (_e, filtres) => H.listerFactures(db(), filtres))

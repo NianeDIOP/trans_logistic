@@ -44,7 +44,8 @@ const api: Api = {
     }
   },
   parametres: apiParametres(),
-  factures: apiFactures()
+  factures: apiFactures(),
+  tableauDeBord: (filtre) => ipcRenderer.invoke(IPC.tableauDeBord, filtre)
 }
 
 contextBridge.exposeInMainWorld('api', api)

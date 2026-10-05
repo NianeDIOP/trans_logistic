@@ -6,6 +6,7 @@ import EcranAVenir from './pages/EcranAVenir'
 import Historique from './pages/Historique'
 import NouvelleFacture from './pages/NouvelleFacture'
 import Parametres from './pages/Parametres'
+import TableauDeBord from './pages/TableauDeBord'
 import { MENU, type Ecran } from './navigation'
 
 /** Écran affiché et ses paramètres. */
@@ -65,7 +66,7 @@ export default function App(): React.JSX.Element {
             key={cle}
             factureId={route.factureId ?? null}
             dupliquerDe={route.dupliquerDe ?? null}
-            libelleRetour={route.retour === 'historique' ? 'Historique' : 'Accueil'}
+            libelleRetour={route.retour ? MENU.find((m) => m.ecran === route.retour)?.titre ?? 'Accueil' : 'Accueil'}
             onRetour={retour}
             onOuvrir={(r) => naviguer({ ecran: 'nouvelle-facture', retour: route.retour, ...r })}
           />
@@ -79,6 +80,14 @@ export default function App(): React.JSX.Element {
             onDupliquer={(dupliquerDe) => naviguer({ ecran: 'nouvelle-facture', dupliquerDe, retour: 'historique' })}
           />
         )
+      case 'tableau-de-bord':
+        return (
+          <TableauDeBord
+            key={cle}
+            onRetour={accueil}
+            onOuvrirFacture={(factureId) => naviguer({ ecran: 'nouvelle-facture', factureId, retour: 'tableau-de-bord' })}
+          />
+        )
       default:
         return <EcranAVenir entree={entree!} onRetour={accueil} />
     }
@@ -87,7 +96,7 @@ export default function App(): React.JSX.Element {
   return (
     <FournisseurNotifications>
       <div className="app">
-        <TitleBar contexte={route.retour === 'historique' ? 'Historique' : entree?.titre} />
+        <TitleBar contexte={route.retour ? MENU.find((m) => m.ecran === route.retour)?.titre : entree?.titre} />
         <main className="app-contenu">{contenu()}</main>
       </div>
     </FournisseurNotifications>

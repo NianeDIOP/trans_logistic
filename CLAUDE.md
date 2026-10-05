@@ -259,5 +259,12 @@ npm run dist       # générer l'installateur Windows
   - `factureAAfficher` : une facture émise s'affiche toujours avec ses valeurs figées.
   - Écran `pages/Historique.tsx` ; la vue d'une facture émise (`VueFacture`) gère règlements, avoir,
     duplication et liens facture ↔ avoir. Navigation par `Route` dans `App.tsx` (retour vers l'historique).
-- [ ] Phase 6 — Tableau de bord
+- [x] Phase 6 — Tableau de bord
+  - `src/main/db/statistiques.ts` : CA net (factures émises − avoirs, chacun à sa date), TVA collectée,
+    série mensuelle complète, top 5 clients, conteneurs par type / zone (factures non annulées),
+    impayés à ce jour avec ancienneté. Périodes partagées : `src/core/periodes.ts`.
+  - Écran `pages/TableauDeBord.tsx` : 4 indicateurs, histogramme empilé HT + TVA (Recharts, une seule
+    échelle, infobulle, vue tableau), barres horizontales en HTML, liste des impayés cliquable.
+  - Couleurs des séries validées (script dataviz, fond blanc) : HT `#1f56cf`, TVA `#c48a0c`
+    (l'or clair `#f2b51d` est trop pâle pour une série).
 - [ ] Phase 7 — Sauvegarde/restauration, packaging .exe, GitHub Actions
