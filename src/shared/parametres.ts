@@ -26,12 +26,17 @@ export interface ZoneSaisie {
 export interface Prestation {
   id: number
   libelle: string
+  /** Prix HT unitaire (par facture, ou par conteneur si `par_conteneur`). */
   prix: number
   soumis_tva: boolean
+  /** Facturée pour chaque conteneur de la facture (ex. AGS aller simple). */
+  par_conteneur: boolean
+  /** Ajoutée d'office à chaque nouvelle facture. */
+  automatique: boolean
   actif: boolean
   ordre: number
 }
-export type PrestationSaisie = Pick<Prestation, 'libelle' | 'prix' | 'soumis_tva'>
+export type PrestationSaisie = Pick<Prestation, 'libelle' | 'prix' | 'soumis_tva' | 'par_conteneur' | 'automatique'>
 
 /** Listes simples : types de conteneurs, natures, modes de paiement. */
 export type NomListe = 'types_conteneurs' | 'natures' | 'modes_paiement'

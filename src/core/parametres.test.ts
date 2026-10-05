@@ -40,12 +40,12 @@ describe('validerClient', () => {
 
 describe('validerPrestation', () => {
   it('accepte une prestation hors TVA', () => {
-    expect(validerPrestation({ libelle: 'AGS aller simple', prix: 1500, soumis_tva: false }).ok).toBe(true)
+    expect(validerPrestation({ libelle: 'AGS aller simple', prix: 1500, soumis_tva: false, par_conteneur: false, automatique: false }).ok).toBe(true)
   })
 
   it('refuse un prix négatif ou décimal', () => {
-    expect(validerPrestation({ libelle: 'X', prix: -1, soumis_tva: false }).ok).toBe(false)
-    expect(validerPrestation({ libelle: 'X', prix: 10.5, soumis_tva: false }).ok).toBe(false)
+    expect(validerPrestation({ libelle: 'X', prix: -1, soumis_tva: false, par_conteneur: false, automatique: false }).ok).toBe(false)
+    expect(validerPrestation({ libelle: 'X', prix: 10.5, soumis_tva: false, par_conteneur: false, automatique: false }).ok).toBe(false)
   })
 })
 

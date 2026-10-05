@@ -64,6 +64,15 @@ Toutes ces valeurs sont modifiables dans Paramètres et stockées en base, jamai
 Résultat attendu : HT = 72 500, TVA = 12 600, TTC = 85 100,
 en lettres : « Quatre-vingt-cinq mille cent francs CFA ».
 
+### Conteneurs et AGS
+- Type de conteneur : **20' ou 40'** (liste paramétrable). Le **prix HT dépend du type** et de la zone
+  (grille Zones et tarifs).
+- **AGS aller simple : 1 500 FCFA par conteneur (par N° TC)**, hors TVA. La ligne AGS est ajoutée d'office
+  à chaque nouvelle facture ; quantité = nombre de conteneurs, montant = quantité × 1 500, recalculés
+  automatiquement (prestation « par conteneur » + « automatique », migration 4). Sur le PDF :
+  « AGS aller simple — 3 conteneurs × 1 500 ».
+- Imprimé : 1 000 FCFA par facture, hors TVA.
+
 ### Montant en lettres
 - Fonction `nombreEnLettres(n)` en français, avec tests unitaires.
 - Respecter : « quatre-vingts » (avec s seul), « cent » / « cents », « mille » invariable,

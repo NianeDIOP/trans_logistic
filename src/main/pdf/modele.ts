@@ -55,6 +55,10 @@ export function modeleFacture(
            <td>${echapper(l.zone) || '—'}${l.designation ? `<div class="precision">${echapper(l.designation)}</div>` : ''}</td>
            <td>${echapper(l.nature_libelle) || '—'}</td>`
         : `<td colspan="4" class="designation">${echapper(l.designation)}${
+            l.quantite > 1
+              ? ` <span class="quantite">— ${l.quantite} conteneurs × ${montant(Math.round(l.montant_ht / l.quantite))}</span>`
+              : ''
+          }${
             l.soumis_tva ? '' : ' <span class="mention-tva">hors TVA</span>'
           }</td>`
       return `<tr>${cellules}<td class="num">${montant(l.montant_ht)}</td></tr>`
@@ -148,6 +152,7 @@ table { width: 100%; border-collapse: collapse; }
 .designation { color: #2a3656; }
 .precision { font-size: 8.5pt; color: #8590aa; }
 .mention-tva { font-size: 8pt; color: #8a5d00; }
+.quantite { font-size: 9pt; color: #48557a; }
 
 /* Totaux */
 .recap { display: flex; justify-content: space-between; align-items: flex-start; gap: 8mm; margin-top: 6mm; page-break-inside: avoid; }

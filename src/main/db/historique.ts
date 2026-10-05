@@ -210,9 +210,9 @@ export function creerAvoir(
 
     db.prepare(
       `INSERT INTO lignes (facture_id, ordre, num_conteneur, type_conteneur, type_libelle, zone, nature,
-         nature_libelle, designation, montant_ht, soumis_tva, prestation_id)
+         nature_libelle, designation, montant_ht, soumis_tva, prestation_id, quantite)
        SELECT ?, ordre, num_conteneur, type_conteneur, type_libelle, zone, nature, nature_libelle,
-         designation, montant_ht, soumis_tva, prestation_id
+         designation, montant_ht, soumis_tva, prestation_id, quantite
        FROM lignes WHERE facture_id = ? ORDER BY ordre`
     ).run(id, f.id)
 

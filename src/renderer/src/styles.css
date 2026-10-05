@@ -2718,3 +2718,71 @@ select.saisie {
   flex-shrink: 0;
   margin-top: 2px;
 }
+
+/* Prestations par conteneur */
+
+.ligne-quantite {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bleu-roi);
+  white-space: nowrap;
+}
+
+.montant-calcule {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px dashed var(--filet);
+  border-radius: 8px;
+  background: #f7f9fd;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.montant-calcule span {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--texte-3);
+}
+
+.puce:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.puce:disabled:hover {
+  border-color: var(--filet);
+  background: var(--blanc);
+}
+
+.option {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid var(--filet);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.option .case {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.option span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12.5px;
+  color: var(--texte-3);
+}
+
+.option strong {
+  font-size: 13.5px;
+  color: var(--texte);
+}

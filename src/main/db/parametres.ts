@@ -242,21 +242,27 @@ export function reactiverZone(db: SqlDatabase, nom: string): void {
 
 /* --------------------------------------------------------------- Prestations */
 
-interface LignePrestation extends Omit<Prestation, 'actif' | 'soumis_tva'> {
+interface LignePrestation extends Omit<Prestation, 'actif' | 'soumis_tva' | 'par_conteneur' | 'automatique'> {
   actif: number
   soumis_tva: number
+  par_conteneur: number
+  automatique: number
 }
 
 const versPrestation = (r: LignePrestation): Prestation => ({
   ...r,
   actif: r.actif === 1,
-  soumis_tva: r.soumis_tva === 1
+  soumis_tva: r.soumis_tva === 1,
+  par_conteneur: r.par_conteneur === 1,
+  automatique: r.automatique === 1
 })
+
+const COLONNES_PRESTATION = 'id, libelle, prix, soumis_tva, par_conteneur, automatique, actif, ordre'
 
 export function listerPrestations(db: SqlDatabase, inclureInactifs = false): Prestation[] {
   const rows = db
     .prepare(
-      `SELECT id, libelle, prix, soumis_tva, actif, ordre FROM prestations
+      `SELECT ${COLONNES_PRESTATION} FROM prestations
        WHERE (? = 1 OR actif = 1) ORDER BY actif DESC, ordre, id`
     )
     .all(inclureInactifs ? 1 : 0) as LignePrestation[]
@@ -265,7 +271,7 @@ export function listerPrestations(db: SqlDatabase, inclureInactifs = false): Pre
 
 function prestationParId(db: SqlDatabase, id: number): Prestation {
   const r = db
-    .prepare('SELECT id, libelle, prix, soumis_tva, actif, ordre FROM prestations WHERE id = ?')
+    .prepare(`SELECT ${COLONNES_PRESTATION} FROM prestations WHERE id = ?`)
     .get(id) as LignePrestation | undefined
   if (!r) throw new Error('Prestation introuvable')
   return versPrestation(r)
@@ -291,10 +297,10 @@ export function creerPrestation(db: SqlDatabase, saisie: PrestationSaisie): Pres
   verifierDoublonPrestation(db, v.libelle, null)
   const r = db
     .prepare(
-      `INSERT INTO prestations (libelle, prix, soumis_tva, ordre)
-       VALUES (?, ?, ?, (SELECT COALESCE(MAX(ordre), 0) + 1 FROM prestations))`
+      `INSERT INTO prestations (libelle, prix, soumis_tva, par_conteneur, automatique, ordre)
+       VALUES (?, ?, ?, ?, ?, (SELECT COALESCE(MAX(ordre), 0) + 1 FROM prestations))`
     )
-    .run(v.libelle, v.prix, v.soumis_tva ? 1 : 0)
+    .run(v.libelle, v.prix, v.soumis_tva ? 1 : 0, v.par_conteneur ? 1 : 0, v.automatique ? 1 : 0)
   return prestationParId(db, dernierId(r))
 }
 
@@ -302,12 +308,9 @@ export function modifierPrestation(db: SqlDatabase, id: number, saisie: Prestati
   const v = verifier(validerPrestation(saisie))
   prestationParId(db, id)
   verifierDoublonPrestation(db, v.libelle, id)
-  db.prepare('UPDATE prestations SET libelle = ?, prix = ?, soumis_tva = ? WHERE id = ?').run(
-    v.libelle,
-    v.prix,
-    v.soumis_tva ? 1 : 0,
-    id
-  )
+  db.prepare(
+    'UPDATE prestations SET libelle = ?, prix = ?, soumis_tva = ?, par_conteneur = ?, automatique = ? WHERE id = ?'
+  ).run(v.libelle, v.prix, v.soumis_tva ? 1 : 0, v.par_conteneur ? 1 : 0, v.automatique ? 1 : 0, id)
   return prestationParId(db, id)
 }
 

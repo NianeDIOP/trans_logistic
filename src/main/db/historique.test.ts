@@ -12,11 +12,11 @@ let dangote: number
 
 const conteneur = (num: string, montant = 70000): LigneSaisie => ({
   num_conteneur: num, type_conteneur: '20', zone: 'Dakar Zone 1', nature: 'import',
-  designation: '', montant_ht: montant, soumis_tva: true, prestation_id: null
+  designation: '', montant_ht: montant, soumis_tva: true, quantite: 1, prestation_id: null
 })
 const ags: LigneSaisie = {
   num_conteneur: '', type_conteneur: null, zone: '', nature: null, designation: 'AGS aller simple',
-  montant_ht: 1500, soumis_tva: false, prestation_id: 1
+  montant_ht: 1500, soumis_tva: false, quantite: 1, prestation_id: 1
 }
 const saisie = (f: Partial<FactureSaisie> = {}): FactureSaisie => ({
   id: null, client_id: sococim, date: '2026-10-05', num_bl: '', notes: '',

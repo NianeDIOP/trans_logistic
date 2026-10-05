@@ -21,6 +21,8 @@ interface Edition {
   libelle: string
   prix: number | null
   soumis_tva: boolean
+  par_conteneur: boolean
+  automatique: boolean
 }
 
 export default function OngletPrestations(): React.JSX.Element {
@@ -44,8 +46,8 @@ export default function OngletPrestations(): React.JSX.Element {
     setErreurs({})
     setEdition(
       p
-        ? { id: p.id, libelle: p.libelle, prix: p.prix, soumis_tva: p.soumis_tva }
-        : { id: null, libelle: '', prix: null, soumis_tva: false }
+        ? { id: p.id, libelle: p.libelle, prix: p.prix, soumis_tva: p.soumis_tva, par_conteneur: p.par_conteneur, automatique: p.automatique }
+        : { id: null, libelle: '', prix: null, soumis_tva: false, par_conteneur: false, automatique: false }
     )
   }
 
@@ -54,7 +56,9 @@ export default function OngletPrestations(): React.JSX.Element {
     const saisie: PrestationSaisie = {
       libelle: edition.libelle,
       prix: edition.prix ?? Number.NaN,
-      soumis_tva: edition.soumis_tva
+      soumis_tva: edition.soumis_tva,
+      par_conteneur: edition.par_conteneur,
+      automatique: edition.automatique
     }
     try {
       const api = window.api.parametres.prestations
@@ -107,6 +111,7 @@ export default function OngletPrestations(): React.JSX.Element {
               <tr>
                 <th>Libellé</th>
                 <th className="col-montant">Prix HT</th>
+                <th>Facturation</th>
                 <th>TVA</th>
                 <th className="col-actions" aria-label="Actions" />
               </tr>
@@ -118,7 +123,11 @@ export default function OngletPrestations(): React.JSX.Element {
                     <strong>{p.libelle}</strong>
                   </td>
                   <td className="col-montant">
-                    {formatMontant(p.prix)} <span className="unite">FCFA</span>
+                    {formatMontant(p.prix)} <span className="unite">FCFA{p.par_conteneur ? ' / TC' : ''}</span>
+                  </td>
+                  <td>
+                    {p.par_conteneur ? 'Par conteneur' : 'Par facture'}
+                    {p.automatique && <span className="sous-ligne">Ajoutée d’office</span>}
                   </td>
                   <td>
                     {p.soumis_tva ? <Badge genre="tva">Soumis à TVA</Badge> : <Badge genre="hors-tva">Hors TVA</Badge>}
@@ -168,7 +177,7 @@ export default function OngletPrestations(): React.JSX.Element {
         >
           <div className="grille-champs grille-une-colonne">
             <ChampTexte libelle="Libellé" obligatoire placeholder="ex. AGS aller simple" valeur={edition.libelle} onChange={(v) => setEdition({ ...edition, libelle: v })} erreur={erreurs.libelle} />
-            <ChampMontant libelle="Prix HT" obligatoire valeur={edition.prix} onChange={(v) => setEdition({ ...edition, prix: v })} erreur={erreurs.prix} />
+            <ChampMontant libelle={edition.par_conteneur ? 'Prix HT par conteneur' : 'Prix HT'} obligatoire valeur={edition.prix} onChange={(v) => setEdition({ ...edition, prix: v })} erreur={erreurs.prix} />
             <div className="choix-tva" role="radiogroup" aria-label="Régime de TVA">
               <button type="button" role="radio" aria-checked={!edition.soumis_tva} className={!edition.soumis_tva ? 'actif' : ''} onClick={() => setEdition({ ...edition, soumis_tva: false })}>
                 <strong>Hors TVA</strong>
@@ -179,6 +188,20 @@ export default function OngletPrestations(): React.JSX.Element {
                 <span>Prestation facturée par 2M</span>
               </button>
             </div>
+            <label className="option">
+              <input type="checkbox" className="case" checked={edition.par_conteneur} onChange={(e) => setEdition({ ...edition, par_conteneur: e.target.checked })} />
+              <span>
+                <strong>Facturée par conteneur</strong>
+                Le montant est multiplié par le nombre de conteneurs de la facture (ex. AGS : 1 500 × 3 TC = 4 500).
+              </span>
+            </label>
+            <label className="option">
+              <input type="checkbox" className="case" checked={edition.automatique} onChange={(e) => setEdition({ ...edition, automatique: e.target.checked })} />
+              <span>
+                <strong>Ajoutée d’office à chaque nouvelle facture</strong>
+                Elle peut toujours être retirée d’une facture particulière.
+              </span>
+            </label>
           </div>
         </Modale>
       )}

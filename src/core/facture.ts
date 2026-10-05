@@ -1,5 +1,6 @@
 /** Règles de saisie d'une facture et utilitaires de présentation. */
 import type { FactureSaisie, LigneSaisie } from '../shared/factures'
+import type { Prestation } from '../shared/parametres'
 
 export interface ErreursFacture {
   client_id?: string
@@ -98,4 +99,48 @@ export function nomFichierFacture(numero: string, client: string, type: 'facture
       .slice(0, 60)
   const nom = propre(client) || 'Client'
   return `${type === 'avoir' ? 'Avoir' : 'Facture'}_${propre(numero)}_${nom}.pdf`
+}
+
+/** Nombre de conteneurs saisis (lignes de conteneur non vides). */
+export function nombreConteneurs(lignes: LigneSaisie[]): number {
+  return lignes.filter((l) => estLigneConteneur(l) && !ligneVide(l)).length
+}
+
+/**
+ * Recalcule les prestations facturées par conteneur (ex. AGS aller simple) :
+ * quantité = nombre de conteneurs, montant = quantité × prix unitaire du catalogue.
+ * Si la prestation n'est plus au catalogue, le prix unitaire déjà appliqué est conservé.
+ */
+export function appliquerPrestationsParConteneur(lignes: LigneSaisie[], prestations: Prestation[]): LigneSaisie[] {
+  const n = nombreConteneurs(lignes)
+  let modifie = false
+  const resultat = lignes.map((l) => {
+    if (l.prestation_id === null || estLigneConteneur(l)) return l
+    const p = prestations.find((x) => x.id === l.prestation_id)
+    const parConteneur = p ? p.par_conteneur : l.quantite !== 1
+    if (!parConteneur) return l
+    const unitaire = p ? p.prix : l.quantite > 0 ? Math.round(l.montant_ht / l.quantite) : 0
+    if (l.quantite === n && l.montant_ht === n * unitaire) return l
+    modifie = true
+    return { ...l, quantite: n, montant_ht: n * unitaire }
+  })
+  return modifie ? resultat : lignes
+}
+
+/** Lignes ajoutées d'office à une nouvelle facture (prestations « automatiques »). */
+export function lignesAutomatiques(prestations: Prestation[]): LigneSaisie[] {
+  return prestations
+    .filter((p) => p.automatique && p.actif)
+    .map((p) => ({
+      genre: 'frais' as const,
+      num_conteneur: '',
+      type_conteneur: null,
+      zone: '',
+      nature: null,
+      designation: p.libelle,
+      montant_ht: p.par_conteneur ? 0 : p.prix,
+      soumis_tva: p.soumis_tva,
+      quantite: p.par_conteneur ? 0 : 1,
+      prestation_id: p.id
+    }))
 }
