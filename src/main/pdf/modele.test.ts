@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Facture } from '../../shared/factures'
 import type { Entreprise } from '../../shared/types'
-import { modeleFacture } from './modele'
+import { modeleFacture, teinte } from './modele'
 
 const entreprise: Entreprise = {
   id: 1,
@@ -18,7 +18,9 @@ const entreprise: Entreprise = {
   cachet_path: null,
   taux_tva: 18,
   prefixe_facture: '2M',
-  mentions: 'Paiement à réception.\nMerci.'
+  mentions: 'Paiement à réception.\nMerci.',
+  modele_facture: 'classique',
+  theme_facture: 'marque'
 }
 
 const ligne = {
@@ -123,5 +125,38 @@ describe('détail des totaux', () => {
     expect(html).toContain('<td>TVA 18 % sur conteneurs</td><td class="num">12 600</td>')
     expect(html).toContain('<td>Débours hors TVA</td><td class="num">2 500</td>')
     expect(html).toContain('85 100 FCFA')
+  })
+})
+
+describe('modèles et thèmes', () => {
+  it('applique la mise en page et le thème de l’entreprise', () => {
+    const html = modeleFacture(facture, { ...entreprise, modele_facture: 'bandeau', theme_facture: 'emeraude' }, ressources).html
+    expect(html).toContain('<body class="modele-bandeau">')
+    expect(html).toContain('--p: #0f5d4a')
+  })
+
+  it('un aperçu peut imposer modèle et thème ; une valeur inconnue revient au défaut', () => {
+    const html = modeleFacture(facture, entreprise, ressources, 'ecran', { modele: 'epure', theme: 'noir_blanc' }).html
+    expect(html).toContain('<body class="modele-epure">')
+    expect(html).toContain('--p: #111111')
+    const defaut = modeleFacture(facture, { ...entreprise, modele_facture: 'inconnu', theme_facture: '?' }, ressources).html
+    expect(defaut).toContain('<body class="modele-classique">')
+    expect(defaut).toContain('--p: #0b2569')
+  })
+
+  it('les cinq mises en page produisent un document complet', () => {
+    for (const m of ['classique', 'bandeau', 'epure', 'moderne', 'compact']) {
+      const html = modeleFacture(facture, entreprise, ressources, 'pdf', { modele: m }).html.replace(/&nbsp;/g, ' ')
+      expect(html).toContain('85 100 FCFA')
+      expect(html).toContain('Quatre-vingt-cinq mille cent francs CFA')
+    }
+  })
+})
+
+describe('teinte', () => {
+  it('mélange avec le blanc', () => {
+    expect(teinte('#000000', 0.5)).toBe('#808080')
+    expect(teinte('#0b2569', 0)).toBe('#0b2569')
+    expect(teinte('#0b2569', 1)).toBe('#ffffff')
   })
 })

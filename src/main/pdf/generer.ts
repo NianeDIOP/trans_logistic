@@ -48,9 +48,10 @@ async function ressources(entreprise: Entreprise): Promise<RessourcesPdf> {
 export async function documentFacture(
   facture: Facture,
   entreprise: Entreprise,
-  mode: ModeRendu
+  mode: ModeRendu,
+  presentation?: { modele?: string; theme?: string }
 ): Promise<DocumentPdf> {
-  return modeleFacture(facture, entreprise, await ressources(entreprise), mode)
+  return modeleFacture(facture, entreprise, await ressources(entreprise), mode, presentation)
 }
 
 /** Charge un document dans une fenêtre invisible (sans script) et exécute `action`. */

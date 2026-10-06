@@ -6,6 +6,7 @@ import {
   GearSixIcon,
   InfoIcon,
   ListBulletsIcon,
+  PaletteIcon,
   MapTrifoldIcon,
   ReceiptIcon,
   UsersThreeIcon,
@@ -18,12 +19,14 @@ import OngletListes from './parametres/OngletListes'
 import OngletPrestations from './parametres/OngletPrestations'
 import OngletSauvegarde from './parametres/OngletSauvegarde'
 import OngletAPropos from './parametres/OngletAPropos'
+import OngletModeles from './parametres/OngletModeles'
 import OngletZones from './parametres/OngletZones'
 
-type Onglet = 'entreprise' | 'clients' | 'zones' | 'prestations' | 'listes' | 'sauvegarde' | 'apropos'
+type Onglet = 'entreprise' | 'modeles' | 'clients' | 'zones' | 'prestations' | 'listes' | 'sauvegarde' | 'apropos'
 
 const ONGLETS: { id: Onglet; titre: string; Icone: Icon }[] = [
   { id: 'entreprise', titre: 'Société', Icone: BuildingsIcon },
+  { id: 'modeles', titre: 'Modèles de facture', Icone: PaletteIcon },
   { id: 'clients', titre: 'Clients', Icone: UsersThreeIcon },
   { id: 'zones', titre: 'Zones et tarifs', Icone: MapTrifoldIcon },
   { id: 'prestations', titre: 'Prestations', Icone: ReceiptIcon },
@@ -83,6 +86,7 @@ export default function Parametres({ onRetour }: Props): React.JSX.Element {
 
         <div className="parametres-contenu">
           {onglet === 'entreprise' && <OngletEntreprise onModifie={surModification} />}
+          {onglet === 'modeles' && <OngletModeles />}
           {onglet === 'clients' && <OngletClients />}
           {onglet === 'zones' && <OngletZones />}
           {onglet === 'prestations' && <OngletPrestations />}

@@ -26,6 +26,7 @@ import type {
   Zone,
   ZoneSaisie
 } from '../../shared/parametres'
+import { MODELES_FACTURE, THEMES_FACTURE } from '../../shared/modeles'
 import type { SqlDatabase } from './migrations'
 
 /** Erreur de saisie : message général et, le cas échéant, erreurs par champ. */
@@ -423,4 +424,13 @@ export function supprimerElement(db: SqlDatabase, nom: NomListe, id: number): Re
 
 export function reactiverElement(db: SqlDatabase, nom: NomListe, id: number): void {
   db.prepare(`UPDATE ${nomListe(nom)} SET actif = 1 WHERE id = ?`).run(id)
+}
+
+/* ------------------------------------------------- Modèle et thème des factures */
+
+export function definirPresentation(db: SqlDatabase, modele: string, theme: string): Entreprise {
+  if (!MODELES_FACTURE.some((m) => m.id === modele)) throw new ErreurValidation('Modèle de facture inconnu.')
+  if (!THEMES_FACTURE.some((t) => t.id === theme)) throw new ErreurValidation('Thème de couleurs inconnu.')
+  db.prepare('UPDATE entreprise SET modele_facture = ?, theme_facture = ? WHERE id = 1').run(modele, theme)
+  return lireEntreprise(db)
 }
