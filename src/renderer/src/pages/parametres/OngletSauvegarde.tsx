@@ -2,12 +2,15 @@ import { useCallback, useEffect, useState } from 'react'
 import {
   ArrowCounterClockwiseIcon,
   ClockClockwiseIcon,
+  DownloadSimpleIcon,
+  FileArrowUpIcon,
   FolderOpenIcon,
   HardDrivesIcon,
   ShieldCheckIcon,
   WarningIcon
 } from '@phosphor-icons/react'
 import type { ApercuSauvegarde, InfosSauvegarde } from '@shared/sauvegarde'
+import type { ResumeImport } from '@shared/types'
 import Confirmation from '../../components/ui/Confirmation'
 import EnTeteSection from '../../components/ui/EnTeteSection'
 import { useNotifier } from '../../components/ui/Notifications'
@@ -22,6 +25,7 @@ export default function OngletSauvegarde(): React.JSX.Element {
   const [infos, setInfos] = useState<InfosSauvegarde | null>(null)
   const [aRestaurer, setARestaurer] = useState<ApercuSauvegarde | null>(null)
   const [enCours, setEnCours] = useState(false)
+  const [aImporter, setAImporter] = useState<(ResumeImport & { chemin: string }) | null>(null)
 
   const charger = useCallback(() => {
     appel(window.api.sauvegarde.infos())
@@ -39,6 +43,39 @@ export default function OngletSauvegarde(): React.JSX.Element {
     } catch (err) {
       notifier((err as Error).message, 'erreur')
     } finally {
+      setEnCours(false)
+    }
+  }
+
+  const exporterJson = async (): Promise<void> => {
+    try {
+      const chemin = await appel(window.api.sauvegarde.exporterJson())
+      if (chemin) notifier(`Export enregistré : ${chemin}`)
+    } catch (err) {
+      notifier((err as Error).message, 'erreur')
+    }
+  }
+
+  const choisirJson = async (): Promise<void> => {
+    try {
+      const r = await appel(window.api.sauvegarde.choisirJson())
+      if (r) setAImporter(r)
+    } catch (err) {
+      notifier((err as Error).message, 'erreur')
+    }
+  }
+
+  const importerJson = async (): Promise<void> => {
+    if (!aImporter) return
+    const chemin = aImporter.chemin
+    setAImporter(null)
+    setEnCours(true)
+    try {
+      const r = await appel(window.api.sauvegarde.importerJson(chemin))
+      notifier(`Import terminé : ${r.nb_clients} clients et ${r.nb_factures} factures. L'application se recharge…`)
+      setTimeout(() => window.location.reload(), 1500)
+    } catch (err) {
+      notifier((err as Error).message, 'erreur')
       setEnCours(false)
     }
   }
@@ -109,6 +146,29 @@ export default function OngletSauvegarde(): React.JSX.Element {
         </section>
       </div>
 
+      <section className="carte bloc-transfert">
+        <span className="pastille">
+          <FileArrowUpIcon size={20} weight="duotone" />
+        </span>
+        <div className="bloc-transfert-texte">
+          <h3>Changer d’ordinateur (fichier JSON)</h3>
+          <p className="texte-discret">
+            Exportez tout le contenu de l’application (société, logo et cachet, clients, tarifs, prestations, listes,
+            factures, règlements) dans un fichier JSON, puis importez-le sur le nouvel ordinateur : rien à ressaisir.
+          </p>
+        </div>
+        <div className="bloc-transfert-actions">
+          <button className="btn btn-primaire" onClick={() => void exporterJson()} disabled={enCours}>
+            <DownloadSimpleIcon size={18} weight="duotone" />
+            Exporter les données
+          </button>
+          <button className="btn btn-secondaire" onClick={() => void choisirJson()} disabled={enCours}>
+            <FileArrowUpIcon size={18} weight="duotone" />
+            Importer un export…
+          </button>
+        </div>
+      </section>
+
       <section className="carte carte-tableau">
         <header className="sauvegardes-entete">
           <div>
@@ -161,6 +221,41 @@ export default function OngletSauvegarde(): React.JSX.Element {
         )}
       </section>
 
+      {aImporter && (
+        <Confirmation
+          titre="Importer ces données ?"
+          danger
+          libelleAction="Remplacer les données"
+          message={
+            <>
+              <dl className="apercu-sauvegarde">
+                <div>
+                  <dt>Société</dt>
+                  <dd>{aImporter.raison_sociale || '—'}</dd>
+                </div>
+                <div>
+                  <dt>Exporté le</dt>
+                  <dd>{aImporter.exporte_le ? dateHeure.format(new Date(aImporter.exporte_le)) : '—'}</dd>
+                </div>
+                <div>
+                  <dt>Clients</dt>
+                  <dd>{aImporter.nb_clients}</dd>
+                </div>
+                <div>
+                  <dt>Factures émises</dt>
+                  <dd>{aImporter.nb_factures}</dd>
+                </div>
+              </dl>
+              <p className="avertissement">
+                <WarningIcon size={18} weight="fill" />
+                Toutes les données actuelles seront remplacées par celles du fichier. Une copie de sécurité est faite avant.
+              </p>
+            </>
+          }
+          onConfirmer={() => void importerJson()}
+          onAnnuler={() => setAImporter(null)}
+        />
+      )}
       {aRestaurer && (
         <Confirmation
           titre="Restaurer cette sauvegarde ?"

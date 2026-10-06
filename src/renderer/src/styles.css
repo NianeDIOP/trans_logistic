@@ -2848,3 +2848,59 @@ select.saisie {
   background: var(--bleu-pale);
   color: var(--bleu);
 }
+
+/* Transfert JSON */
+.bloc-transfert {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+}
+
+.bloc-transfert h3 {
+  margin: 0 0 4px;
+  font-family: var(--police-titre);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--bleu-marine);
+}
+
+.bloc-transfert-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Signature du concepteur */
+.signature-concepteur {
+  font-size: 12px;
+  color: var(--texte-3);
+}
+
+.signature-concepteur strong {
+  font-weight: 600;
+  color: var(--texte-2);
+}
+
+.a-propos {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+}
+
+.a-propos dl {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 8px 16px;
+  margin: 0;
+}
+
+.a-propos dt {
+  color: var(--texte-3);
+}
+
+.a-propos dd {
+  margin: 0;
+  font-weight: 600;
+}

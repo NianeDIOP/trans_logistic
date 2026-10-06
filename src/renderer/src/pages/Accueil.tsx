@@ -110,11 +110,9 @@ export default function Accueil({ onOuvrir }: Props): React.JSX.Element {
             RC {entreprise.rc} · NINEA {entreprise.ninea}
           </span>
         )}
-        {info && (
-          <span>
-            Version {info.version} · schéma {info.schemaVersion}
-          </span>
-        )}
+        <span className="signature-concepteur">
+          {info && `Version ${info.version} · `}Conçu par <strong>Niane Diop</strong> · 77 158 89 03
+        </span>
       </footer>
     </div>
   )

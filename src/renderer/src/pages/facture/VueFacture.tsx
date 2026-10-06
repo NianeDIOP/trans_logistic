@@ -21,6 +21,7 @@ import { appel } from '../../lib/appel'
 import ApercuDocument from './ApercuDocument'
 import ModaleAvoir from './ModaleAvoir'
 import ModalePaiement from './ModalePaiement'
+import ModaleSuppressionFacture from './ModaleSuppressionFacture'
 
 interface Props {
   facture: Facture
@@ -30,15 +31,17 @@ interface Props {
   /** La facture a changé (règlement, annulation). */
   onChange: (facture: Facture) => void
   onOuvrir: (route: { factureId?: number; dupliquerDe?: number }) => void
+  /** Après suppression définitive. */
+  onSupprimee: () => void
 }
 
 /** Facture émise : lecture seule, PDF, règlements, avoir, duplication. */
-export default function VueFacture({ facture, nouvelle, onNouvelleFacture, onChange, onOuvrir }: Props): React.JSX.Element {
+export default function VueFacture({ facture, nouvelle, onNouvelleFacture, onChange, onOuvrir, onSupprimee }: Props): React.JSX.Element {
   const notifier = useNotifier()
   const [html, setHtml] = useState<string | null>(null)
   const [paiements, setPaiements] = useState<Paiement[]>([])
   const [enCours, setEnCours] = useState<string | null>(null)
-  const [modale, setModale] = useState<'paiement' | 'avoir' | null>(null)
+  const [modale, setModale] = useState<'paiement' | 'avoir' | 'suppression' | null>(null)
   const [aSupprimer, setASupprimer] = useState<Paiement | null>(null)
   const estAvoir = facture.type === 'avoir'
   const reste = facture.total_ttc - facture.regle
@@ -202,6 +205,10 @@ export default function VueFacture({ facture, nouvelle, onNouvelleFacture, onCha
               Annuler par un avoir…
             </button>
           )}
+          <button className="btn btn-fantome btn-avoir" onClick={() => setModale('suppression')}>
+            <TrashIcon size={18} weight="duotone" />
+            Supprimer définitivement…
+          </button>
           <button className="btn btn-fantome btn-nouvelle" onClick={onNouvelleFacture}>
             <FilePlusIcon size={18} weight="duotone" />
             Nouvelle facture
@@ -258,6 +265,16 @@ export default function VueFacture({ facture, nouvelle, onNouvelleFacture, onCha
           onCree={(avoir) => {
             setModale(null)
             onOuvrir({ factureId: avoir.id })
+          }}
+        />
+      )}
+      {modale === 'suppression' && (
+        <ModaleSuppressionFacture
+          facture={{ id: facture.id, numero: facture.numero, type: facture.type, client: facture.client_raison_sociale }}
+          onFermer={() => setModale(null)}
+          onSupprimee={() => {
+            setModale(null)
+            onSupprimee()
           }}
         />
       )}

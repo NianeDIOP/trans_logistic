@@ -1,4 +1,4 @@
-import { copyFile } from 'node:fs/promises'
+import { copyFile, rm } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import { app, BrowserWindow, dialog, shell } from 'electron'
 import type { Facture, FactureSaisie } from '../shared/factures'
@@ -81,6 +81,11 @@ export function registerFacturesHandlers(): void {
   canal('factures:modesPaiement', () => listerListe(db(), 'modes_paiement'))
   canal('factures:enregistrerPaiement', (_e, id: number, saisie) => H.enregistrerPaiement(db(), id, saisie))
   canal('factures:supprimerPaiement', (_e, paiementId: number) => H.supprimerPaiement(db(), paiementId))
+  canal('factures:supprimer', async (_e, id: number) => {
+    const r = H.supprimerFacture(db(), id)
+    if (r.pdf_path) await rm(r.pdf_path, { force: true })
+    return { numero: r.numero, trou: r.trou }
+  })
   canal('factures:creerAvoir', async (_e, id: number, options) => {
     const avoir = H.creerAvoir(db(), id, options)
     try {

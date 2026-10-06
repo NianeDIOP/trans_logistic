@@ -133,12 +133,15 @@ export interface FacturesApi {
   supprimerPaiement(paiementId: number): R<Facture>
   /** Annule la facture par un avoir (numéroté et archivé) ; retourne l'avoir. */
   creerAvoir(id: number, options: { date: string; motif: string }): R<Facture>
+  /** Supprime définitivement une facture ou un avoir (et son PDF archivé). */
+  supprimer(id: number): R<{ numero: string | null; trou: boolean }>
 }
 
 export const CANAUX_FACTURES = [
   'referentiels', 'lire', 'enregistrer', 'valider', 'apercu',
   'ouvrirPdf', 'enregistrerCopie', 'imprimer', 'supprimerBrouillon',
-  'lister', 'paiements', 'modesPaiement', 'enregistrerPaiement', 'supprimerPaiement', 'creerAvoir'
+  'lister', 'paiements', 'modesPaiement', 'enregistrerPaiement', 'supprimerPaiement', 'creerAvoir',
+  'supprimer'
 ] as const satisfies readonly (keyof FacturesApi)[]
 
 /** API exposée au renderer via `contextBridge` (window.api). */
@@ -162,10 +165,26 @@ export interface SauvegardeApi {
   /** Remplace la base et redémarre l'application. */
   restaurer(chemin: string): R<null>
   ouvrirDossier(): R<null>
+  /** Export de tout le contenu en JSON (fichier choisi) ; chemin, ou null si annulé. */
+  exporterJson(): R<string | null>
+  /** Choix d'un export JSON ; résumé de son contenu, ou null si annulé. */
+  choisirJson(): R<(ResumeImport & { chemin: string }) | null>
+  /** Remplace toutes les données par celles de l'export. */
+  importerJson(chemin: string): R<ResumeImport>
+}
+
+export interface ResumeImport {
+  version: number
+  exporte_le: string
+  raison_sociale: string
+  nb_clients: number
+  nb_factures: number
+  nb_paiements: number
 }
 
 export const CANAUX_SAUVEGARDE = [
-  'infos', 'sauvegarder', 'choisir', 'examiner', 'restaurer', 'ouvrirDossier'
+  'infos', 'sauvegarder', 'choisir', 'examiner', 'restaurer', 'ouvrirDossier',
+  'exporterJson', 'choisirJson', 'importerJson'
 ] as const satisfies readonly (keyof SauvegardeApi)[]
 
 /** Noms des canaux IPC. */

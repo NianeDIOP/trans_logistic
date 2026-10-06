@@ -29,7 +29,11 @@ function createWindow(): void {
     }
   })
 
-  win.once('ready-to-show', () => win.show())
+  // Démarrage en plein écran (fenêtre agrandie).
+  win.once('ready-to-show', () => {
+    win.maximize()
+    win.show()
+  })
 
   const notifyMaximized = (): void =>
     win.webContents.send(IPC.windowMaximizedChanged, win.isMaximized())

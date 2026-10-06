@@ -6,6 +6,7 @@ import {
   CopyIcon,
   FilePdfIcon,
   MagnifyingGlassIcon,
+  TrashIcon,
   XIcon
 } from '@phosphor-icons/react'
 import type { FiltresHistorique, PageHistorique } from '@shared/historique'
@@ -15,6 +16,8 @@ import { formatMontant } from '../../../core/montants'
 import BadgeStatut from '../components/BadgeStatut'
 import { useNotifier } from '../components/ui/Notifications'
 import { appel } from '../lib/appel'
+import ModaleSuppressionFacture from './facture/ModaleSuppressionFacture'
+import type { ResumeFacture } from '@shared/historique'
 
 interface Props {
   onRetour: () => void
@@ -53,6 +56,7 @@ export default function Historique({ onRetour, onOuvrir, onDupliquer }: Props): 
   const [statut, setStatut] = useState<FiltresHistorique['statut'] | ''>('')
   const [page, setPage] = useState(1)
   const [resultat, setResultat] = useState<PageHistorique | null>(null)
+  const [aSupprimer, setASupprimer] = useState<ResumeFacture | null>(null)
   const champRecherche = useRef<HTMLInputElement>(null)
 
   // Recherche appliquée après une courte pause de frappe.
@@ -226,6 +230,11 @@ export default function Historique({ onRetour, onOuvrir, onDupliquer }: Props): 
                             <CopyIcon size={18} />
                           </button>
                         )}
+                        {f.numero && (
+                          <button className="btn-icone btn-icone-danger" title="Supprimer définitivement" onClick={() => setASupprimer(f)}>
+                            <TrashIcon size={18} />
+                          </button>
+                        )}
                       </td>
                     </tr>
                   )
@@ -252,6 +261,17 @@ export default function Historique({ onRetour, onOuvrir, onDupliquer }: Props): 
           </nav>
         )}
       </div>
+
+      {aSupprimer && (
+        <ModaleSuppressionFacture
+          facture={{ id: aSupprimer.id, numero: aSupprimer.numero, type: aSupprimer.type, client: aSupprimer.client_raison_sociale }}
+          onFermer={() => setASupprimer(null)}
+          onSupprimee={() => {
+            setASupprimer(null)
+            charger()
+          }}
+        />
+      )}
     </div>
   )
 }

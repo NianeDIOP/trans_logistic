@@ -1,7 +1,10 @@
 import { BrowserWindow } from 'electron'
 import { canal } from './ipc-commun'
 import {
+  choisirJson,
   choisirSauvegarde,
+  exporterJson,
+  importerJson,
   examinerSauvegarde,
   infosSauvegarde,
   ouvrirDossierAutomatique,
@@ -16,4 +19,7 @@ export function registerSauvegardeHandlers(): void {
   canal('sauvegarde:examiner', (_e, chemin: string) => examinerSauvegarde(chemin))
   canal('sauvegarde:restaurer', (_e, chemin: string) => restaurer(chemin))
   canal('sauvegarde:ouvrirDossier', () => ouvrirDossierAutomatique())
+  canal('sauvegarde:exporterJson', (e) => exporterJson(BrowserWindow.fromWebContents(e.sender)))
+  canal('sauvegarde:choisirJson', (e) => choisirJson(BrowserWindow.fromWebContents(e.sender)))
+  canal('sauvegarde:importerJson', (_e, chemin: string) => importerJson(chemin))
 }

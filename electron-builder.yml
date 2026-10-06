@@ -1,6 +1,6 @@
 appId: sn.deuxm.facturation
 productName: 2M Facturation
-copyright: Copyright © 2026 2M Logistique et Transport
+copyright: Copyright © 2026 2M Logistique et Transport — Conçu par Niane Diop (77 158 89 03)
 directories:
   buildResources: build
   output: release

@@ -133,3 +133,31 @@ describe('avoirs', () => {
     expect(F.enregistrerEtValider(db, saisie()).numero).toBe('2M-2026-0002')
   })
 })
+
+describe('supprimerFacture', () => {
+  it('supprime la dernière facture et libère son numéro', () => {
+    F.enregistrerEtValider(db, saisie())
+    const b = F.enregistrerEtValider(db, saisie())
+    H.enregistrerPaiement(db, b.id, paiement(1000))
+    const r = H.supprimerFacture(db, b.id)
+    expect(r).toMatchObject({ numero: '2M-2026-0002', trou: false })
+    expect(db.prepare('SELECT COUNT(*) AS n FROM paiements').get()).toEqual({ n: 0 })
+    expect(F.enregistrerEtValider(db, saisie()).numero).toBe('2M-2026-0002')
+  })
+
+  it('signale le trou quand ce n’est pas le dernier numéro', () => {
+    const a = F.enregistrerEtValider(db, saisie())
+    F.enregistrerEtValider(db, saisie())
+    expect(H.supprimerFacture(db, a.id).trou).toBe(true)
+  })
+
+  it('exige de supprimer l’avoir d’abord, et supprimer l’avoir rétablit la facture', () => {
+    const f = F.enregistrerEtValider(db, saisie())
+    H.enregistrerPaiement(db, f.id, paiement(1000))
+    const av = H.creerAvoir(db, f.id, { date: '2026-10-06' })
+    expect(() => H.supprimerFacture(db, f.id)).toThrow(/avoir/)
+    H.supprimerFacture(db, av.id)
+    expect(F.lireFacture(db, f.id).statut).toBe('partiellement_payee')
+    expect(() => H.supprimerFacture(db, f.id)).not.toThrow()
+  })
+})
