@@ -301,3 +301,9 @@ npm run dist       # générer l'installateur Windows
   - Export / import JSON de tout le contenu (`src/main/db/transfert.ts`, Paramètres → Sauvegarde) pour
     changer d'ordinateur : tables + logo et cachet en data URL ; import dans une transaction, après copie
     de sécurité « avant-import » ; accepte un export d'une version de schéma égale ou antérieure.
+  - Modèles de facture (migration 5 : `entreprise.modele_facture`, `entreprise.theme_facture`) :
+    5 mises en page (`classique`, `bandeau`, `epure`, `moderne`, `compact`) × 10 thèmes de couleurs, dont
+    « Noir et blanc » (`src/shared/modeles.ts`). Le modèle PDF (`src/main/pdf/modele.ts`) est piloté par des
+    variables CSS (`--p`, `--a`, `--clair`…) + une feuille par mise en page (`CSS_MODELES`). Choix et aperçu
+    en direct : Paramètres → Modèles de facture. Textes du PDF agrandis et plus gras pour l'impression.
+    Les PDF déjà archivés gardent leur apparence d'origine.

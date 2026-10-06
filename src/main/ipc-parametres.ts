@@ -4,6 +4,9 @@ import { getDatabase } from './db'
 import * as P from './db/parametres'
 import { choisirEtCopierImage, imageEnDataUrl, supprimerImage } from './images'
 import { canal } from './ipc-commun'
+import { documentFacture } from './pdf/generer'
+import { factureExemple } from './pdf/exemple'
+import { lireFacture } from './db/factures'
 
 function verifierTypeImage(type: TypeImage): TypeImage {
   if (type !== 'logo' && type !== 'cachet') throw new Error("Type d'image inconnu")
@@ -35,6 +38,19 @@ export function registerParametresHandlers(): void {
     const ancien = verifierTypeImage(type) === 'logo' ? e.logo_path : e.cachet_path
     P.definirImage(db(), type, null)
     await supprimerImage(ancien)
+  })
+
+  canal('parametres:entreprise:definirPresentation', (_e, modele: string, theme: string) =>
+    P.definirPresentation(db(), modele, theme)
+  )
+  canal('parametres:entreprise:apercuModele', async (_e, modele: string, theme: string) => {
+    // Aperçu sur la dernière facture émise, sinon sur une facture d'exemple.
+    const e = P.lireEntreprise(db())
+    const derniere = db()
+      .prepare("SELECT id FROM factures WHERE type = 'facture' AND statut <> 'brouillon' ORDER BY date DESC, id DESC LIMIT 1")
+      .get() as { id: number } | undefined
+    const facture = derniere ? lireFacture(db(), derniere.id) : factureExemple(e.taux_tva)
+    return (await documentFacture(facture, e, 'ecran', { modele, theme })).html
   })
 
   // Clients

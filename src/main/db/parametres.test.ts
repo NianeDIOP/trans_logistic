@@ -181,3 +181,12 @@ describe('listes', () => {
     expect(() => P.listerListe(db, 'clients' as never)).toThrow(/inconnue/)
   })
 })
+
+describe('modèle et thème des factures', () => {
+  it('valeurs par défaut, modification, refus d’un identifiant inconnu', () => {
+    expect([P.lireEntreprise(db).modele_facture, P.lireEntreprise(db).theme_facture]).toEqual(['classique', 'marque'])
+    expect(P.definirPresentation(db, 'bandeau', 'noir_blanc')).toMatchObject({ modele_facture: 'bandeau', theme_facture: 'noir_blanc' })
+    expect(() => P.definirPresentation(db, 'inconnu', 'marque')).toThrow(/Modèle/)
+    expect(() => P.definirPresentation(db, 'classique', 'rose')).toThrow(/Thème/)
+  })
+})

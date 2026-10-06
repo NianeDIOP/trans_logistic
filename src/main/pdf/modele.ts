@@ -7,6 +7,7 @@ import { montantEnLettres } from '../../core/lettres'
 import { formatMontant } from '../../core/montants'
 import type { Entreprise } from '../../shared/types'
 import type { Facture } from '../../shared/factures'
+import { modeleParId, themeParId } from '../../shared/modeles'
 
 export interface RessourcesPdf {
   /** Règles @font-face (polices embarquées). */
@@ -36,12 +37,66 @@ export interface DocumentPdf {
  */
 export type ModeRendu = 'pdf' | 'impression' | 'ecran'
 
+/** Mélange une couleur hexadécimale avec du blanc (ratio 0 → couleur, 1 → blanc). */
+export function teinte(hex: string, ratio: number): string {
+  const n = parseInt(hex.slice(1), 16)
+  const c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => Math.round(v + (255 - v) * ratio))
+  return `#${c.map((v) => v.toString(16).padStart(2, '0')).join('')}`
+}
+
+/** Feuille de style propre à chaque mise en page (complète la feuille commune). */
+const CSS_MODELES: Record<string, string> = {
+  classique: '',
+  bandeau: `
+.entete { padding: 5mm 6mm; border-radius: 3mm; background: var(--p); }
+.entete .logo-cadre { padding: 2mm 3.5mm; border-radius: 2mm; background: #fff; }
+.entete img { height: 19mm; }
+.societe, .societe div, .societe .nom { color: var(--sur-p); }
+.filet { margin-top: 1.5mm; }
+.document h1 { font-style: normal; text-transform: uppercase; letter-spacing: .06em; }
+.client { border: 0; background: var(--clair); }`,
+  epure: `
+.entete { padding-bottom: 4mm; border-bottom: .3mm solid var(--p); }
+.filet { display: none; }
+.document h1 { font-style: normal; font-weight: 700; text-transform: uppercase; letter-spacing: .18em; font-size: 20pt; }
+.client { border: 0; border-left: .6mm solid var(--a); border-radius: 0; padding: 1mm 0 1mm 5mm; }
+.lignes thead th { background: none !important; color: var(--p) !important; border-bottom: .6mm solid var(--p); border-radius: 0 !important; }
+.lignes tbody tr:nth-child(even) td { background: none; }
+.tva th { background: none; border-bottom: .4mm solid var(--p); }
+.totaux .net td { background: none !important; color: var(--p) !important; border: 0; border-top: .6mm solid var(--p); font-size: 12pt; }
+.totaux .net td:last-child { color: var(--p) !important; }`,
+  moderne: `
+.entete { padding-left: 5mm; border-left: 2.5mm solid var(--p); }
+.filet { display: none; }
+.bloc { margin-top: 7mm; }
+.document h1 { font-size: 32pt; font-style: normal; letter-spacing: -.01em; }
+.document .numero { display: inline-block; margin-top: 4mm; padding: 1.5mm 4mm; border-radius: 10mm; background: var(--clair); }
+.client { border: 0; border-radius: 3mm; background: var(--clair); }
+.lignes thead th:first-child { border-radius: 2mm 0 0 2mm; }
+.lignes thead th:last-child { border-radius: 0 2mm 2mm 0; }
+.totaux .net td { background: var(--a) !important; border-color: var(--a) !important; color: #fff !important; font-size: 12pt; }
+.totaux .net td:last-child { color: #fff !important; }`,
+  compact: `
+body { font-size: 9.5pt; }
+.entete img { height: 18mm; }
+.bloc { margin: 5mm 0 4mm; }
+.document h1 { font-size: 20pt; }
+.client { padding: 3mm 4mm; }
+.lignes td { padding: 1.5mm 2.5mm; }
+.lignes thead th { padding: 2mm 2.5mm; }
+.recap { margin-top: 4mm; }
+.signature .zone { min-height: 26mm; }`
+}
+
 export function modeleFacture(
   facture: Facture,
   entreprise: Entreprise,
   ressources: RessourcesPdf,
-  mode: ModeRendu = 'pdf'
+  mode: ModeRendu = 'pdf',
+  presentation?: { modele?: string; theme?: string }
 ): DocumentPdf {
+  const gabarit = modeleParId(presentation?.modele ?? entreprise.modele_facture).id
+  const theme = themeParId(presentation?.theme ?? entreprise.theme_facture)
   const brouillon = facture.statut === 'brouillon'
   const titre = facture.type === 'avoir' ? 'Avoir' : 'Facture'
   const numero = facture.numero ?? 'en attente de validation'
@@ -94,13 +149,13 @@ export function modeleFacture(
     .join(' · ')
 
   const contenuPied = `
-    <div style="font-weight:700;color:#0b2569">${piedEntreprise}</div>
+    <div style="font-weight:700;color:${theme.principal}">${piedEntreprise}</div>
     ${piedBanque ? `<div>Banque : ${piedBanque}</div>` : ''}
     <div>${piedContacts}</div>`
-  const pied = `<div style="width:100%;margin:0 14mm;padding-top:2mm;border-top:0.5mm solid #f2b51d;
-    font-family:'Segoe UI',Arial,sans-serif;font-size:7pt;line-height:1.45;color:#48557a;text-align:center;
+  const pied = `<div style="width:100%;margin:0 14mm;padding-top:2mm;border-top:0.5mm solid ${theme.accent};
+    font-family:'Segoe UI',Arial,sans-serif;font-size:7.5pt;line-height:1.45;color:#2b2b2b;text-align:center;
     -webkit-print-color-adjust:exact">${contenuPied}
-    <div style="margin-top:1mm;color:#8590aa">Page <span class="pageNumber"></span> / <span class="totalPages"></span></div>
+    <div style="margin-top:1mm;color:#6b6b6b">Page <span class="pageNumber"></span> / <span class="totalPages"></span></div>
   </div>`
 
   const html = `<!doctype html>
@@ -111,72 +166,74 @@ export function modeleFacture(
 <style>
 ${ressources.policesCss}
 @page { size: A4; margin: 14mm 14mm 24mm; }
+:root { --p: ${theme.principal}; --a: ${theme.accent}; --sur-p: ${theme.surPrincipal}; --clair: ${teinte(theme.principal, 0.92)}; --tres-clair: ${teinte(theme.principal, 0.96)}; --filet-t: ${teinte(theme.principal, 0.82)}; --texte: #161616; --texte-2: #333a44; --texte-3: #5b6370; }
 * { box-sizing: border-box; }
 html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-body { margin: 0; font-family: 'Source Sans 3', sans-serif; font-size: 10pt; line-height: 1.4; color: #0e1a36; }
+body { margin: 0; font-family: 'Source Sans 3', sans-serif; font-size: 10.5pt; line-height: 1.42; color: var(--texte); }
 .titre-police { font-family: 'Montserrat', sans-serif; }
 
 /* En-tête */
-.entete { display: flex; justify-content: space-between; align-items: center; gap: 10mm; padding-bottom: 5mm; }
-.entete img { height: 27mm; }
-.societe { text-align: right; font-size: 9pt; color: #48557a; }
-.societe .nom { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 12.5pt; color: #0b2569; letter-spacing: .02em; margin-bottom: 1.5mm; }
-.filet-or { height: 1.2mm; border-radius: 1mm; background: linear-gradient(90deg, #c48a0c, #f2b51d 45%, #ffe08a 70%, #f2b51d); }
+.entete { display: flex; justify-content: space-between; align-items: center; gap: 8mm; padding-bottom: 4mm; }
+.entete img { height: 24mm; display: block; }
+.societe { text-align: right; font-size: 10pt; font-weight: 600; color: var(--texte-2); }
+.societe .nom { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 14pt; color: var(--p); letter-spacing: .02em; margin-bottom: 1.5mm; }
+.filet { height: 1.2mm; border-radius: 1mm; background: var(--a); }
 
 /* Bloc titre + client */
-.bloc { display: flex; justify-content: space-between; align-items: flex-start; gap: 10mm; margin: 8mm 0 7mm; }
-.document h1 { margin: 0; font-family: 'Montserrat', sans-serif; font-weight: 800; font-style: italic; font-size: 26pt; line-height: 1; color: #0b2569; }
-.document .numero { margin-top: 3mm; font-size: 11.5pt; }
-.document .numero strong { font-family: 'Montserrat', sans-serif; font-weight: 700; color: #0b2569; }
-.document .date { margin-top: 1mm; color: #48557a; }
-.reference-avoir { margin-top: 3mm; padding: 1mm 0 1mm 3mm; border-left: .8mm solid #f2b51d; font-size: 9.5pt; }
-.reference-avoir strong { font-family: 'Montserrat', sans-serif; font-weight: 700; color: #0b2569; }
-.reference-avoir .motif { color: #48557a; }
-.client { width: 82mm; padding: 4mm 5mm; border: .4mm solid #0b2569; border-radius: 2.5mm; }
-.client .libelle { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 7.5pt; letter-spacing: .14em; text-transform: uppercase; color: #c48a0c; }
-.client .nom { margin: 1mm 0 1.5mm; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 11.5pt; color: #0b2569; }
-.client p { margin: .6mm 0 0; font-size: 9.5pt; color: #2a3656; }
-.client .bl { margin-top: 2mm; padding-top: 1.5mm; border-top: .2mm solid #dde3ef; }
-.etiquette { display: inline-block; min-width: 11mm; font-size: 8pt; font-weight: 600; color: #8590aa; }
+.bloc { display: flex; justify-content: space-between; align-items: flex-start; gap: 8mm; margin: 6mm 0 5mm; }
+.document h1 { margin: 0; font-family: 'Montserrat', sans-serif; font-weight: 800; font-style: italic; font-size: 26pt; line-height: 1; color: var(--p); }
+.document .numero { margin-top: 3mm; font-size: 12pt; font-weight: 600; }
+.document .numero strong { font-family: 'Montserrat', sans-serif; font-weight: 700; color: var(--p); }
+.document .date { margin-top: 1mm; font-weight: 600; color: var(--texte-2); }
+.reference-avoir { margin-top: 3mm; padding: 1mm 0 1mm 3mm; border-left: .8mm solid var(--a); font-size: 10pt; }
+.reference-avoir strong { font-family: 'Montserrat', sans-serif; font-weight: 700; color: var(--p); }
+.reference-avoir .motif { color: var(--texte-2); }
+.client { width: 84mm; padding: 4mm 5mm; border: .4mm solid var(--p); border-radius: 2.5mm; }
+.client .libelle { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 8pt; letter-spacing: .14em; text-transform: uppercase; color: var(--texte-3); }
+.client .nom { margin: 1mm 0 1.5mm; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 12.5pt; color: var(--p); }
+.client p { margin: .6mm 0 0; font-size: 10pt; font-weight: 600; color: var(--texte); }
+.client .bl { margin-top: 2mm; padding-top: 1.5mm; border-top: .2mm solid var(--filet-t); }
+.etiquette { display: inline-block; min-width: 12mm; font-size: 8.5pt; font-weight: 600; color: var(--texte-3); }
 
 /* Tableau des lignes */
 table { width: 100%; border-collapse: collapse; }
-.lignes thead th { padding: 2.6mm 3mm; background: #0b2569; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 7.8pt; letter-spacing: .08em; text-transform: uppercase; text-align: left; }
+.lignes thead th { padding: 2.6mm 3mm; background: var(--p); color: var(--sur-p); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 8.5pt; letter-spacing: .08em; text-transform: uppercase; text-align: left; }
 .lignes thead th:first-child { border-radius: 1.5mm 0 0 0; }
 .lignes thead th:last-child { border-radius: 0 1.5mm 0 0; text-align: right; }
-.lignes td { padding: 2.4mm 3mm; border-bottom: .2mm solid #dde3ef; vertical-align: top; }
-.lignes tbody tr:nth-child(even) td { background: #f5f7fc; }
+.lignes td { padding: 2.1mm 3mm; border-bottom: .2mm solid var(--filet-t); vertical-align: top; font-weight: 600; }
+.lignes tbody tr:nth-child(even) td { background: var(--tres-clair); }
 .lignes tr { page-break-inside: avoid; }
 .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .mono { font-variant-numeric: tabular-nums; letter-spacing: .02em; }
-.designation { color: #2a3656; }
-.precision { font-size: 8.5pt; color: #8590aa; }
-.mention-tva { font-size: 8pt; color: #8a5d00; }
-.quantite { font-size: 9pt; color: #48557a; }
+.designation { color: var(--texte); }
+.precision { font-size: 9pt; color: var(--texte-3); }
+.mention-tva { font-size: 8.5pt; font-weight: 400; color: var(--texte-3); }
+.quantite { font-size: 9.5pt; color: var(--texte-2); }
 
 /* Totaux */
-.recap { display: flex; justify-content: space-between; align-items: flex-start; gap: 8mm; margin-top: 6mm; page-break-inside: avoid; }
-.tva { width: 88mm; }
-.tva th, .tva td, .totaux td { padding: 1.8mm 3mm; border: .2mm solid #dde3ef; font-size: 9pt; }
-.tva th { background: #eaf0fc; color: #0b2569; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 7.5pt; letter-spacing: .06em; text-transform: uppercase; }
-.totaux { width: 78mm; }
-.totaux td:first-child { color: #48557a; }
-.totaux .ttc td { font-weight: 600; color: #0e1a36; }
-.totaux .sous-total td { color: #8590aa; font-size: 8.5pt; }
-.totaux .net td { border-color: #0b2569; background: #0b2569; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 10.5pt; }
-.totaux .net td:last-child { color: #ffe08a; }
-.lettres { margin-top: 5mm; padding: 1mm 0 1mm 4mm; border-left: .8mm solid #f2b51d; font-size: 9.5pt; page-break-inside: avoid; }
-.lettres strong { font-family: 'Montserrat', sans-serif; font-weight: 700; color: #0b2569; }
-.mentions { margin-top: 4mm; font-size: 9pt; color: #48557a; }
+.recap { display: flex; justify-content: space-between; align-items: flex-start; gap: 6mm; margin-top: 5mm; page-break-inside: avoid; }
+.tva { width: 80mm; }
+.tva th, .tva td, .totaux td { padding: 1.6mm 3mm; border: .2mm solid var(--filet-t); font-size: 10pt; font-weight: 600; }
+.tva th { background: var(--clair); color: var(--p); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 8pt; letter-spacing: .06em; text-transform: uppercase; }
+.totaux { width: 96mm; }
+.totaux td:first-child { white-space: nowrap; }
+.totaux td:first-child { color: var(--texte-2); }
+.totaux .ttc td { font-weight: 700; color: var(--texte); }
+.totaux .sous-total td { color: var(--texte-3); font-size: 9pt; }
+.totaux .net td { border-color: var(--p); background: var(--p); color: var(--sur-p); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 11pt; }
+.totaux .net td:last-child { color: var(--sur-p); }
+.lettres { margin-top: 4mm; padding: 1mm 0 1mm 4mm; border-left: .8mm solid var(--a); font-size: 10.5pt; font-weight: 600; page-break-inside: avoid; }
+.lettres strong { font-family: 'Montserrat', sans-serif; font-weight: 700; color: var(--p); }
+.mentions { margin-top: 3mm; font-size: 9.5pt; font-weight: 600; color: var(--texte-2); }
 
 /* Cachet et signature */
-.signature { display: flex; justify-content: flex-end; margin-top: 8mm; page-break-inside: avoid; }
-.signature .zone { width: 70mm; min-height: 34mm; padding: 3mm 4mm; border: .3mm dashed #bdc6da; border-radius: 2.5mm; text-align: center; }
-.signature .libelle { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 7.5pt; letter-spacing: .12em; text-transform: uppercase; color: #8590aa; }
+.signature { display: flex; justify-content: flex-end; margin-top: 5mm; page-break-inside: avoid; }
+.signature .zone { width: 70mm; min-height: 28mm; padding: 3mm 4mm; border: .3mm dashed var(--filet-t); border-radius: 2.5mm; text-align: center; }
+.signature .libelle { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 8pt; letter-spacing: .12em; text-transform: uppercase; color: var(--texte-3); }
 .signature img { max-width: 58mm; max-height: 30mm; margin-top: 2mm; }
 
 /* Pied de page dans le flux (impression directe, aperçu) */
-.pied-flux { margin-top: 10mm; padding-top: 2.5mm; border-top: .5mm solid #f2b51d; font-size: 7.6pt; line-height: 1.45; color: #48557a; text-align: center; page-break-inside: avoid; }
+.pied-flux { margin-top: 10mm; padding-top: 2.5mm; border-top: .5mm solid var(--a); font-size: 8pt; line-height: 1.45; color: #2b2b2b; text-align: center; page-break-inside: avoid; }
 ${mode === 'ecran' ? `
 /* Aperçu à l'écran : une feuille A4 */
 html { background: #fff; }
@@ -184,14 +241,17 @@ body { width: 210mm; min-height: 297mm; margin: 0 auto; padding: 14mm 14mm 10mm;
 .pied-flux { margin-top: auto; }
 .signature { margin-bottom: 10mm; }` : ''}
 
+/* Mise en page « ${gabarit} » */
+${CSS_MODELES[gabarit] ?? ''}
+
 /* Brouillon */
-.filigrane { position: fixed; top: 42%; left: 0; right: 0; text-align: center; transform: rotate(-28deg); font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 80pt; letter-spacing: .1em; color: rgba(11, 37, 105, .07); pointer-events: none; }
+.filigrane { position: fixed; top: 42%; left: 0; right: 0; text-align: center; transform: rotate(-28deg); font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 80pt; letter-spacing: .1em; color: var(--p); opacity: .07; pointer-events: none; }
 </style>
 </head>
-<body>
+<body class="modele-${gabarit}">
 ${brouillon ? '<div class="filigrane">BROUILLON</div>' : ''}
 <header class="entete">
-  <img src="${ressources.logo}" alt="">
+  <div class="logo-cadre"><img src="${ressources.logo}" alt=""></div>
   <div class="societe">
     <div class="nom">${echapper(entreprise.raison_sociale)}</div>
     ${entreprise.adresse ? `<div>${echapper(entreprise.adresse)}</div>` : ''}
@@ -199,7 +259,7 @@ ${brouillon ? '<div class="filigrane">BROUILLON</div>' : ''}
     ${entreprise.email ? `<div>${echapper(entreprise.email)}</div>` : ''}
   </div>
 </header>
-<div class="filet-or"></div>
+<div class="filet"></div>
 
 <section class="bloc">
   <div class="document">

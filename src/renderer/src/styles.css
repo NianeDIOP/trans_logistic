@@ -2904,3 +2904,147 @@ select.saisie {
   margin: 0;
   font-weight: 600;
 }
+
+/* =====================================================================
+ * Modèles de facture
+ * ===================================================================== */
+
+.onglet-large {
+  max-width: 1320px;
+}
+
+.modeles {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.modeles-choix {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.galerie-modeles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+}
+
+.vignette {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1.5px solid var(--filet);
+  border-radius: 10px;
+  background: var(--blanc);
+  text-align: left;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.vignette:hover {
+  border-color: #c3cde3;
+}
+
+.vignette.choisie {
+  border-color: var(--bleu-roi);
+  box-shadow: 0 0 0 3px rgb(31 86 207 / 14%);
+}
+
+.vignette-image {
+  display: block;
+  height: 190px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #e7ebf3;
+  pointer-events: none;
+}
+
+.vignette-image .apercu-feuille {
+  padding: 6px;
+  border-radius: 0;
+}
+
+.vignette-image .apercu-page {
+  box-shadow: 0 1px 4px rgb(6 22 64 / 18%);
+}
+
+.vignette-nom {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--police-titre);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bleu-marine);
+}
+
+.vignette.choisie .vignette-nom {
+  color: var(--bleu-roi);
+}
+
+.vignette-description {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--texte-3);
+}
+
+.galerie-themes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 12px;
+}
+
+.theme {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 6px;
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+}
+
+.theme:hover {
+  background: var(--fond);
+}
+
+.theme.choisi {
+  border-color: var(--bleu-roi);
+  background: var(--bleu-pale);
+}
+
+.theme-pastille {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 2px rgb(255 255 255 / 70%),
+    0 2px 6px rgb(6 22 64 / 18%);
+  color: #fff;
+}
+
+.theme-nom {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--texte-2);
+  text-align: center;
+}
+
+.modeles-apercu {
+  position: sticky;
+  top: 16px;
+}
+
+.modeles-apercu .apercu-feuille {
+  padding: 14px;
+}

@@ -285,6 +285,16 @@ export const MIGRATIONS: Migration[] = [
         ALTER TABLE lignes ADD COLUMN quantite INTEGER NOT NULL DEFAULT 1;
       `)
     }
+  },
+  {
+    version: 5,
+    description: 'Modèle (mise en page) et thème de couleurs des factures',
+    up: (db) => {
+      db.exec(`
+        ALTER TABLE entreprise ADD COLUMN modele_facture TEXT NOT NULL DEFAULT 'classique';
+        ALTER TABLE entreprise ADD COLUMN theme_facture TEXT NOT NULL DEFAULT 'marque';
+      `)
+    }
   }
 ]
 

@@ -35,6 +35,10 @@ export interface Entreprise {
   prefixe_facture: string
   /** Mentions de bas de facture (conditions de paiement…), sur plusieurs lignes. */
   mentions: string
+  /** Mise en page des factures (voir `MODELES_FACTURE`). */
+  modele_facture: string
+  /** Thème de couleurs des factures (voir `THEMES_FACTURE`). */
+  theme_facture: string
 }
 
 export interface AppInfo {
@@ -71,6 +75,9 @@ export interface ParametresApi {
     /** Ouvre le sélecteur de fichier ; null si l'utilisateur annule. */
     choisirImage(type: TypeImage): R<string | null>
     retirerImage(type: TypeImage): R<null>
+    definirPresentation(modele: string, theme: string): R<Entreprise>
+    /** HTML d'aperçu (page A4) d'une facture dans le modèle et le thème donnés. */
+    apercuModele(modele: string, theme: string): R<string>
   }
   clients: {
     lister(options?: { recherche?: string; inclureInactifs?: boolean }): R<Client[]>
@@ -103,7 +110,7 @@ export interface ParametresApi {
 
 /** Canaux IPC des Paramètres : « parametres:<groupe>:<action> ». */
 export const CANAUX_PARAMETRES = {
-  entreprise: ['lire', 'modifier', 'lireImage', 'choisirImage', 'retirerImage'],
+  entreprise: ['lire', 'modifier', 'lireImage', 'choisirImage', 'retirerImage', 'definirPresentation', 'apercuModele'],
   clients: ['lister', 'creer', 'modifier', 'supprimer', 'reactiver'],
   zones: ['lister', 'enregistrer', 'supprimer', 'reactiver'],
   prestations: ['lister', 'creer', 'modifier', 'supprimer', 'reactiver'],
