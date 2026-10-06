@@ -129,7 +129,7 @@ body { margin: 0; font-family: 'Source Sans 3', sans-serif; font-size: 10pt; lin
 .document .numero { margin-top: 3mm; font-size: 11.5pt; }
 .document .numero strong { font-family: 'Montserrat', sans-serif; font-weight: 700; color: #0b2569; }
 .document .date { margin-top: 1mm; color: #48557a; }
-.reference-avoir { margin-top: 3mm; padding: 2mm 3mm; border-left: .8mm solid #f2b51d; background: #fbf7ea; font-size: 9.5pt; }
+.reference-avoir { margin-top: 3mm; padding: 1mm 0 1mm 3mm; border-left: .8mm solid #f2b51d; font-size: 9.5pt; }
 .reference-avoir strong { font-family: 'Montserrat', sans-serif; font-weight: 700; color: #0b2569; }
 .reference-avoir .motif { color: #48557a; }
 .client { width: 82mm; padding: 4mm 5mm; border: .4mm solid #0b2569; border-radius: 2.5mm; }
@@ -162,9 +162,10 @@ table { width: 100%; border-collapse: collapse; }
 .totaux { width: 78mm; }
 .totaux td:first-child { color: #48557a; }
 .totaux .ttc td { font-weight: 600; color: #0e1a36; }
+.totaux .sous-total td { color: #8590aa; font-size: 8.5pt; }
 .totaux .net td { border-color: #0b2569; background: #0b2569; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 10.5pt; }
 .totaux .net td:last-child { color: #ffe08a; }
-.lettres { margin-top: 5mm; padding: 3mm 4mm; border-left: 1mm solid #f2b51d; background: #fbf7ea; font-size: 9.5pt; page-break-inside: avoid; }
+.lettres { margin-top: 5mm; padding: 1mm 0 1mm 4mm; border-left: .8mm solid #f2b51d; font-size: 9.5pt; page-break-inside: avoid; }
 .lettres strong { font-family: 'Montserrat', sans-serif; font-weight: 700; color: #0b2569; }
 .mentions { margin-top: 4mm; font-size: 9pt; color: #48557a; }
 
@@ -229,13 +230,19 @@ ${brouillon ? '<div class="filigrane">BROUILLON</div>' : ''}
 
 <section class="recap">
   <table class="tva">
-    <thead><tr><th>Base soumise à TVA</th><th>Taux</th><th>Montant TVA</th></tr></thead>
+    <thead><tr><th>Base TVA (conteneurs)</th><th>Taux</th><th>Montant TVA</th></tr></thead>
     <tbody><tr><td class="num">${montant(facture.base_tva)}</td><td class="num">${facture.taux_tva} %</td><td class="num">${montant(facture.total_tva)}</td></tr></tbody>
   </table>
   <table class="totaux">
     <tbody>
-      <tr><td>Total HT</td><td class="num">${montant(facture.total_ht)}</td></tr>
-      <tr><td>TVA ${facture.taux_tva} %</td><td class="num">${montant(facture.total_tva)}</td></tr>
+      <tr><td>Transport HT (conteneurs)</td><td class="num">${montant(facture.base_tva)}</td></tr>
+      <tr><td>TVA ${facture.taux_tva} % sur conteneurs</td><td class="num">${montant(facture.total_tva)}</td></tr>
+      ${
+        facture.total_ht - facture.base_tva !== 0
+          ? `<tr><td>Débours hors TVA</td><td class="num">${montant(facture.total_ht - facture.base_tva)}</td></tr>`
+          : ''
+      }
+      <tr class="sous-total"><td>Total HT</td><td class="num">${montant(facture.total_ht)}</td></tr>
       <tr class="ttc"><td>Total TTC</td><td class="num">${montant(facture.total_ttc)}</td></tr>
       <tr class="net"><td>${facture.type === 'avoir' ? 'Montant de l’avoir' : 'Net à payer'}</td><td class="num">${montant(facture.total_ttc)} FCFA</td></tr>
     </tbody>
