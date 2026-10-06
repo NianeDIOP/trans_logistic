@@ -307,3 +307,9 @@ npm run dist       # générer l'installateur Windows
     variables CSS (`--p`, `--a`, `--clair`…) + une feuille par mise en page (`CSS_MODELES`). Choix et aperçu
     en direct : Paramètres → Modèles de facture. Textes du PDF agrandis et plus gras pour l'impression.
     Les PDF déjà archivés gardent leur apparence d'origine.
+  - Installateur / désinstallateur NSIS habillés : `build/installer.nsh` (inclus avant le modèle
+    d'electron-builder, UTF-8 avec BOM) fixe les textes français des pages d'accueil et de fin, la couleur
+    des titres et la signature du concepteur (`BrandingText`). Images 24 bits régénérées à partir du logo :
+    `build/installerSidebar.bmp`, `build/uninstallerSidebar.bmp` (164×314), `build/installerHeader.bmp`
+    (150×57). Le script se vérifie sous Linux avec `makensis` (paquet `nsis`) ; l'installateur complet
+    se construit sous Windows.
