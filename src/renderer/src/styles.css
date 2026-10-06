@@ -1781,8 +1781,7 @@ select.saisie {
 }
 
 .totaux-lettres {
-  padding: 4px 0 4px 16px;
-  border-left: 3px solid var(--or);
+  padding: 4px 0;
 }
 
 .totaux-lettres p {
