@@ -115,3 +115,13 @@ describe('prestation par conteneur', () => {
     expect(html).toContain('AGS aller simple <span class="quantite">— 3 conteneurs × 1 500</span>')
   })
 })
+
+describe('détail des totaux', () => {
+  it('la TVA porte sur les conteneurs, les débours sont à part', () => {
+    const html = modeleFacture({ ...facture, lignes: [...facture.lignes, { ...facture.lignes[1], id: 3, designation: 'Imprimé', montant_ht: 1000 }] }, entreprise, ressources).html.replace(/&nbsp;/g, ' ')
+    expect(html).toContain('<td>Transport HT (conteneurs)</td><td class="num">70 000</td>')
+    expect(html).toContain('<td>TVA 18 % sur conteneurs</td><td class="num">12 600</td>')
+    expect(html).toContain('<td>Débours hors TVA</td><td class="num">2 500</td>')
+    expect(html).toContain('85 100 FCFA')
+  })
+})
