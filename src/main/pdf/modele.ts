@@ -129,7 +129,7 @@ body { margin: 0; font-family: 'Source Sans 3', sans-serif; font-size: 10pt; lin
 .document .numero { margin-top: 3mm; font-size: 11.5pt; }
 .document .numero strong { font-family: 'Montserrat', sans-serif; font-weight: 700; color: #0b2569; }
 .document .date { margin-top: 1mm; color: #48557a; }
-.reference-avoir { margin-top: 3mm; padding: 2mm 3mm; border-left: .8mm solid #f2b51d; background: #fbf7ea; font-size: 9.5pt; }
+.reference-avoir { margin-top: 3mm; padding: 1mm 0 1mm 3mm; border-left: .8mm solid #f2b51d; font-size: 9.5pt; }
 .reference-avoir strong { font-family: 'Montserrat', sans-serif; font-weight: 700; color: #0b2569; }
 .reference-avoir .motif { color: #48557a; }
 .client { width: 82mm; padding: 4mm 5mm; border: .4mm solid #0b2569; border-radius: 2.5mm; }
@@ -165,7 +165,7 @@ table { width: 100%; border-collapse: collapse; }
 .totaux .sous-total td { color: #8590aa; font-size: 8.5pt; }
 .totaux .net td { border-color: #0b2569; background: #0b2569; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 10.5pt; }
 .totaux .net td:last-child { color: #ffe08a; }
-.lettres { margin-top: 5mm; padding: 3mm 4mm; border-left: 1mm solid #f2b51d; background: #fbf7ea; font-size: 9.5pt; page-break-inside: avoid; }
+.lettres { margin-top: 5mm; padding: 1mm 0 1mm 4mm; border-left: .8mm solid #f2b51d; font-size: 9.5pt; page-break-inside: avoid; }
 .lettres strong { font-family: 'Montserrat', sans-serif; font-weight: 700; color: #0b2569; }
 .mentions { margin-top: 4mm; font-size: 9pt; color: #48557a; }
 

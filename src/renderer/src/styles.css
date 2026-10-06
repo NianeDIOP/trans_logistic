@@ -1781,10 +1781,8 @@ select.saisie {
 }
 
 .totaux-lettres {
-  padding: 14px 18px;
-  border-left: 4px solid var(--or);
-  border-radius: 0 8px 8px 0;
-  background: #fbf7ea;
+  padding: 4px 0 4px 16px;
+  border-left: 3px solid var(--or);
 }
 
 .totaux-lettres p {
