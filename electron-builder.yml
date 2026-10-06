@@ -30,8 +30,10 @@ nsis:
   uninstallerIcon: build/icon.ico
   installerHeaderIcon: build/icon.ico
   installerSidebar: build/installerSidebar.bmp
-  uninstallerSidebar: build/installerSidebar.bmp
+  uninstallerSidebar: build/uninstallerSidebar.bmp
   installerHeader: build/installerHeader.bmp
+  # Textes français des pages d'accueil et de fin, signature du concepteur.
+  include: build/installer.nsh
   installerLanguages: [fr_FR]
   language: '1036'
   displayLanguageSelector: false
