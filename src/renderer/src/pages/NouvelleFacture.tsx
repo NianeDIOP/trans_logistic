@@ -271,6 +271,7 @@ export default function NouvelleFacture({
           onNouvelleFacture={nouvelleFacture}
           onChange={(facture) => setEmise({ facture, nouvelle: false })}
           onOuvrir={onOuvrir}
+          onSupprimee={onRetour}
         />
       ) : !referentiels ? (
         <p className="chargement">Chargement…</p>

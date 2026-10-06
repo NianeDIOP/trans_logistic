@@ -4,6 +4,7 @@ import {
   CaretLeftIcon,
   DatabaseIcon,
   GearSixIcon,
+  InfoIcon,
   ListBulletsIcon,
   MapTrifoldIcon,
   ReceiptIcon,
@@ -16,9 +17,10 @@ import OngletEntreprise from './parametres/OngletEntreprise'
 import OngletListes from './parametres/OngletListes'
 import OngletPrestations from './parametres/OngletPrestations'
 import OngletSauvegarde from './parametres/OngletSauvegarde'
+import OngletAPropos from './parametres/OngletAPropos'
 import OngletZones from './parametres/OngletZones'
 
-type Onglet = 'entreprise' | 'clients' | 'zones' | 'prestations' | 'listes' | 'sauvegarde'
+type Onglet = 'entreprise' | 'clients' | 'zones' | 'prestations' | 'listes' | 'sauvegarde' | 'apropos'
 
 const ONGLETS: { id: Onglet; titre: string; Icone: Icon }[] = [
   { id: 'entreprise', titre: 'Société', Icone: BuildingsIcon },
@@ -26,7 +28,8 @@ const ONGLETS: { id: Onglet; titre: string; Icone: Icon }[] = [
   { id: 'zones', titre: 'Zones et tarifs', Icone: MapTrifoldIcon },
   { id: 'prestations', titre: 'Prestations', Icone: ReceiptIcon },
   { id: 'listes', titre: 'Listes', Icone: ListBulletsIcon },
-  { id: 'sauvegarde', titre: 'Sauvegarde', Icone: DatabaseIcon }
+  { id: 'sauvegarde', titre: 'Sauvegarde', Icone: DatabaseIcon },
+  { id: 'apropos', titre: 'À propos', Icone: InfoIcon }
 ]
 
 interface Props {
@@ -85,6 +88,7 @@ export default function Parametres({ onRetour }: Props): React.JSX.Element {
           {onglet === 'prestations' && <OngletPrestations />}
           {onglet === 'listes' && <OngletListes />}
           {onglet === 'sauvegarde' && <OngletSauvegarde />}
+          {onglet === 'apropos' && <OngletAPropos />}
         </div>
       </div>
 

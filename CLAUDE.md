@@ -91,8 +91,12 @@ en lettres : « Quatre-vingt-cinq mille cent francs CFA ».
 ### Statuts et intégrité
 - Statuts : `brouillon`, `emise`, `payee`, `partiellement_payee`, `annulee`.
 - Un brouillon est modifiable et supprimable.
-- Une facture validée n'est **jamais modifiée ni supprimée**. Pour l'annuler : créer un **avoir**
-  (numéro préfixé `AV-`) qui la référence.
+- Une facture validée n'est **jamais modifiée**. Pour l'annuler : créer un **avoir**
+  (numéro préfixé `AV-`) qui la référence (solution recommandée).
+- À la demande du client, une facture ou un avoir peut aussi être **supprimé définitivement**
+  (`supprimerFacture`, confirmation en retapant le numéro) : lignes, règlements et PDF archivé effacés.
+  Une facture annulée ne se supprime qu'après son avoir ; supprimer un avoir rétablit la facture.
+  Supprimer le dernier numéro le libère ; sinon la numérotation garde un trou (l'utilisateur est averti).
 
 ## 5. Modèle de données
 
@@ -291,3 +295,9 @@ npm run dist       # générer l'installateur Windows
     à la Release GitHub pour un tag `v*`. Installateur non signé (avertissement SmartScreen).
   - L'installateur ne se construit pas depuis Linux (module natif better-sqlite3) : passer par la CI.
   - Version 1.0.0.
+- [x] Évolutions après la Phase 7
+  - Fenêtre agrandie au démarrage. Signature du concepteur (Niane Diop, 77 158 89 03) : accueil,
+    Paramètres → À propos, métadonnées de l'exécutable.
+  - Export / import JSON de tout le contenu (`src/main/db/transfert.ts`, Paramètres → Sauvegarde) pour
+    changer d'ordinateur : tables + logo et cachet en data URL ; import dans une transaction, après copie
+    de sécurité « avant-import » ; accepte un export d'une version de schéma égale ou antérieure.

@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Facturation du transport de conteneurs — 2M Logistique et Transport",
   "private": true,
-  "author": "2M Logistique et Transport",
+  "author": "Niane Diop",
   "main": "./out/main/index.js",
   "scripts": {
     "postinstall": "install-electron && electron-builder install-app-deps",

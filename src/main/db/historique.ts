@@ -222,3 +222,55 @@ export function creerAvoir(
   })
   return lireFacture(db, avoirId)
 }
+
+/* ------------------------------------------------------- Suppression définitive */
+
+export interface ResultatSuppressionFacture {
+  numero: string | null
+  pdf_path: string | null
+  /** La suppression laisse un trou dans la numérotation (ce n'était pas le dernier numéro). */
+  trou: boolean
+}
+
+/**
+ * Supprime définitivement une facture ou un avoir (lignes et règlements compris).
+ * - Une facture annulée par un avoir ne se supprime qu'après suppression de l'avoir.
+ * - Supprimer un avoir rétablit la facture qu'il annulait (statut recalculé d'après ses règlements).
+ * - Supprimer le dernier numéro de la séquence le libère ; sinon la numérotation garde un trou.
+ */
+export function supprimerFacture(db: SqlDatabase, id: number): ResultatSuppressionFacture {
+  return transaction(db, () => {
+    const f = db
+      .prepare('SELECT id, numero, type, statut, facture_origine_id, pdf_path FROM factures WHERE id = ?')
+      .get(id) as
+      | { id: number; numero: string | null; type: string; statut: string; facture_origine_id: number | null; pdf_path: string | null }
+      | undefined
+    if (!f) throw new Error('Facture introuvable')
+
+    const avoir = db
+      .prepare("SELECT numero FROM factures WHERE facture_origine_id = ? AND type = 'avoir' LIMIT 1")
+      .get(id) as { numero: string } | undefined
+    if (avoir) {
+      throw new Error(`Cette facture est annulée par l'avoir ${avoir.numero} : supprimez d'abord l'avoir.`)
+    }
+
+    let trou = false
+    if (f.numero) {
+      // Même séquence : même préfixe complet et même année (tout sauf le numéro final).
+      const base = f.numero.slice(0, f.numero.lastIndexOf('-') + 1)
+      const suivants = db
+        .prepare('SELECT COUNT(*) AS n FROM factures WHERE type = ? AND numero LIKE ? AND numero > ? AND length(numero) >= length(?)')
+        .get(f.type, `${base}%`, f.numero, f.numero) as { n: number }
+      trou = Number(suivants.n) > 0
+    }
+
+    db.prepare('DELETE FROM paiements WHERE facture_id = ?').run(id)
+    db.prepare('DELETE FROM lignes WHERE facture_id = ?').run(id)
+    db.prepare('DELETE FROM factures WHERE id = ?').run(id)
+    if (f.type === 'avoir' && f.facture_origine_id !== null) {
+      db.prepare("UPDATE factures SET statut = 'emise' WHERE id = ?").run(f.facture_origine_id)
+      recalculerStatut(db, f.facture_origine_id)
+    }
+    return { numero: f.numero, pdf_path: f.pdf_path, trou }
+  })
+}
