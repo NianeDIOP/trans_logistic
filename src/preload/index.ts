@@ -1,10 +1,12 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import {
+  CANAUX_EXPORTS,
   CANAUX_FACTURES,
   CANAUX_SAUVEGARDE,
   CANAUX_PARAMETRES,
   IPC,
   type Api,
+  type ExportsApi,
   type FacturesApi,
   type ParametresApi,
   type SauvegardeApi
@@ -39,6 +41,14 @@ function apiSauvegarde(): SauvegardeApi {
   return api as unknown as SauvegardeApi
 }
 
+function apiExports(): ExportsApi {
+  const api: Record<string, unknown> = {}
+  for (const action of CANAUX_EXPORTS) {
+    api[action] = (...args: unknown[]) => ipcRenderer.invoke(`exports:${action}`, ...args)
+  }
+  return api as unknown as ExportsApi
+}
+
 const api: Api = {
   getAppInfo: () => ipcRenderer.invoke(IPC.appInfo),
   getEntreprise: () => ipcRenderer.invoke(IPC.entrepriseGet),
@@ -56,7 +66,8 @@ const api: Api = {
   parametres: apiParametres(),
   factures: apiFactures(),
   tableauDeBord: (filtre) => ipcRenderer.invoke(IPC.tableauDeBord, filtre),
-  sauvegarde: apiSauvegarde()
+  sauvegarde: apiSauvegarde(),
+  exports: apiExports()
 }
 
 contextBridge.exposeInMainWorld('api', api)

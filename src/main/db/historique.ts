@@ -30,7 +30,8 @@ function transaction<T>(db: SqlDatabase, fn: () => T): T {
 
 /* ------------------------------------------------------------------ Liste */
 
-export function listerFactures(db: SqlDatabase, filtres: FiltresHistorique = {}): PageHistorique {
+/** Clause WHERE (alias `f` pour factures) et paramètres correspondant aux filtres de l'historique. */
+export function filtreHistorique(filtres: FiltresHistorique): { where: string; params: unknown[] } {
   const conditions: string[] = []
   const params: unknown[] = []
 
@@ -59,7 +60,11 @@ export function listerFactures(db: SqlDatabase, filtres: FiltresHistorique = {})
     conditions.push("f.type = 'facture' AND f.statut = ?")
     params.push(filtres.statut)
   }
-  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
+  return { where: conditions.length ? `WHERE ${conditions.join(' AND ')}` : '', params }
+}
+
+export function listerFactures(db: SqlDatabase, filtres: FiltresHistorique = {}): PageHistorique {
+  const { where, params } = filtreHistorique(filtres)
 
   const parPage = Math.min(Math.max(filtres.parPage ?? 25, 1), 200)
   const total = Number(

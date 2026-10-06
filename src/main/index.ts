@@ -6,6 +6,7 @@ import { closeDatabase, openDatabase } from './db'
 import { registerIpcHandlers } from './ipc'
 import { registerFacturesHandlers } from './ipc-factures'
 import { registerParametresHandlers } from './ipc-parametres'
+import { registerExportsHandlers } from './ipc-exports'
 import { registerSauvegardeHandlers } from './ipc-sauvegarde'
 import { sauvegardeAutomatique } from './sauvegarde'
 
@@ -72,6 +73,7 @@ app.whenReady().then(() => {
   registerParametresHandlers()
   registerFacturesHandlers()
   registerSauvegardeHandlers()
+  registerExportsHandlers()
   createWindow()
   void sauvegardeAutomatique()
 

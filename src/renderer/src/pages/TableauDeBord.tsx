@@ -24,6 +24,7 @@ import type { TableauDeBord as Donnees } from '@shared/tableau'
 import { formatDate } from '../../../core/facture'
 import { formatMontant } from '../../../core/montants'
 import { bornesPeriode, libelleMois, type Periode } from '../../../core/periodes'
+import MenuExport from '../components/MenuExport'
 import { useNotifier } from '../components/ui/Notifications'
 import { appel } from '../lib/appel'
 
@@ -165,6 +166,14 @@ export default function TableauDeBord({ onRetour, onOuvrirFacture }: Props): Rea
             </button>
           ))}
         </div>
+        <MenuExport
+          choix={[
+            { genre: 'synthese', libelle: 'Synthèse de la période', detail: 'Chiffres, mois, clients, conteneurs et impayés' },
+            { genre: 'factures', libelle: 'Factures de la période', detail: 'Une ligne par facture ou avoir émis' },
+            { genre: 'impayes', libelle: 'Impayés à ce jour', detail: 'Factures à encaisser, avec leur ancienneté' }
+          ]}
+          exporter={(genre) => window.api.exports.tableau(bornesPeriode(periode), genre)}
+        />
       </header>
 
       {!donnees ? (

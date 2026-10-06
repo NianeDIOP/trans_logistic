@@ -145,17 +145,19 @@ modes_paiement   (id, code, libelle, actif, ordre)               -- espèces, ch
 - Tableau : N° TC, Type, Zone de livraison, Nature, Prix HT.
 - Tableau TVA (base, taux, montant) + tableau Total HT / Total TTC / Net à payer.
 - Montant en lettres sous les totaux.
-- Zone cachet et signature.
+- Espace vierge en bas pour le cachet et la signature apposés à la main (ni cadre, ni libellé, ni image).
 - Nom de fichier : `Facture_2M-2026-0001_NomClient.pdf`.
 
 ### Historique
 - Liste paginée, recherche par numéro, client, BL, conteneur, période et statut.
 - Actions : ouvrir le PDF, dupliquer, enregistrer un paiement, créer un avoir.
+- Export CSV (Excel) de la liste filtrée : factures ou détail des lignes.
 
 ### Tableau de bord
 - CA HT et TTC du mois et de l'année, TVA collectée par mois.
 - Impayés (montant + liste), top 5 clients, conteneurs par type et par zone.
 - Filtre par période.
+- Export CSV : synthèse de la période, factures de la période, impayés.
 
 ### Paramètres — principe d'automatisation (IMPORTANT)
 **Toute donnée qui entre dans une facture provient des Paramètres.** La saisie d'une facture se fait
@@ -315,3 +317,11 @@ npm run dist       # générer l'installateur Windows
     (150×57, même fond bleu marine). Le script se vérifie sous Linux avec `makensis -WX` (paquet `nsis`),
     et les pages se capturent avec Wine + Xvfb ; l'installateur complet se construit sous Windows.
   - Montant en lettres (écran et PDF) sans filet ni fond.
+  - Cachet et signature : plus rien d'imprimé, un espace vierge (`.signature`, marge basse de 37 mm qui se
+    réduit en bas de page au lieu de créer une page vide). L'image de cachet n'est plus proposée dans
+    Paramètres → Entreprise (la colonne `cachet_path` reste, pour la compatibilité des exports JSON).
+  - Exports CSV : `src/core/csv.ts` (séparateur « ; », CRLF, UTF-8 avec BOM, montants en entiers bruts,
+    dates JJ/MM/AAAA, formules neutralisées), `src/main/db/exports.ts` (`exportFactures`, `exportLignes`,
+    mêmes filtres que la liste via `filtreHistorique`), canaux `exports:historique|tableau|afficher`
+    (`src/main/ipc-exports.ts`). Bouton « Exporter » (`components/MenuExport.tsx`) dans l'Historique et le
+    Tableau de bord ; le fichier est ensuite montré dans l'Explorateur.

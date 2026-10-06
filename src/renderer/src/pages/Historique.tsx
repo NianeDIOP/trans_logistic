@@ -14,6 +14,7 @@ import { formatDate } from '../../../core/facture'
 import { bornesPeriode, type Periode } from '../../../core/periodes'
 import { formatMontant } from '../../../core/montants'
 import BadgeStatut from '../components/BadgeStatut'
+import MenuExport from '../components/MenuExport'
 import { useNotifier } from '../components/ui/Notifications'
 import { appel } from '../lib/appel'
 import ModaleSuppressionFacture from './facture/ModaleSuppressionFacture'
@@ -68,20 +69,16 @@ export default function Historique({ onRetour, onOuvrir, onDupliquer }: Props): 
     return () => clearTimeout(t)
   }, [recherche])
 
-  const charger = useCallback(() => {
+  const filtres = useCallback((): FiltresHistorique => {
     const b = periode === 'perso' ? { du: du || undefined, au: au || undefined } : bornesPeriode(periode)
-    appel(
-      window.api.factures.lister({
-        recherche: rechercheEffective,
-        ...b,
-        statut: statut || undefined,
-        page,
-        parPage: PAR_PAGE
-      })
-    )
+    return { recherche: rechercheEffective, ...b, statut: statut || undefined }
+  }, [rechercheEffective, periode, du, au, statut])
+
+  const charger = useCallback(() => {
+    appel(window.api.factures.lister({ ...filtres(), page, parPage: PAR_PAGE }))
       .then(setResultat)
       .catch((err: Error) => notifier(err.message, 'erreur'))
-  }, [rechercheEffective, periode, du, au, statut, page, notifier])
+  }, [filtres, page, notifier])
 
   useEffect(charger, [charger])
   useEffect(() => champRecherche.current?.focus(), [])
@@ -107,6 +104,15 @@ export default function Historique({ onRetour, onOuvrir, onDupliquer }: Props): 
           <ClockCounterClockwiseIcon size={22} weight="duotone" />
         </span>
         <h1>Historique</h1>
+        <div className="entete-actions">
+          <MenuExport
+            choix={[
+              { genre: 'factures', libelle: 'Liste des factures', detail: 'Une ligne par facture ou avoir, avec règlements et reste à payer' },
+              { genre: 'lignes', libelle: 'Détail des lignes', detail: 'Une ligne par conteneur, AGS, imprimé…' }
+            ]}
+            exporter={(genre) => window.api.exports.historique(filtres(), genre)}
+          />
+        </div>
       </header>
 
       <div className="historique">
