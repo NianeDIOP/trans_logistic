@@ -4,14 +4,21 @@
 
 !define CONCEPTEUR "Niane Diop · 77 158 89 03"
 
-; Couleurs des textes d'en-tête et des pages d'accueil / de fin (bleu marine de la charte).
+; Pages d'accueil / de fin : fond blanc, titres bleu marine (charte).
+; L'en-tête des autres pages est repeint en bleu marine par enteteMarque (voir customHeader).
 !define MUI_TEXTCOLOR 0B2569
 !define MUI_BGCOLOR FFFFFF
-!define MUI_HEADER_TRANSPARENT_TEXT
+!define COULEUR_ENTETE 0B2569
 
 ; Demander confirmation si l'utilisateur interrompt l'opération.
 !define MUI_ABORTWARNING
 !define MUI_UNABORTWARNING
+
+!ifndef BUILD_UNINSTALLER
+  !define MUI_CUSTOMFUNCTION_GUIINIT enteteMarque
+!else
+  !define MUI_CUSTOMFUNCTION_UNGUIINIT un.enteteMarque
+!endif
 
 !ifndef BUILD_UNINSTALLER
   ; --- Installateur ---------------------------------------------------------
@@ -54,6 +61,29 @@ Merci d'avoir utilisé 2M Facturation.$\r$\n$\r$\n\
 Conçu par ${CONCEPTEUR}"
 !endif
 
+; En-tête des fenêtres : bandeau bleu marine, titre blanc en gras, sous-titre bleu clair.
+; installerHeader.bmp a le même fond (#0B2569) et porte le logo sur une carte blanche.
+!macro enteteMarqueCorps
+  GetDlgItem $0 $HWNDPARENT 1034
+  SetCtlColors $0 "" "${COULEUR_ENTETE}"
+  GetDlgItem $0 $HWNDPARENT 1037
+  SetCtlColors $0 "FFFFFF" "${COULEUR_ENTETE}"
+  CreateFont $1 "$(^Font)" 10 700
+  SendMessage $0 0x0030 $1 1
+  GetDlgItem $0 $HWNDPARENT 1038
+  SetCtlColors $0 "D6E0F7" "${COULEUR_ENTETE}"
+!macroend
+
 !macro customHeader
   BrandingText "2M Facturation ${VERSION} — Conçu par ${CONCEPTEUR}"
+
+  !ifndef BUILD_UNINSTALLER
+    Function enteteMarque
+      !insertmacro enteteMarqueCorps
+    FunctionEnd
+  !else
+    Function un.enteteMarque
+      !insertmacro enteteMarqueCorps
+    FunctionEnd
+  !endif
 !macroend

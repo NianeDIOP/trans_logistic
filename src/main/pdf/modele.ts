@@ -222,7 +222,7 @@ table { width: 100%; border-collapse: collapse; }
 .totaux .sous-total td { color: var(--texte-3); font-size: 9pt; }
 .totaux .net td { border-color: var(--p); background: var(--p); color: var(--sur-p); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 11pt; }
 .totaux .net td:last-child { color: var(--sur-p); }
-.lettres { margin-top: 4mm; padding: 1mm 0 1mm 4mm; border-left: .8mm solid var(--a); font-size: 10.5pt; font-weight: 600; page-break-inside: avoid; }
+.lettres { margin-top: 4mm; font-size: 10.5pt; font-weight: 600; page-break-inside: avoid; }
 .lettres strong { font-family: 'Montserrat', sans-serif; font-weight: 700; color: var(--p); }
 .mentions { margin-top: 3mm; font-size: 9.5pt; font-weight: 600; color: var(--texte-2); }
 

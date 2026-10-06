@@ -309,7 +309,9 @@ npm run dist       # générer l'installateur Windows
     Les PDF déjà archivés gardent leur apparence d'origine.
   - Installateur / désinstallateur NSIS habillés : `build/installer.nsh` (inclus avant le modèle
     d'electron-builder, UTF-8 avec BOM) fixe les textes français des pages d'accueil et de fin, la couleur
-    des titres et la signature du concepteur (`BrandingText`). Images 24 bits régénérées à partir du logo :
+    des titres et la signature du concepteur (`BrandingText`). L'en-tête des pages intérieures est repeint
+    en bleu marine (`enteteMarque`, appelée par `MUI_CUSTOMFUNCTION_GUIINIT` / `UNGUIINIT`), titre blanc. Images 24 bits régénérées à partir du logo :
     `build/installerSidebar.bmp`, `build/uninstallerSidebar.bmp` (164×314), `build/installerHeader.bmp`
-    (150×57). Le script se vérifie sous Linux avec `makensis` (paquet `nsis`) ; l'installateur complet
-    se construit sous Windows.
+    (150×57, même fond bleu marine). Le script se vérifie sous Linux avec `makensis -WX` (paquet `nsis`),
+    et les pages se capturent avec Wine + Xvfb ; l'installateur complet se construit sous Windows.
+  - Montant en lettres (écran et PDF) sans filet ni fond.
