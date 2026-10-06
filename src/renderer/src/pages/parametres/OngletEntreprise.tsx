@@ -191,9 +191,10 @@ export default function OngletEntreprise({ onModifie }: Props): React.JSX.Elemen
       </div>
 
       <div className="carte">
-        <h3 className="carte-titre">Logo et cachet</h3>
+        <h3 className="carte-titre">Logo</h3>
         <div className="grille-images">
-          {(['logo', 'cachet'] as const).map((type) => (
+          {/* Le cachet et la signature s'apposent à la main : la facture leur laisse un espace vierge. */}
+          {(['logo'] as const).map((type) => (
             <div key={type} className="bloc-image">
               <div className="bloc-image-apercu">
                 {images[type] ? (

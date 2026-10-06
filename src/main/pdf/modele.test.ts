@@ -87,6 +87,15 @@ describe('modeleFacture', () => {
   })
 })
 
+describe('cachet et signature', () => {
+  it('laisse un espace vierge : ni libellé, ni cadre, ni image de cachet', () => {
+    const html = modeleFacture(facture, entreprise, { ...ressources, cachet: 'data:image/png;base64,CCC' }).html
+    expect(html).toContain('<section class="signature" aria-hidden="true"></section>')
+    expect(html).not.toContain('Cachet et signature')
+    expect(html).not.toContain('base64,CCC')
+  })
+})
+
 describe('modes de rendu', () => {
   it('le pied de page est dans la page pour l’aperçu et l’impression, pas pour le PDF', () => {
     expect(modeleFacture(facture, entreprise, ressources, 'pdf').html).not.toContain('<footer class="pied-flux">')

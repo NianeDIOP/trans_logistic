@@ -160,7 +160,23 @@ export interface Api {
   factures: FacturesApi
   tableauDeBord(filtre: { du?: string; au?: string }): R<TableauDeBord>
   sauvegarde: SauvegardeApi
+  exports: ExportsApi
 }
+
+/** Historique : une ligne par document, ou une ligne par ligne de facture. */
+export type ExportHistorique = 'factures' | 'lignes'
+/** Tableau de bord : synthèse (plusieurs tableaux), factures de la période, impayés à ce jour. */
+export type ExportTableau = 'synthese' | 'factures' | 'impayes'
+
+/** Exports CSV (séparateur « ; », UTF-8) ; chaque export retourne le chemin du fichier, ou null si annulé. */
+export interface ExportsApi {
+  historique(filtres: FiltresHistorique, genre: ExportHistorique): R<string | null>
+  tableau(filtre: { du?: string; au?: string }, genre: ExportTableau): R<string | null>
+  /** Montre le fichier dans l'Explorateur. */
+  afficher(chemin: string): R<null>
+}
+
+export const CANAUX_EXPORTS = ['historique', 'tableau', 'afficher'] as const satisfies readonly (keyof ExportsApi)[]
 
 export interface SauvegardeApi {
   infos(): R<InfosSauvegarde>

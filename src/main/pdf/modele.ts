@@ -85,7 +85,7 @@ body { font-size: 9.5pt; }
 .lignes td { padding: 1.5mm 2.5mm; }
 .lignes thead th { padding: 2mm 2.5mm; }
 .recap { margin-top: 4mm; }
-.signature .zone { min-height: 26mm; }`
+.signature { margin-bottom: 31mm; }`
 }
 
 export function modeleFacture(
@@ -226,11 +226,8 @@ table { width: 100%; border-collapse: collapse; }
 .lettres strong { font-family: 'Montserrat', sans-serif; font-weight: 700; color: var(--p); }
 .mentions { margin-top: 3mm; font-size: 9.5pt; font-weight: 600; color: var(--texte-2); }
 
-/* Cachet et signature */
-.signature { display: flex; justify-content: flex-end; margin-top: 5mm; page-break-inside: avoid; }
-.signature .zone { width: 70mm; min-height: 28mm; padding: 3mm 4mm; border: .3mm dashed var(--filet-t); border-radius: 2.5mm; text-align: center; }
-.signature .libelle { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 8pt; letter-spacing: .12em; text-transform: uppercase; color: var(--texte-3); }
-.signature img { max-width: 58mm; max-height: 30mm; margin-top: 2mm; }
+/* Espace laissé vierge pour le cachet et la signature apposés à la main */
+.signature { height: 0; margin-bottom: 37mm; }
 
 /* Pied de page dans le flux (impression directe, aperçu) */
 .pied-flux { margin-top: 10mm; padding-top: 2.5mm; border-top: .5mm solid var(--a); font-size: 8pt; line-height: 1.45; color: #2b2b2b; text-align: center; page-break-inside: avoid; }
@@ -239,7 +236,7 @@ ${mode === 'ecran' ? `
 html { background: #fff; }
 body { width: 210mm; min-height: 297mm; margin: 0 auto; padding: 14mm 14mm 10mm; display: flex; flex-direction: column; }
 .pied-flux { margin-top: auto; }
-.signature { margin-bottom: 10mm; }` : ''}
+.signature { margin-bottom: 47mm; }` : ''}
 
 /* Mise en page « ${gabarit} » */
 ${CSS_MODELES[gabarit] ?? ''}
@@ -315,12 +312,7 @@ ${brouillon ? '<div class="filigrane">BROUILLON</div>' : ''}
 </div>
 ${entreprise.mentions ? `<div class="mentions">${texte(entreprise.mentions)}</div>` : ''}
 
-<section class="signature">
-  <div class="zone">
-    <div class="libelle">Cachet et signature</div>
-    ${ressources.cachet ? `<img src="${ressources.cachet}" alt="">` : ''}
-  </div>
-</section>
+<section class="signature" aria-hidden="true"></section>
 ${mode === 'pdf' ? '' : `<footer class="pied-flux">${contenuPied}</footer>`}
 </body>
 </html>`
