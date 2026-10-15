@@ -23,10 +23,27 @@ Un seul utilisateur : le propriétaire.
 gestion-depot/
 ├── crates/noyau     règles de gestion pures (conversions, fiche, contrôles, caisse) + tests
 ├── crates/donnees   base SQLite : schéma, migrations, stocks, réceptions, alimentations, journées + tests
+├── app/             interface (Svelte 5) et application de bureau (app/src-tauri, Tauri 2)
 └── docs/            cahier des charges
 ```
 
-L'interface (Tauri 2) viendra dans `app/` au lot suivant.
+## Construire l'installateur Windows
+
+Une fois sur le PC Windows (une seule fois) :
+1. Installer **Rust** : https://rustup.rs (choisir les options par défaut).
+2. Installer **Visual Studio Build Tools**, charge de travail « Développement Desktop en C++ ».
+3. Node.js est déjà installé (utilisé pour 2M Facturation).
+
+Puis, à chaque nouvelle version :
+
+```bash
+cd gestion-depot\app
+npm ci
+npm run tauri build
+```
+
+L'installateur se trouve dans `gestion-depot\target\release\bundle\nsis\`.
+Pour essayer sans installer : `npm run tauri dev`.
 
 ## Commandes
 
@@ -35,6 +52,7 @@ cd gestion-depot
 cargo test           # tous les tests
 cargo clippy --all-targets
 cargo fmt --all
+cd app && npm run check && npm run build
 ```
 
 Conception : Niane Diop · 77 158 89 03

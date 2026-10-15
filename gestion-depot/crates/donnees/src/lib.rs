@@ -6,8 +6,10 @@
 
 pub mod migrations;
 mod operations;
+pub mod parametres;
 
 pub use operations::*;
+pub use parametres::*;
 
 use rusqlite::Connection;
 use std::path::Path;

@@ -4,7 +4,7 @@
 //! qu'à la saisie et à l'affichage. Son nom est paramétrable.
 
 /// Nom d'un conditionnement : « caisse » / « caisses » / « cs ».
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct Conditionnement {
     pub singulier: String,
     pub pluriel: String,
@@ -39,7 +39,7 @@ impl Conditionnement {
 }
 
 /// Format d'un produit : nombre de bouteilles par conditionnement (6, 12 ou 24) et nom du conditionnement.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct Format {
     pub bouteilles_par_conditionnement: i64,
     pub conditionnement: Conditionnement,

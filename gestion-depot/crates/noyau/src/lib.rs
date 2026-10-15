@@ -11,6 +11,7 @@ pub mod caisse;
 pub mod catalogue;
 pub mod fiche;
 pub mod montant;
+pub mod presentation;
 pub mod stock;
 
 pub use caisse::{BilanCaisse, bilan_caisse};

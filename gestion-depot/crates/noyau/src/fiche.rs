@@ -7,7 +7,7 @@
 use crate::stock::Format;
 
 /// Ce qui est saisi pour un produit et une journée.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct SaisieLigne {
     /// Stock initial connu de l'application (stock restant de la dernière journée validée).
     pub stock_initial: i64,
@@ -26,7 +26,8 @@ pub struct SaisieLigne {
     pub montant_fiche: Option<i64>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum Gravite {
     /// Empêche de valider la journée.
     Bloquante,
@@ -34,7 +35,8 @@ pub enum Gravite {
     Avertissement,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
 pub enum Alerte {
     /// RG-10 : le stock restant dépasse le stock total.
     RestantSuperieurAuTotal { restant: i64, total: i64 },
@@ -90,7 +92,7 @@ impl Alerte {
 }
 
 /// Résultat des calculs d'une ligne.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct LigneCalculee {
     pub alimentation: i64,
     pub stock_total: i64,
@@ -145,29 +147,33 @@ pub fn calculer_ligne(saisie: &SaisieLigne, format: &Format, prix: Option<i64>) 
     let montant = ventes * prix_retenu;
 
     if let Some(note) = saisie.stock_initial_fiche
-        && note != saisie.stock_initial {
-            alertes.push(Alerte::EcartOuverture {
-                ecart: note - saisie.stock_initial,
-            });
-        }
+        && note != saisie.stock_initial
+    {
+        alertes.push(Alerte::EcartOuverture {
+            ecart: note - saisie.stock_initial,
+        });
+    }
     if let Some(fiche) = saisie.ventes_fiche
-        && fiche != ventes {
-            alertes.push(Alerte::VentesDifferentes {
-                fiche,
-                calcul: ventes,
-            });
-        }
+        && fiche != ventes
+    {
+        alertes.push(Alerte::VentesDifferentes {
+            fiche,
+            calcul: ventes,
+        });
+    }
     if let (Some(fiche), Some(parametre)) = (saisie.prix_fiche, prix)
-        && fiche != parametre {
-            alertes.push(Alerte::PrixDifferent { fiche, parametre });
-        }
+        && fiche != parametre
+    {
+        alertes.push(Alerte::PrixDifferent { fiche, parametre });
+    }
     if let Some(fiche) = saisie.montant_fiche
-        && fiche != montant {
-            alertes.push(Alerte::MontantDifferent {
-                fiche,
-                calcul: montant,
-            });
-        }
+        && fiche != montant
+    {
+        alertes.push(Alerte::MontantDifferent {
+            fiche,
+            calcul: montant,
+        });
+    }
 
     LigneCalculee {
         alimentation,

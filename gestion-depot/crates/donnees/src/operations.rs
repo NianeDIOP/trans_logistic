@@ -7,8 +7,12 @@ use noyau::{
 };
 use rusqlite::{Connection, OptionalExtension, params};
 
+/// Stock d'ouverture saisi : date du comptage et (produit, dépôt, boutique) en bouteilles.
+pub type StockOuverture = (Option<String>, Vec<(i64, i64, i64)>);
+
 /// Lieu de stockage.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum Lieu {
     Depot,
     Boutique,
@@ -23,7 +27,7 @@ impl Lieu {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Produit {
     pub id: i64,
     pub nom: String,
@@ -35,6 +39,8 @@ pub struct Produit {
     pub seuil_boutique_bt: i64,
     pub ordre: i64,
     pub actif: bool,
+    /// Conditionnement propre au produit ; `None` = conditionnement par défaut.
+    pub conditionnement_id: Option<i64>,
 }
 
 impl Produit {
@@ -48,14 +54,14 @@ impl Produit {
 }
 
 /// Ligne de réception ou d'alimentation : conditionnements entiers + bouteilles isolées.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct LigneQuantite {
     pub produit_id: i64,
     pub conditionnements: i64,
     pub bouteilles: i64,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct ReceptionSaisie {
     pub date: String,
     pub fournisseur_id: Option<i64>,
@@ -67,7 +73,7 @@ pub struct ReceptionSaisie {
 }
 
 /// Fiche journalière telle que recopiée par le propriétaire.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct FicheSaisie {
     pub date: String,
     /// Lignes saisies ; les produits actifs absents sont considérés sans mouvement.
@@ -79,7 +85,7 @@ pub struct FicheSaisie {
 }
 
 /// Ligne préparée pour la saisie d'une journée.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct LignePreparee {
     pub produit: Produit,
     pub stock_initial: i64,
@@ -88,14 +94,14 @@ pub struct LignePreparee {
     pub prix: Option<i64>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct BilanJournee {
     pub journee_id: i64,
     pub lignes: Vec<(i64, LigneCalculee)>,
     pub caisse: BilanCaisse,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct SituationProduit {
     pub produit: Produit,
     pub depot: i64,
@@ -132,7 +138,7 @@ fn verifier_date(date: &str) -> Resultat<()> {
 // ------------------------------------------------------------------ Lecture (fonctions sur une connexion)
 
 const SELECT_PRODUIT: &str = "SELECT p.id, p.nom, p.contenance, p.categorie, p.bt_par_conditionnement, p.format_a_confirmer,
-    p.seuil_depot_conditionnements, p.seuil_boutique_bt, p.ordre, p.actif, c.singulier, c.pluriel, c.abreviation
+    p.seuil_depot_conditionnements, p.seuil_boutique_bt, p.ordre, p.actif, c.singulier, c.pluriel, c.abreviation, p.conditionnement_id
   FROM produits p
   JOIN conditionnements c ON c.id = COALESCE(p.conditionnement_id, (SELECT id FROM conditionnements WHERE par_defaut = 1 LIMIT 1))";
 
@@ -153,6 +159,7 @@ fn ligne_produit(r: &rusqlite::Row) -> rusqlite::Result<Produit> {
         seuil_boutique_bt: r.get(7)?,
         ordre: r.get(8)?,
         actif: r.get::<_, i64>(9)? == 1,
+        conditionnement_id: r.get(13)?,
     })
 }
 
@@ -462,6 +469,11 @@ impl Base {
         }
         for &(produit_id, depot, boutique) in lines_ok(lignes)? {
             lire_produit(&tx, produit_id)?;
+            // Une nouvelle saisie remplace la précédente (correction avant la mise en service).
+            tx.execute(
+                "DELETE FROM mouvements WHERE type = 'ouverture' AND produit_id = ?1",
+                params![produit_id],
+            )?;
             mouvement(
                 &tx,
                 date,
@@ -485,6 +497,25 @@ impl Base {
         }
         tx.commit()?;
         Ok(())
+    }
+
+    /// Stock d'ouverture déjà saisi : (produit, dépôt, boutique) en bouteilles, et sa date.
+    pub fn stock_ouverture_actuel(&self) -> Resultat<StockOuverture> {
+        let date: Option<String> = self.conn.query_row(
+            "SELECT MAX(date) FROM mouvements WHERE type = 'ouverture'",
+            [],
+            |r| r.get(0),
+        )?;
+        let mut stmt = self.conn.prepare(
+            "SELECT produit_id,
+               COALESCE(SUM(CASE WHEN lieu = 'depot' THEN quantite END), 0),
+               COALESCE(SUM(CASE WHEN lieu = 'boutique' THEN quantite END), 0)
+             FROM mouvements WHERE type = 'ouverture' GROUP BY produit_id",
+        )?;
+        let lignes = stmt
+            .query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?
+            .collect::<rusqlite::Result<Vec<_>>>()?;
+        Ok((date, lignes))
     }
 
     pub fn ajouter_fournisseur(&self, nom: &str, telephone: &str) -> Resultat<i64> {
@@ -665,9 +696,10 @@ impl Base {
         verifier_date(&fiche.date)?;
         let tx = self.conn.transaction()?;
         if let Some((_, statut)) = journee_existante(&tx, &fiche.date)?
-            && statut == "validee" {
-                return refus("Cette journée est déjà validée.");
-            }
+            && statut == "validee"
+        {
+            return refus("Cette journée est déjà validée.");
+        }
         let anterieure: Option<String> = tx.query_row(
             "SELECT MIN(date) FROM journees WHERE date < ?1 AND statut = 'brouillon'",
             params![fiche.date],

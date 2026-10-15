@@ -1,6 +1,6 @@
 //! Caisse du jour (§ 5.3) : écart = (total reçu + dépenses) − total des ventes.
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct BilanCaisse {
     pub total_ventes: i64,
     pub total_recu: i64,

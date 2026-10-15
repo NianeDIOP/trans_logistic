@@ -2,3 +2,6 @@
 name = "noyau"
 version.workspace = true
 edition.workspace = true
+
+[dependencies]
+serde = { version = "1.0.229", features = ["derive"] }

@@ -6,4 +6,5 @@ edition.workspace = true
 [dependencies]
 noyau = { version = "0.1.0", path = "../noyau" }
 rusqlite = { version = "0.40.2", features = ["bundled"] }
+serde = { version = "1.0.229", features = ["derive"] }
 thiserror = "2.0.21"
