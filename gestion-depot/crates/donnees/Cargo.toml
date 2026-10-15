@@ -1,0 +1,9 @@
+[package]
+name = "donnees"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+noyau = { version = "0.1.0", path = "../noyau" }
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+thiserror = "2.0.21"

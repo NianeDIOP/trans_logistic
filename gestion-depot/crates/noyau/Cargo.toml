@@ -1,0 +1,4 @@
+[package]
+name = "noyau"
+version.workspace = true
+edition.workspace = true

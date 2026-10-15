@@ -3,6 +3,10 @@
 Ce fichier est lu automatiquement par Claude Code à chaque session.
 Il décrit le projet, les règles métier et les conventions à respecter.
 
+> **Autre projet dans ce dépôt** : le dossier `gestion-depot/` est une application **distincte** (gestion de
+> dépôt et de boutique de boissons, en Rust). Elle a son propre `gestion-depot/CLAUDE.md` ; ne rien partager
+> entre les deux projets.
+
 ## 1. Objectif
 
 Application **desktop Windows**, fonctionnant **hors connexion**, pour générer les factures
