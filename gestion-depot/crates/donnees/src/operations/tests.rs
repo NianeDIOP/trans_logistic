@@ -356,3 +356,17 @@ fn dates_invalides_refusees() {
     assert!(base.preparer_fiche("2026-13-01").is_err());
     assert!(date_valide("2026-10-14"));
 }
+
+#[test]
+fn stock_ouverture_resaisi_sans_doublon() {
+    let (mut base, heineken, _) = base();
+    base.stock_ouverture("2026-10-13", &[(heineken, 48, 10)])
+        .unwrap();
+    base.stock_ouverture("2026-10-13", &[(heineken, 72, 0)])
+        .unwrap();
+    assert_eq!(base.stock(heineken, Lieu::Depot, None).unwrap(), 72);
+    assert_eq!(base.stock(heineken, Lieu::Boutique, None).unwrap(), 0);
+    let (date, lignes) = base.stock_ouverture_actuel().unwrap();
+    assert_eq!(date.as_deref(), Some("2026-10-13"));
+    assert_eq!(lignes, vec![(heineken, 72, 0)]);
+}

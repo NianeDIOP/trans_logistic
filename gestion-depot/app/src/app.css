@@ -1,0 +1,382 @@
+/* Identité de « Gestion Dépôt et Boutique ».
+   --p et --a viennent du thème choisi dans Paramètres → Apparence ; tout le reste en dérive. */
+
+:root {
+  --p: #123d3a;
+  --a: #c8891a;
+  --fond: #f3f6f5;
+  --carte: #ffffff;
+  --texte: #17211f;
+  --texte-2: #4c5b58;
+  --texte-3: #849390;
+  --filet: #dde6e4;
+  --survol: color-mix(in srgb, var(--p) 6%, var(--carte));
+  --p-pale: color-mix(in srgb, var(--p) 10%, var(--carte));
+  --a-pale: color-mix(in srgb, var(--a) 16%, var(--carte));
+  --sur-p: #ffffff;
+  --danger: #b42318;
+  --danger-pale: #fdecea;
+  --alerte: #a15c00;
+  --alerte-pale: #fff4dd;
+  --ok: #217a47;
+  --ok-pale: #e5f5ec;
+  --rayon: 0;
+  --ombre: 0 1px 2px rgb(10 30 28 / 6%), 0 8px 24px rgb(10 30 28 / 7%);
+  --police: 'Manrope Variable', 'Segoe UI', system-ui, sans-serif;
+  --taille: 14.5px;
+  color-scheme: light;
+}
+
+:root[data-mode='sombre'] {
+  --fond: #0e1514;
+  --carte: #172120;
+  --texte: #e6eeec;
+  --texte-2: #a9b8b5;
+  --texte-3: #75857f;
+  --filet: #273433;
+  --survol: color-mix(in srgb, var(--a) 8%, var(--carte));
+  --p-pale: color-mix(in srgb, var(--p) 45%, var(--carte));
+  --a-pale: color-mix(in srgb, var(--a) 22%, var(--carte));
+  --danger-pale: #3a1d1a;
+  --alerte-pale: #3a2c12;
+  --ok-pale: #15301f;
+  --ombre: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 25%);
+  color-scheme: dark;
+}
+
+:root[data-texte='grand'] {
+  --taille: 16.5px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--police);
+  font-size: var(--taille);
+  line-height: 1.5;
+  color: var(--texte);
+  background: var(--fond);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  height: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+h1 {
+  font-size: 1.75em;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 1.2em;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: 0.78em;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--texte-3);
+}
+
+/* ------------------------------------------------------------ Cartes */
+
+.carte {
+  background: var(--carte);
+  border: 1px solid var(--filet);
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre);
+  padding: 22px 24px;
+}
+
+.carte > h2 + p,
+.carte > header p {
+  color: var(--texte-2);
+  margin-top: 2px;
+}
+
+.discret {
+  color: var(--texte-3);
+  font-size: 0.92em;
+}
+
+/* ------------------------------------------------------------ Boutons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: none;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.btn-p {
+  background: var(--p);
+  color: var(--sur-p);
+}
+
+.btn-p:not(:disabled):hover {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p) 22%, transparent);
+}
+
+.btn-s {
+  background: var(--carte);
+  border-color: var(--filet);
+}
+
+.btn-s:not(:disabled):hover {
+  border-color: var(--p);
+}
+
+.btn-f {
+  color: var(--texte-2);
+}
+
+.btn-f:not(:disabled):hover {
+  background: var(--survol);
+}
+
+.btn-danger {
+  color: var(--danger);
+}
+
+.btn-icone {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 2px;
+  background: none;
+  color: var(--texte-2);
+  cursor: pointer;
+}
+
+.btn-icone:hover:not(:disabled) {
+  background: var(--survol);
+  color: var(--p);
+}
+
+.btn-icone:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* ------------------------------------------------------------ Formulaires */
+
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.champ > span {
+  font-size: 0.86em;
+  font-weight: 700;
+  color: var(--texte-2);
+}
+
+.champ > small {
+  color: var(--texte-3);
+  font-size: 0.82em;
+}
+
+.saisie {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--filet);
+  border-radius: 2px;
+  background: var(--carte);
+  outline: none;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+textarea.saisie {
+  height: auto;
+  min-height: 72px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.saisie:focus {
+  border-color: var(--p);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p) 18%, transparent);
+}
+
+.saisie.nombre {
+  text-align: right;
+}
+
+.saisie.invalide {
+  border-color: var(--danger);
+}
+
+.grille-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+}
+
+.grille-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px 20px;
+}
+
+.case {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.case input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--p);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+/* ------------------------------------------------------------ Tableaux */
+
+.tableau {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableau th {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--filet);
+  font-size: 0.74em;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texte-3);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tableau td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--filet);
+  vertical-align: middle;
+}
+
+.tableau tbody tr:hover td {
+  background: var(--survol);
+}
+
+.tableau .nb {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tableau tfoot td {
+  font-weight: 800;
+  border-bottom: 0;
+}
+
+/* ------------------------------------------------------------ Badges */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 2px;
+  font-size: 0.78em;
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--p-pale);
+  color: var(--p);
+}
+
+:root[data-mode='sombre'] .badge {
+  color: var(--texte);
+}
+
+.badge-alerte {
+  background: var(--alerte-pale);
+  color: var(--alerte);
+}
+
+.badge-danger {
+  background: var(--danger-pale);
+  color: var(--danger);
+}
+
+.badge-ok {
+  background: var(--ok-pale);
+  color: var(--ok);
+}
+
+.badge-neutre {
+  background: var(--survol);
+  color: var(--texte-3);
+}
+
+/* ------------------------------------------------------------ Divers */
+
+.vide {
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--texte-3);
+}
+
+.erreur-texte {
+  color: var(--danger);
+  font-size: 0.86em;
+  font-weight: 600;
+}
+
+:focus-visible {
+  outline: 2px solid var(--a);
+  outline-offset: 2px;
+}
