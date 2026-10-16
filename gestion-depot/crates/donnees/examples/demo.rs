@@ -5,7 +5,8 @@
 //! GD_DONNEES=/chemin/dossier  (puis lancer l'application)
 //! ```
 
-use donnees::{Base, Identite, LigneQuantite, ReceptionSaisie};
+use donnees::{Base, FicheSaisie, Identite, LigneQuantite, ReceptionSaisie};
+use noyau::fiche::SaisieLigne;
 
 /// (désignation, bouteilles par caisse, prix de vente d'illustration)
 const FORMATS: [(&str, i64, i64); 29] = [
@@ -93,6 +94,69 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     base.stock_ouverture("2026-09-30", &ouverture)?;
     base.enregistrer_reception(&reception)?;
+
+    // Deux semaines de fiches : une alimentation au dépôt le 6, des ventes chaque jour, un brouillon le 15.
+    let alimentation: Vec<LigneQuantite> = reception
+        .lignes
+        .iter()
+        .filter(|l| l.conditionnements >= 2)
+        .map(|l| LigneQuantite {
+            produit_id: l.produit_id,
+            conditionnements: 1,
+            bouteilles: 0,
+        })
+        .collect();
+    for jour in 2..=15 {
+        let date = format!("2026-10-{jour:02}");
+        if jour == 6 {
+            base.enregistrer_alimentation(&date, &alimentation, "Réassort de la semaine")?;
+        }
+        let mut fiche = FicheSaisie {
+            date: date.clone(),
+            ..Default::default()
+        };
+        let situation = base.situation(&date)?;
+        let mut ventes = 0;
+        for (i, l) in base.preparer_fiche(&date)?.iter().enumerate() {
+            let i = i as i64;
+            // Le vendeur reçoit une caisse quand la boutique descend sous 3 bouteilles.
+            let au_depot = situation
+                .iter()
+                .find(|s| s.produit.id == l.produit.id)
+                .map_or(0, |s| s.depot);
+            let bt = l.produit.format.bouteilles_par_conditionnement;
+            let alim = i64::from(l.stock_initial < 3 && i % 3 != 0 && au_depot >= bt);
+            let total = l.stock_initial + alim * bt + l.alimentation_enregistree;
+            let vendu = ((i * 3 + jour * 7) % 6).min(total);
+            if alim == 0 && vendu == 0 {
+                continue;
+            }
+            ventes += vendu * l.prix.unwrap_or(0);
+            fiche.lignes.push((
+                l.produit.id,
+                SaisieLigne {
+                    alimentation_conditionnements: alim,
+                    stock_restant: Some(total - vendu),
+                    ..Default::default()
+                },
+            ));
+        }
+        let depenses = if jour % 3 == 0 { 2_500 } else { 0 };
+        let ecart = match jour % 5 {
+            1 => -1_000,
+            3 => 500,
+            _ => 0,
+        };
+        fiche.total_recu = ventes - depenses + ecart;
+        if depenses > 0 {
+            fiche.depenses.push(("Glace et sachets".into(), depenses));
+        }
+        if jour == 15 {
+            base.enregistrer_brouillon(&fiche)?;
+        } else {
+            base.valider_journee(&fiche)?;
+        }
+    }
     println!("Base de démonstration créée : {}", chemin.display());
     Ok(())
 }

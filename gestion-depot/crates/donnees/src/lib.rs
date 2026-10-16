@@ -4,10 +4,12 @@
 //! alimentation, vente, casse, inventaire). Chaque opération qui modifie le stock est écrite dans
 //! une transaction (tout ou rien).
 
+pub mod consultations;
 pub mod migrations;
 mod operations;
 pub mod parametres;
 
+pub use consultations::*;
 pub use operations::*;
 pub use parametres::*;
 

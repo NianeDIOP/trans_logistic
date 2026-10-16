@@ -47,7 +47,14 @@ Le cahier des charges fait foi : `docs/cahier-des-charges-v1.1.pdf`. Les codes `
   paramètres (boutique et logo, produits / formats / prix datés / seuils / ordre, conditionnements, stock
   d'ouverture, apparence : 8 thèmes, mode sombre, grand texte, modèles et en-têtes de documents avec aperçu).
   Données ajoutées : `donnees::parametres` (identité, présentation, conditionnements, produits, prix). 35 tests.
-- [ ] Lot 2 — Écrans Dépôt (réceptions, alimentations, inventaire, fiche de stock).
-- [ ] Lot 3 — Écran Fiche journalière, caisse, historique, réouverture tracée (RG-22).
+- [x] Lot 2 — Écrans Dépôt (`pages/Depot.svelte` + `pages/depot/`) : réceptions fournisseur (création rapide
+  de fournisseur), alimentations de la boutique (stock du dépôt affiché, RG-14), inventaire dépôt ou boutique
+  (théorique, compté, écart), fiche de stock d'un produit avec soldes. Saisie commune : `TableQuantites.svelte`.
+- [x] Lot 3 — Fiche du jour (`pages/Fiche.svelte`) : saisie dans l'ordre de la fiche papier, Entrée = ligne
+  suivante, calculs et alertes en direct par le cœur Rust (`fiche_apercu`), contrôle facultatif des chiffres
+  du vendeur, caisse (reçu, dépenses, écart), brouillon, validation, réouverture de la dernière journée avec
+  motif (RG-22, `donnees::consultations`). Historique (`pages/Historique.svelte`) : journées par période,
+  totaux, écart cumulé ; un clic ouvre la fiche (`aller('fiche', undefined, date)`, adresse `#/fiche/AAAA-MM-JJ`).
+  La base de démonstration contient deux semaines de fiches (13 validées, 1 brouillon). 38 tests.
 - [ ] Lot 4 — Tableau de bord, rapports, impressions PDF, export Excel, fiche vierge.
 - [ ] Lot 5 — Mot de passe, sauvegardes, export complet, installateur Windows.

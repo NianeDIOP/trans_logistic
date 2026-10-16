@@ -74,6 +74,7 @@ pub struct ReceptionSaisie {
 
 /// Fiche journalière telle que recopiée par le propriétaire.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
+#[serde(default)]
 pub struct FicheSaisie {
     pub date: String,
     /// Lignes saisies ; les produits actifs absents sont considérés sans mouvement.

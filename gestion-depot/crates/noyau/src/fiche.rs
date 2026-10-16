@@ -8,6 +8,7 @@ use crate::stock::Format;
 
 /// Ce qui est saisi pour un produit et une journée.
 #[derive(Debug, Clone, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(default)]
 pub struct SaisieLigne {
     /// Stock initial connu de l'application (stock restant de la dernière journée validée).
     pub stock_initial: i64,
