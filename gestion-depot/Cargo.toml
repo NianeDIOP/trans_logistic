@@ -3,7 +3,14 @@ resolver = "3"
 members = ["crates/noyau", "crates/donnees", "app/src-tauri"]
 
 [workspace.package]
-version = "0.1.0"
+version = "1.0.0"
 edition = "2024"
 authors = ["Niane Diop"]
 license = "UNLICENSED"
+
+# Le chiffrement du mot de passe (Argon2) est lent sans optimisation : compilé optimisé même en développement.
+[profile.dev.package.argon2]
+opt-level = 3
+
+[profile.dev.package.blake2]
+opt-level = 3

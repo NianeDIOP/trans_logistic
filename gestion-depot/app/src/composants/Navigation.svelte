@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { aller, MODULES, route } from '../lib/etat.svelte'
+  import { Lock } from '@lucide/svelte'
+  import { appel } from '../lib/api'
+  import { aller, global, MODULES, route } from '../lib/etat.svelte'
+
+  async function verrouiller() {
+    await appel('verrouiller')
+    global.verrouille = true
+  }
 
   // Barre de navigation horizontale ; raccourcis : chiffres 1 à 5, Échap pour l'accueil.
   function touche(e: KeyboardEvent) {
@@ -21,9 +28,16 @@
       {m.titre}
     </button>
   {/each}
+  {#if global.securite?.protege}
+    <button class="verrouiller" onclick={verrouiller} title="Verrouiller l’application"><Lock size={16} /> Verrouiller</button>
+  {/if}
 </nav>
 
 <style>
+  .verrouiller {
+    margin-left: auto;
+  }
+
   .navigation {
     display: flex;
     gap: 2px;

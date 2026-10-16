@@ -16,18 +16,31 @@ use noyau::stock::quantite_courte;
 use noyau::{format_fcfa, quantite_lisible};
 use serde::Serialize;
 use std::sync::MutexGuard;
+use std::sync::atomic::Ordering;
 use tauri::State;
 
-type R<T> = Result<T, String>;
+pub(crate) type R<T> = Result<T, String>;
 
-fn base<'a>(etat: &'a State<Etat>) -> R<MutexGuard<'a, Base>> {
-    etat.base
-        .lock()
-        .map_err(|_| "La base de données est indisponible.".to_string())
+/// Accès à la base pour une commande ordinaire : refusé tant que l'application est verrouillée (ET-10).
+pub(crate) fn base<'a>(etat: &'a State<Etat>) -> R<MutexGuard<'a, Base>> {
+    if !etat.deverrouille.load(Ordering::SeqCst) {
+        return Err("L’application est verrouillée : saisissez le mot de passe.".into());
+    }
+    base_libre(etat)
 }
 
-fn texte<E: std::fmt::Display>(e: E) -> String {
-    e.to_string()
+/// Accès sans contrôle du verrou : identité et apparence, nécessaires à l'écran de connexion.
+pub(crate) fn base_libre<'a>(etat: &'a State<Etat>) -> R<MutexGuard<'a, Base>> {
+    etat.base
+        .lock()
+        .map_err(|_| texte("La base de données est indisponible."))
+}
+
+/// Message d'erreur affichable ; il est aussi inscrit au journal des erreurs (ET-06).
+pub(crate) fn texte<E: std::fmt::Display>(e: E) -> String {
+    let message = e.to_string();
+    crate::journal::erreur(&message);
+    message
 }
 
 // ------------------------------------------------------------------ Général
@@ -114,7 +127,7 @@ pub fn references() -> References {
 
 #[tauri::command]
 pub fn identite_lire(etat: State<Etat>) -> R<Identite> {
-    base(&etat)?.identite().map_err(texte)
+    base_libre(&etat)?.identite().map_err(texte)
 }
 
 #[tauri::command]
@@ -125,7 +138,7 @@ pub fn identite_modifier(etat: State<Etat>, identite: Identite) -> R<Identite> {
 /// Logo en data URL (pour l'affichage), ou `None`.
 #[tauri::command]
 pub fn logo_lire(etat: State<Etat>) -> R<Option<String>> {
-    let chemin = base(&etat)?.identite().map_err(texte)?.logo_path;
+    let chemin = base_libre(&etat)?.identite().map_err(texte)?.logo_path;
     let Some(chemin) = chemin else {
         return Ok(None);
     };
@@ -173,7 +186,7 @@ pub fn logo_definir(etat: State<Etat>, data_url: Option<String>) -> R<()> {
 
 #[tauri::command]
 pub fn presentation_lire(etat: State<Etat>) -> R<Presentation> {
-    base(&etat)?.presentation().map_err(texte)
+    base_libre(&etat)?.presentation().map_err(texte)
 }
 
 #[tauri::command]
@@ -597,4 +610,33 @@ pub fn journees_lister(etat: State<Etat>, du: String, au: String) -> R<Vec<Journ
 #[tauri::command]
 pub fn journee_reouvrir(etat: State<Etat>, date: String, motif: String) -> R<()> {
     base(&etat)?.reouvrir_journee(&date, &motif).map_err(texte)
+}
+
+// ------------------------------------------------------------------ Rapports (lot 4)
+
+#[tauri::command]
+pub fn rapport_periode(etat: State<Etat>, du: String, au: String) -> R<donnees::RapportPeriode> {
+    base(&etat)?.rapport_periode(&du, &au).map_err(texte)
+}
+
+#[tauri::command]
+pub fn indicateurs(etat: State<Etat>, date: String) -> R<donnees::Indicateurs> {
+    base(&etat)?.indicateurs(&date).map_err(texte)
+}
+
+#[tauri::command]
+pub fn journee_lire(etat: State<Etat>, date: String) -> R<Option<donnees::JourneeEnregistree>> {
+    base(&etat)?.journee(&date).map_err(texte)
+}
+
+/// EF-32 : écrit un classeur Excel au chemin choisi par l'utilisateur.
+#[tauri::command]
+pub fn excel_enregistrer(
+    etat: State<Etat>,
+    chemin: String,
+    feuilles: Vec<crate::excel::Feuille>,
+) -> R<()> {
+    let boutique = base(&etat)?.identite().map_err(texte)?.nom_commercial;
+    crate::excel::ecrire(&chemin, &boutique, &feuilles)
+        .map_err(|e| format!("Le fichier Excel n’a pas pu être écrit : {e}"))
 }

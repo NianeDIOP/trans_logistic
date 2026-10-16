@@ -1,5 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { Printer } from '@lucide/svelte'
+  import Apercu from '../../composants/Apercu.svelte'
   import { appel } from '../../lib/api'
   import { global } from '../../lib/etat.svelte'
   import { dateCourte, enConditionnements, entier } from '../../lib/format'
@@ -9,6 +11,7 @@
   let produits = $state<Produit[]>([])
   let choisi = $state('')
   let mouvements = $state<MouvementStock[]>([])
+  let apercu = $state(false)
 
   const TYPES: Record<string, string> = {
     ouverture: 'Stock d’ouverture',
@@ -49,8 +52,35 @@
       <div><dt>Boutique</dt><dd>{entier(mouvements[0]!.solde_boutique)} bt</dd></div>
       <div><dt>Total</dt><dd>{entier(mouvements[0]!.solde_depot + mouvements[0]!.solde_boutique)} bt</dd></div>
     </dl>
+    <button class="btn btn-s imprimer" onclick={() => (apercu = true)}><Printer size={17} /> Imprimer</button>
   {/if}
 </section>
+
+{#if apercu && produit}
+  <Apercu titre="Fiche de stock — {produit.designation}" periode="Situation au {dateCourte(global.date)} · {produit.bt_par_conditionnement} bt par {produit.conditionnement}" onfermer={() => (apercu = false)}>
+    <div class="doc-resume">
+      <div><span>Dépôt</span><strong>{fmt(mouvements[0]!.solde_depot)}</strong></div>
+      <div><span>Boutique</span><strong>{entier(mouvements[0]!.solde_boutique)} bt</strong></div>
+      <div><span>Total</span><strong>{entier(mouvements[0]!.solde_depot + mouvements[0]!.solde_boutique)} bt</strong></div>
+    </div>
+    <table class="doc-table">
+      <thead><tr><th>Date</th><th>Mouvement</th><th>Lieu</th><th class="nb">Quantité (bt)</th><th class="nb">Solde dépôt</th><th class="nb">Solde boutique</th><th>Motif</th></tr></thead>
+      <tbody>
+        {#each [...mouvements].reverse() as m, i (i)}
+          <tr>
+            <td>{dateCourte(m.date)}</td>
+            <td>{TYPES[m.type_mouvement] ?? m.type_mouvement}</td>
+            <td>{m.lieu === 'depot' ? 'Dépôt' : 'Boutique'}</td>
+            <td class="nb" class:rouge={m.quantite < 0}>{m.quantite > 0 ? '+' : ''}{entier(m.quantite)}</td>
+            <td class="nb">{fmt(m.solde_depot)}</td>
+            <td class="nb">{entier(m.solde_boutique)}</td>
+            <td>{m.motif}</td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  </Apercu>
+{/if}
 
 <section class="carte" style="padding: 4px 6px">
   <table class="tableau">
@@ -81,6 +111,10 @@
     align-items: flex-end;
     gap: 30px;
     margin-bottom: 14px;
+  }
+
+  .imprimer {
+    margin-left: auto;
   }
 
   .barre .champ {

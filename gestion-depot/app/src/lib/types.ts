@@ -228,3 +228,66 @@ export interface JourneeResume {
   ecart: number
   bouteilles_vendues: number
 }
+
+// ------------------------------------------------------------------ Rapports
+
+export interface Cumul { journees: number; ventes: number; recu: number; depenses: number; ecart: number; bouteilles: number }
+
+export interface ActiviteProduit {
+  produit_id: number
+  designation: string
+  categorie: string
+  ordre: number
+  bouteilles_vendues: number
+  montant: number
+  casse: number
+  recu_depot: number
+  alimente: number
+}
+
+export interface RapportPeriode {
+  du: string
+  au: string
+  totaux: Cumul
+  casse: number
+  recu_depot: number
+  alimente: number
+  produits: ActiviteProduit[]
+  categories: { categorie: string; bouteilles: number; montant: number }[]
+  jours: JourneeResume[]
+  depenses: [string, number][]
+}
+
+export interface Indicateurs {
+  date: string
+  jour: Cumul
+  semaine: Cumul
+  mois: Cumul
+  meilleurs: { designation: string; bouteilles: number; montant: number }[]
+  serie: [string, number][]
+  derniere_validee: string | null
+  brouillons: string[]
+}
+
+// ------------------------------------------------------------------ Sécurité et sauvegarde
+
+export interface CopieSauvegarde { nom: string; chemin: string; octets: number }
+
+export interface EtatSecurite {
+  protege: boolean
+  deverrouille: boolean
+  dossier_donnees: string
+  dossier_sauvegardes: string
+  fichier_reinitialisation: string
+  derniere_sauvegarde_externe: string | null
+  date_du_jour: string
+  copies: CopieSauvegarde[]
+}
+
+export interface InfosSauvegarde {
+  nom_boutique: string
+  version_schema: number
+  nb_produits: number
+  derniere_journee: string | null
+  nb_journees: number
+}

@@ -143,7 +143,7 @@
       </table>
       <div class="doc-pied">{p.pied_page || 'Pied de page'} · page 1 / 1</div>
     </div>
-    <p class="discret">Valeurs d’illustration. Les impressions arrivent avec les rapports (lot 4).</p>
+    <p class="discret">Valeurs d’illustration. Ces réglages s’appliquent à toutes les impressions ; couleurs et mise en page peuvent aussi être changées au moment d’imprimer.</p>
   </section>
 </div>
 

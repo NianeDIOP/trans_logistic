@@ -191,6 +191,11 @@ const MIGRATIONS: &[(i64, &str)] = &[(1, MIGRATION_1)];
 /// Format provisoire des produits du catalogue initial, à confirmer dans les Paramètres.
 pub const FORMAT_PROVISOIRE: i64 = 12;
 
+/// Version de schéma attendue par ce logiciel.
+pub fn version_cible() -> i64 {
+    MIGRATIONS.last().map_or(0, |m| m.0)
+}
+
 pub fn version(conn: &Connection) -> rusqlite::Result<i64> {
     conn.query_row(
         "SELECT COALESCE(MAX(version), 0) FROM schema_version",

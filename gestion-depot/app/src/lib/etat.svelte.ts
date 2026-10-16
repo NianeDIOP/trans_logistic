@@ -1,11 +1,11 @@
 // État global de l'interface : identité, présentation (thème), navigation, notifications.
 import { appel } from './api'
 import { aujourdhui } from './format'
-import type { Identite, Presentation, References } from './types'
+import type { EtatSecurite, Identite, Presentation, References } from './types'
 import { ClipboardList, History, House, PackageSearch, Settings, Warehouse } from '@lucide/svelte'
 
 export type Page = 'accueil' | 'fiche' | 'depot' | 'situation' | 'historique' | 'parametres'
-export type Onglet = 'boutique' | 'produits' | 'conditionnements' | 'ouverture' | 'apparence' | 'apropos'
+export type Onglet = 'boutique' | 'produits' | 'conditionnements' | 'ouverture' | 'apparence' | 'securite' | 'apropos'
 
 export const global = $state({
   pret: false,
@@ -13,7 +13,10 @@ export const global = $state({
   identite: null as Identite | null,
   presentation: null as Presentation | null,
   references: null as References | null,
-  logo: null as string | null
+  logo: null as string | null,
+  /** ET-10 : vrai tant que le mot de passe n'a pas été saisi. */
+  verrouille: false,
+  securite: null as EtatSecurite | null
 })
 
 /** Modules de l'application, dans l'ordre de la barre de navigation. */
@@ -80,6 +83,7 @@ export async function chargerGlobal(): Promise<void> {
     appel<References>('references'),
     appel<string | null>('logo_lire')
   ])
-  Object.assign(global, { identite, presentation, references, logo, pret: true })
+  const securite = await appel<EtatSecurite>('securite_etat')
+  Object.assign(global, { identite, presentation, references, logo, securite, verrouille: securite.protege && !securite.deverrouille, pret: true })
   appliquerTheme(presentation, references)
 }

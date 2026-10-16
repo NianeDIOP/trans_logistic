@@ -6,7 +6,9 @@ Application de bureau Windows, **hors connexion**, développée en **Rust**, pou
 - stock de la **boutique** en bouteilles ;
 - saisie et contrôle de la **fiche journalière** remplie à la main par le vendeur ;
 - **caisse du jour** : total des ventes, argent reçu, dépenses, écart ;
-- situation actuelle, historique, rapports, impressions.
+- situation actuelle, historique, rapports, impressions (PDF) et export Excel ;
+- tableau de bord, fiche vierge à imprimer pour le vendeur ;
+- mot de passe, sauvegardes automatiques et sur clé USB, restauration, changement d'ordinateur.
 
 Un seul utilisateur : le propriétaire.
 
@@ -27,7 +29,30 @@ gestion-depot/
 └── docs/            cahier des charges
 ```
 
-## Construire l'installateur Windows
+## Installer (version prête)
+
+L'installateur est construit automatiquement par GitHub Actions (workflow « Gestion Dépôt — tests et
+installateur Windows ») :
+- à chaque modification sur `main` : artefact **Gestion-Depot-Setup** de l'exécution ;
+- pour une version (tag `gestion-depot-1.0.0`, etc.) : fichier `.exe` joint à la page **Releases** du dépôt.
+
+Double-cliquer sur le `.exe`. Installateur non signé : à l'avertissement de Windows, « Informations
+complémentaires » puis « Exécuter quand même ».
+
+Données : `%APPDATA%\sn.niane.gestion-depot\` (base, logo, sauvegardes automatiques, journal des erreurs).
+
+## Construire l'installateur depuis Linux (sans Windows)
+
+```bash
+sudo apt-get install gcc-mingw-w64-x86-64 nsis
+rustup target add x86_64-pc-windows-gnu
+cd gestion-depot/app && npm ci && npm run tauri build -- --target x86_64-pc-windows-gnu
+```
+
+Résultat : `gestion-depot/target/x86_64-pc-windows-gnu/release/bundle/nsis/Gestion Dépôt et Boutique_<version>_x64-setup.exe`
+(WebView2Loader.dll est inclus ; si le moteur WebView2 manque sur le PC, l'installateur le télécharge).
+
+## Construire l'installateur soi-même sur Windows
 
 Une fois sur le PC Windows (une seule fois) :
 1. Installer **Rust** : https://rustup.rs (choisir les options par défaut).

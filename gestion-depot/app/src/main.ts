@@ -1,5 +1,6 @@
 import '@fontsource-variable/manrope'
 import './app.css'
+import './documents.css'
 import { mount } from 'svelte'
 import App from './App.svelte'
 
