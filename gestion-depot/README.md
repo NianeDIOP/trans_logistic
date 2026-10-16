@@ -41,6 +41,17 @@ complémentaires » puis « Exécuter quand même ».
 
 Données : `%APPDATA%\sn.niane.gestion-depot\` (base, logo, sauvegardes automatiques, journal des erreurs).
 
+## Construire l'installateur depuis Linux (sans Windows)
+
+```bash
+sudo apt-get install gcc-mingw-w64-x86-64 nsis
+rustup target add x86_64-pc-windows-gnu
+cd gestion-depot/app && npm ci && npm run tauri build -- --target x86_64-pc-windows-gnu
+```
+
+Résultat : `gestion-depot/target/x86_64-pc-windows-gnu/release/bundle/nsis/Gestion Dépôt et Boutique_<version>_x64-setup.exe`
+(WebView2Loader.dll est inclus ; si le moteur WebView2 manque sur le PC, l'installateur le télécharge).
+
 ## Construire l'installateur soi-même sur Windows
 
 Une fois sur le PC Windows (une seule fois) :

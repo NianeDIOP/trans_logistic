@@ -41,7 +41,7 @@
         "displayLanguageSelector": false,
         "installMode": "currentUser"
       },
-      "webviewInstallMode": { "type": "embedBootstrapper" }
+      "webviewInstallMode": { "type": "downloadBootstrapper", "silent": true }
     }
   }
 }

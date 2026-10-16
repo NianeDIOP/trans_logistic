@@ -75,4 +75,8 @@ Le cahier des charges fait foi : `docs/cahier-des-charges-v1.1.pdf`. Les codes `
   `journal-erreurs.log` (ET-06, `src-tauri/src/journal.rs`). 45 tests.
 - [x] Version 1.0.0. Installateur : `.github/workflows/gestion-depot.yml` (tests sur Ubuntu, NSIS sur
   `windows-latest`, artefact `Gestion-Depot-Setup`, joint à la Release pour un tag `gestion-depot-*`, distinct
-  des tags `v*` de 2M). WebView2 : `embedBootstrapper`.
+  des tags `v*` de 2M). WebView2 : `downloadBootstrapper` silencieux (rien à télécharger à la construction).
+  Les exécutions GitHub Actions du dépôt échouent en 3 s sans démarrer (problème de compte, depuis le 6/10) :
+  l'installateur se construit aussi depuis Linux avec MinGW (`--target x86_64-pc-windows-gnu`, voir README),
+  vérifié sous Wine (`LANG=C.UTF-8` obligatoire, sinon les noms accentués échouent) : installation silencieuse
+  `/S`, raccourcis Bureau et menu Démarrer, lancement de l'exécutable.
