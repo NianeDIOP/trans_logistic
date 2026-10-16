@@ -18,7 +18,7 @@
 
 <EnTete titre="Dépôt" sousTitre="Entrées du fournisseur, transferts vers la boutique, comptages et historique des mouvements." />
 
-<nav class="onglets" aria-label="Rubriques du dépôt">
+<nav class="onglets-module" aria-label="Rubriques du dépôt">
   {#each ONGLETS as o (o.id)}
     <button class:actif={onglet === o.id} onclick={() => (onglet = o.id)}><o.Icone size={17} /> {o.titre}</button>
   {/each}

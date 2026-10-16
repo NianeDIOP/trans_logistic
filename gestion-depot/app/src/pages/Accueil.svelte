@@ -25,6 +25,13 @@
   const points = $derived(
     (indic?.serie ?? []).map(([d, v]) => ({ cle: d, libelle: dateCourte(d).slice(0, 5), valeur: v }))
   )
+  // ET-12 : rappel hebdomadaire si aucune sauvegarde externe récente.
+  const sauvegardeEnRetard = $derived.by(() => {
+    const s = global.securite
+    if (!s) return false
+    if (!s.derniere_sauvegarde_externe) return true
+    return Date.parse(s.date_du_jour) - Date.parse(s.derniere_sauvegarde_externe) > 7 * 86_400_000
+  })
   const signe = (n: number) => (n > 0 ? `+${fcfa(n)}` : fcfa(n))
 
   // Les modules (hors Accueil), numérotés : la touche du chiffre les ouvre.
@@ -74,6 +81,18 @@
       {/if}
     </p>
     <button class="btn btn-s" onclick={() => aller('fiche')}>Fiche du jour <ArrowRight size={15} /></button>
+  </section>
+{/if}
+
+{#if global.securite && sauvegardeEnRetard}
+  <section class="config">
+    <TriangleAlert size={20} />
+    <p>
+      <strong>Sauvegarde :</strong>
+      {global.securite.derniere_sauvegarde_externe ? `la dernière copie sur clé USB date du ${dateCourte(global.securite.derniere_sauvegarde_externe)}.` : 'aucune copie n’a encore été faite sur une clé USB.'}
+      Une sauvegarde par semaine protège vos données.
+    </p>
+    <button class="btn btn-s" onclick={() => aller('parametres', 'securite')}>Sauvegarder <ArrowRight size={15} /></button>
   </section>
 {/if}
 

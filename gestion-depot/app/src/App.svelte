@@ -10,6 +10,7 @@
   import Fiche from './pages/Fiche.svelte'
   import Depot from './pages/Depot.svelte'
   import Historique from './pages/Historique.svelte'
+  import Verrou from './pages/Verrou.svelte'
 
   let erreur = $state('')
 
@@ -28,6 +29,8 @@
     <div class="demarrage"><p class="erreur-texte">{erreur}</p></div>
   {:else if !global.pret}
     <div class="demarrage"><p class="discret">Chargement…</p></div>
+  {:else if global.verrouille}
+    <Verrou />
   {:else}
     <Navigation />
     <main class="contenu">

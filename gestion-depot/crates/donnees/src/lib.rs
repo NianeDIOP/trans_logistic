@@ -9,6 +9,7 @@ pub mod migrations;
 mod operations;
 pub mod parametres;
 pub mod rapports;
+pub mod securite;
 
 pub use consultations::*;
 pub use operations::*;

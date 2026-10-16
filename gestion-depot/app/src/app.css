@@ -381,15 +381,15 @@ textarea.saisie {
   outline-offset: 2px;
 }
 
-/* Onglets internes d'un module (Dépôt, Historique). */
-.onglets {
+/* Onglets internes d’un module (Dépôt, Historique). */
+.onglets-module {
   display: flex;
   gap: 0;
   margin-bottom: 20px;
   border-bottom: 1px solid var(--filet);
 }
 
-.onglets button {
+.onglets-module button {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -402,7 +402,7 @@ textarea.saisie {
   cursor: pointer;
 }
 
-.onglets button.actif {
+.onglets-module button.actif {
   color: var(--texte);
   border-bottom-color: var(--a);
 }

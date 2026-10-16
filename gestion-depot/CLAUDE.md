@@ -56,5 +56,23 @@ Le cahier des charges fait foi : `docs/cahier-des-charges-v1.1.pdf`. Les codes `
   motif (RG-22, `donnees::consultations`). Historique (`pages/Historique.svelte`) : journées par période,
   totaux, écart cumulé ; un clic ouvre la fiche (`aller('fiche', undefined, date)`, adresse `#/fiche/AAAA-MM-JJ`).
   La base de démonstration contient deux semaines de fiches (13 validées, 1 brouillon). 38 tests.
-- [ ] Lot 4 — Tableau de bord, rapports, impressions PDF, export Excel, fiche vierge.
-- [ ] Lot 5 — Mot de passe, sauvegardes, export complet, installateur Windows.
+- [x] Lot 4 — Rapports (`donnees::rapports` : rapport de période, indicateurs ; seules les journées validées
+  comptent). Accueil = tableau de bord (jour / 7 jours / mois, histogramme 30 jours, meilleurs produits, rappel
+  des brouillons). Historique → onglet « Rapport de période ». Impressions : `composants/Apercu.svelte` (aperçu
+  A4 déplacé sous `<body>`, couleurs et mise en page modifiables, `@page` avec pied numéroté « page x / y »,
+  `window.print()` → imprimante ou « Microsoft Print to PDF ») + feuille `documents.css` ; documents dans
+  `pages/documents/` (fiche vierge paysage, situation du jour, rapport de période, mouvements du dépôt) et dans
+  Situation, Fiche de stock, Inventaire (feuille de comptage, rapport d'écarts). Excel : `src-tauri/src/excel.rs`
+  (rust_xlsxwriter, nombres bruts, en-têtes figés, filtres) + `lib/excel.ts` (fenêtre « Enregistrer sous »).
+  Rendu imprimé vérifié avec Chromium (Playwright, `page.pdf`) : même moteur que WebView2.
+- [x] Lot 5 — `donnees::securite` : mot de passe Argon2 dans `parametres` (ET-10 ; oubli = fichier
+  `REINITIALISER-MOT-DE-PASSE.txt` dans le dossier des données), sauvegarde = `VACUUM INTO` + table
+  `fichiers_joints` (logo) dans un seul fichier `.gdsauv` (ET-12, ET-13), copie automatique quotidienne au
+  démarrage, 30 conservées (ET-11), vérification puis restauration avec copie « avant-restauration » (logo
+  replacé dans le dossier d'images local). Application : verrou (`Etat.deverrouille`, `base()` refuse tant que
+  verrouillé, `base_libre()` pour l'identité et l'apparence), écran `pages/Verrou.svelte`, bouton Verrouiller,
+  onglet Paramètres → Sauvegarde et sécurité, rappel hebdomadaire sur l'accueil, journal des erreurs
+  `journal-erreurs.log` (ET-06, `src-tauri/src/journal.rs`). 45 tests.
+- [x] Version 1.0.0. Installateur : `.github/workflows/gestion-depot.yml` (tests sur Ubuntu, NSIS sur
+  `windows-latest`, artefact `Gestion-Depot-Setup`, joint à la Release pour un tag `gestion-depot-*`, distinct
+  des tags `v*` de 2M). WebView2 : `embedBootstrapper`.

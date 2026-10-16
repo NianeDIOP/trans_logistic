@@ -268,3 +268,26 @@ export interface Indicateurs {
   derniere_validee: string | null
   brouillons: string[]
 }
+
+// ------------------------------------------------------------------ Sécurité et sauvegarde
+
+export interface CopieSauvegarde { nom: string; chemin: string; octets: number }
+
+export interface EtatSecurite {
+  protege: boolean
+  deverrouille: boolean
+  dossier_donnees: string
+  dossier_sauvegardes: string
+  fichier_reinitialisation: string
+  derniere_sauvegarde_externe: string | null
+  date_du_jour: string
+  copies: CopieSauvegarde[]
+}
+
+export interface InfosSauvegarde {
+  nom_boutique: string
+  version_schema: number
+  nb_produits: number
+  derniere_journee: string | null
+  nb_journees: number
+}

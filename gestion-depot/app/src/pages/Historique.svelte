@@ -11,7 +11,7 @@
 
 <EnTete titre="Historique et rapports" sousTitre="Journées enregistrées, ventes par produit et par catégorie, encaissements, écarts de caisse et mouvements du dépôt." />
 
-<nav class="onglets" aria-label="Rubriques de l’historique">
+<nav class="onglets-module" aria-label="Rubriques de l’historique">
   <button class:actif={onglet === 'journees'} onclick={() => (onglet = 'journees')}><CalendarDays size={17} /> Journées</button>
   <button class:actif={onglet === 'rapport'} onclick={() => (onglet = 'rapport')}><ChartColumn size={17} /> Rapport de période</button>
 </nav>

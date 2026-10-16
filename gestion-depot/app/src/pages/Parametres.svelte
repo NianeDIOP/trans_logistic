@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Store, Package, Boxes, ClipboardCheck, Palette, Info } from '@lucide/svelte'
+  import { Store, Package, Boxes, ClipboardCheck, Palette, ShieldCheck, Info } from '@lucide/svelte'
   import EnTete from '../composants/EnTete.svelte'
   import { aller, route, type Onglet } from '../lib/etat.svelte'
   import Boutique from './parametres/Boutique.svelte'
@@ -8,13 +8,15 @@
   import Ouverture from './parametres/Ouverture.svelte'
   import Apparence from './parametres/Apparence.svelte'
   import APropos from './parametres/APropos.svelte'
+  import Securite from './parametres/Securite.svelte'
 
   const ONGLETS: { id: Onglet; titre: string; Icone: typeof Store }[] = [
     { id: 'boutique', titre: 'Boutique', Icone: Store },
     { id: 'produits', titre: 'Produits et prix', Icone: Package },
     { id: 'conditionnements', titre: 'Conditionnements', Icone: Boxes },
     { id: 'ouverture', titre: 'Stock d’ouverture', Icone: ClipboardCheck },
-    { id: 'apparence', titre: 'Apparence et documents', Icone: Palette },
+    { id: 'apparence', titre: 'Apparence', Icone: Palette },
+    { id: 'securite', titre: 'Sauvegarde et sécurité', Icone: ShieldCheck },
     { id: 'apropos', titre: 'À propos', Icone: Info }
   ]
 </script>
@@ -40,6 +42,8 @@
   <Ouverture />
 {:else if route.onglet === 'apparence'}
   <Apparence />
+{:else if route.onglet === 'securite'}
+  <Securite />
 {:else}
   <APropos />
 {/if}

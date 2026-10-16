@@ -4,7 +4,9 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-noyau = { version = "0.1.0", path = "../noyau" }
+argon2 = "0.5"
+noyau = { version = "1.0.0", path = "../noyau" }
+password-hash = { version = "0.5", features = ["getrandom"] }
 rusqlite = { version = "0.40.2", features = ["bundled"] }
 serde = { version = "1.0.229", features = ["derive"] }
 thiserror = "2.0.21"
