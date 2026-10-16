@@ -396,3 +396,205 @@ pub fn stock_ouverture(etat: State<Etat>, date: String, lignes: Vec<LigneOuvertu
     }
     b.stock_ouverture(&date, &converties).map_err(texte)
 }
+
+// ------------------------------------------------------------------ Dépôt (lot 2)
+
+use donnees::{
+    BilanJournee, FicheSaisie, Fournisseur, JourneeEnregistree, JourneeResume, Lieu, LigneQuantite,
+    MouvementStock, OperationDepot, ReceptionSaisie,
+};
+use noyau::LigneCalculee;
+
+#[tauri::command]
+pub fn fournisseurs_lister(etat: State<Etat>) -> R<Vec<Fournisseur>> {
+    base(&etat)?.fournisseurs().map_err(texte)
+}
+
+#[tauri::command]
+pub fn fournisseur_ajouter(etat: State<Etat>, nom: String, telephone: String) -> R<i64> {
+    base(&etat)?
+        .ajouter_fournisseur(&nom, &telephone)
+        .map_err(texte)
+}
+
+#[derive(serde::Deserialize)]
+pub struct ReceptionVue {
+    date: String,
+    fournisseur_id: Option<i64>,
+    num_bl: String,
+    notes: String,
+    lignes: Vec<LigneQuantite>,
+}
+
+#[tauri::command]
+pub fn reception_enregistrer(etat: State<Etat>, reception: ReceptionVue) -> R<i64> {
+    let saisie = ReceptionSaisie {
+        date: reception.date,
+        fournisseur_id: reception.fournisseur_id,
+        num_bl: reception.num_bl,
+        notes: reception.notes,
+        lignes: reception.lignes,
+        prix_achat: Vec::new(),
+    };
+    base(&etat)?.enregistrer_reception(&saisie).map_err(texte)
+}
+
+#[tauri::command]
+pub fn receptions_lister(etat: State<Etat>, du: String, au: String) -> R<Vec<OperationDepot>> {
+    base(&etat)?.receptions(&du, &au).map_err(texte)
+}
+
+#[tauri::command]
+pub fn alimentation_enregistrer(
+    etat: State<Etat>,
+    date: String,
+    lignes: Vec<LigneQuantite>,
+    notes: String,
+) -> R<i64> {
+    base(&etat)?
+        .enregistrer_alimentation(&date, &lignes, &notes)
+        .map_err(texte)
+}
+
+#[tauri::command]
+pub fn alimentations_lister(etat: State<Etat>, du: String, au: String) -> R<Vec<OperationDepot>> {
+    base(&etat)?.alimentations(&du, &au).map_err(texte)
+}
+
+/// Inventaire (EF-22) : `comptes` = (produit, bouteilles comptées) ; retourne (produit, écart).
+#[tauri::command]
+pub fn inventaire_enregistrer(
+    etat: State<Etat>,
+    date: String,
+    lieu: Lieu,
+    comptes: Vec<(i64, i64)>,
+    notes: String,
+) -> R<Vec<(i64, i64)>> {
+    base(&etat)?
+        .enregistrer_inventaire(&date, lieu, &comptes, &notes)
+        .map_err(texte)
+}
+
+#[tauri::command]
+pub fn fiche_stock(etat: State<Etat>, produit_id: i64) -> R<Vec<MouvementStock>> {
+    base(&etat)?.fiche_stock(produit_id).map_err(texte)
+}
+
+// ------------------------------------------------------------------ Fiche du jour et historique (lot 3)
+
+#[derive(Serialize)]
+pub struct LigneFicheVue {
+    produit_id: i64,
+    designation: String,
+    bt_par_conditionnement: i64,
+    conditionnement: String,
+    conditionnement_pluriel: String,
+    stock_initial: i64,
+    alimentation_enregistree: i64,
+    prix: Option<i64>,
+}
+
+#[derive(Serialize)]
+pub struct FichePreparee {
+    lignes: Vec<LigneFicheVue>,
+    /// Fiche déjà enregistrée à cette date (brouillon à reprendre, ou journée validée à consulter).
+    existante: Option<JourneeEnregistree>,
+    /// Date de la dernière journée validée, pour guider la saisie.
+    derniere_validee: Option<String>,
+}
+
+#[tauri::command]
+pub fn fiche_preparer(etat: State<Etat>, date: String) -> R<FichePreparee> {
+    let b = base(&etat)?;
+    let lignes = b
+        .preparer_fiche(&date)
+        .map_err(texte)?
+        .into_iter()
+        .map(|l| LigneFicheVue {
+            produit_id: l.produit.id,
+            designation: l.produit.designation(),
+            bt_par_conditionnement: l.produit.format.bouteilles_par_conditionnement,
+            conditionnement: l.produit.format.conditionnement.singulier.clone(),
+            conditionnement_pluriel: l.produit.format.conditionnement.pluriel.clone(),
+            stock_initial: l.stock_initial,
+            alimentation_enregistree: l.alimentation_enregistree,
+            prix: l.prix,
+        })
+        .collect();
+    let derniere_validee: Option<String> = b
+        .connexion()
+        .query_row(
+            "SELECT MAX(date) FROM journees WHERE statut = 'validee'",
+            [],
+            |r| r.get(0),
+        )
+        .map_err(texte)?;
+    Ok(FichePreparee {
+        lignes,
+        existante: b.journee(&date).map_err(texte)?,
+        derniere_validee,
+    })
+}
+
+#[derive(Serialize)]
+pub struct AlerteVue {
+    bloquante: bool,
+    message: String,
+}
+
+#[derive(Serialize)]
+pub struct LigneApercu {
+    produit_id: i64,
+    calcul: LigneCalculee,
+    alertes: Vec<AlerteVue>,
+}
+
+#[derive(Serialize)]
+pub struct ApercuFiche {
+    lignes: Vec<LigneApercu>,
+    caisse: noyau::BilanCaisse,
+}
+
+/// Calcul en direct de la fiche (mêmes règles que la validation), sans rien enregistrer.
+#[tauri::command]
+pub fn fiche_apercu(etat: State<Etat>, fiche: FicheSaisie) -> R<ApercuFiche> {
+    let (lignes, caisse) = base(&etat)?.apercu_fiche(&fiche).map_err(texte)?;
+    Ok(ApercuFiche {
+        lignes: lignes
+            .into_iter()
+            .map(|(produit_id, calcul)| LigneApercu {
+                produit_id,
+                alertes: calcul
+                    .alertes
+                    .iter()
+                    .map(|a| AlerteVue {
+                        bloquante: a.gravite() == noyau::Gravite::Bloquante,
+                        message: a.message(),
+                    })
+                    .collect(),
+                calcul,
+            })
+            .collect(),
+        caisse,
+    })
+}
+
+#[tauri::command]
+pub fn fiche_brouillon(etat: State<Etat>, fiche: FicheSaisie) -> R<i64> {
+    base(&etat)?.enregistrer_brouillon(&fiche).map_err(texte)
+}
+
+#[tauri::command]
+pub fn fiche_valider(etat: State<Etat>, fiche: FicheSaisie) -> R<BilanJournee> {
+    base(&etat)?.valider_journee(&fiche).map_err(texte)
+}
+
+#[tauri::command]
+pub fn journees_lister(etat: State<Etat>, du: String, au: String) -> R<Vec<JourneeResume>> {
+    base(&etat)?.journees(&du, &au).map_err(texte)
+}
+
+#[tauri::command]
+pub fn journee_reouvrir(etat: State<Etat>, date: String, motif: String) -> R<()> {
+    base(&etat)?.reouvrir_journee(&date, &motif).map_err(texte)
+}

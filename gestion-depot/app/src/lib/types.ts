@@ -107,3 +107,124 @@ export interface LigneSituation {
 }
 
 export interface Ouverture { date: string | null; lignes: [number, number, number][] }
+
+// ------------------------------------------------------------------ Dépôt
+
+export interface Fournisseur { id: number; nom: string; telephone: string }
+
+export interface LigneQuantite { produit_id: number; conditionnements: number; bouteilles: number }
+
+export interface LigneMouvementee { produit_id: number; designation: string; bouteilles: number; quantite: string }
+
+export interface OperationDepot {
+  id: number
+  date: string
+  origine: string
+  reference: string
+  bouteilles: number
+  lignes: LigneMouvementee[]
+}
+
+export interface MouvementStock {
+  date: string
+  lieu: 'depot' | 'boutique'
+  type_mouvement: string
+  quantite: number
+  solde_depot: number
+  solde_boutique: number
+  motif: string
+}
+
+// ------------------------------------------------------------------ Fiche du jour
+
+/** Saisie d'une ligne de fiche (champs absents = 0 / non noté). */
+export interface SaisieLigne {
+  stock_initial: number
+  stock_initial_fiche: number | null
+  alimentation_conditionnements: number
+  alimentation_bouteilles: number
+  stock_restant: number | null
+  casse: number
+  ventes_fiche: number | null
+  prix_fiche: number | null
+  montant_fiche: number | null
+}
+
+export interface FicheSaisie {
+  date: string
+  lignes: [number, SaisieLigne][]
+  total_recu: number
+  depenses: [string, number][]
+  observations: string
+}
+
+export interface LigneFiche {
+  produit_id: number
+  designation: string
+  bt_par_conditionnement: number
+  conditionnement: string
+  conditionnement_pluriel: string
+  stock_initial: number
+  alimentation_enregistree: number
+  prix: number | null
+}
+
+export interface LigneEnregistree {
+  produit_id: number
+  stock_initial: number
+  stock_initial_fiche: number | null
+  alimentation: number
+  stock_total: number
+  stock_restant: number
+  casse: number
+  ventes: number
+  ventes_fiche: number | null
+  prix: number
+  prix_fiche: number | null
+  montant: number
+  montant_fiche: number | null
+}
+
+export interface JourneeEnregistree {
+  date: string
+  statut: 'brouillon' | 'validee'
+  total_ventes: number
+  total_recu: number
+  total_depenses: number
+  ecart: number
+  observations: string
+  valide_le: string | null
+  lignes: LigneEnregistree[]
+  depenses: [string, number][]
+  reouvrable: boolean
+}
+
+export interface FichePreparee {
+  lignes: LigneFiche[]
+  existante: JourneeEnregistree | null
+  derniere_validee: string | null
+}
+
+export interface Calcul {
+  alimentation: number
+  stock_total: number
+  stock_restant: number
+  ventes: number
+  prix: number
+  montant: number
+}
+
+export interface ApercuFiche {
+  lignes: { produit_id: number; calcul: Calcul; alertes: { bloquante: boolean; message: string }[] }[]
+  caisse: { total_ventes: number; total_recu: number; total_depenses: number; ecart: number }
+}
+
+export interface JourneeResume {
+  date: string
+  statut: 'brouillon' | 'validee'
+  total_ventes: number
+  total_recu: number
+  total_depenses: number
+  ecart: number
+  bouteilles_vendues: number
+}

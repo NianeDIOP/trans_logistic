@@ -7,7 +7,9 @@
   import Accueil from './pages/Accueil.svelte'
   import Situation from './pages/Situation.svelte'
   import Parametres from './pages/Parametres.svelte'
-  import Bientot from './pages/Bientot.svelte'
+  import Fiche from './pages/Fiche.svelte'
+  import Depot from './pages/Depot.svelte'
+  import Historique from './pages/Historique.svelte'
 
   let erreur = $state('')
 
@@ -35,8 +37,12 @@
         <Situation />
       {:else if route.page === 'parametres'}
         <Parametres />
+      {:else if route.page === 'fiche'}
+        {#key route.jour}<Fiche />{/key}
+      {:else if route.page === 'depot'}
+        <Depot />
       {:else}
-        <Bientot page={route.page} />
+        <Historique />
       {/if}
     </main>
   {/if}

@@ -26,11 +26,13 @@ export const MODULES: { page: Page; titre: string; description: string; Icone: t
   { page: 'parametres', titre: 'Paramètres', description: 'Boutique, produits et prix, conditionnements, apparence.', Icone: Settings }
 ]
 
-export const route = $state({ page: 'accueil' as Page, onglet: 'boutique' as Onglet })
+/** `jour` : date à ouvrir dans la fiche du jour (depuis l'historique ou l'adresse #/fiche/AAAA-MM-JJ). */
+export const route = $state({ page: 'accueil' as Page, onglet: 'boutique' as Onglet, jour: '' })
 
 /** Navigation ; l'adresse (#/parametres/produits) suit l'écran affiché. */
-export function aller(page: Page, onglet?: Onglet): void {
+export function aller(page: Page, onglet?: Onglet, jour = ''): void {
   route.page = page
+  route.jour = jour
   if (onglet) route.onglet = onglet
   const h = page === 'parametres' ? `#/parametres/${route.onglet}` : `#/${page}`
   if (location.hash !== h) history.replaceState(null, '', h)
@@ -39,7 +41,8 @@ export function aller(page: Page, onglet?: Onglet): void {
 export function lireAdresse(): void {
   const [, page, onglet] = location.hash.split('/')
   if (page) route.page = page as Page
-  if (onglet) route.onglet = onglet as Onglet
+  if (page === 'fiche') route.jour = /^\d{4}-\d{2}-\d{2}$/.test(onglet ?? '') ? onglet! : ''
+  else if (page === 'parametres' && onglet) route.onglet = onglet as Onglet
 }
 
 // ------------------------------------------------------------------ Notifications

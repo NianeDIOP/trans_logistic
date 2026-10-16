@@ -74,6 +74,20 @@ pub fn lancer() {
             commandes::stock_ouverture_possible,
             commandes::stock_ouverture_lire,
             commandes::stock_ouverture,
+            commandes::fournisseurs_lister,
+            commandes::fournisseur_ajouter,
+            commandes::reception_enregistrer,
+            commandes::receptions_lister,
+            commandes::alimentation_enregistrer,
+            commandes::alimentations_lister,
+            commandes::inventaire_enregistrer,
+            commandes::fiche_stock,
+            commandes::fiche_preparer,
+            commandes::fiche_apercu,
+            commandes::fiche_brouillon,
+            commandes::fiche_valider,
+            commandes::journees_lister,
+            commandes::journee_reouvrir,
         ])
         .run(tauri::generate_context!())
         .expect("impossible de démarrer l’application");
