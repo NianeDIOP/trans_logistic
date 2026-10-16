@@ -1,7 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { Search, TriangleAlert } from '@lucide/svelte'
+  import { FileSpreadsheet, Printer, Search, TriangleAlert } from '@lucide/svelte'
   import EnTete from '../composants/EnTete.svelte'
+  import Apercu from '../composants/Apercu.svelte'
+  import { colonnes, exporterExcel } from '../lib/excel'
   import { appel } from '../lib/api'
   import { global } from '../lib/etat.svelte'
   import { dateCourte, entier, fcfa } from '../lib/format'
@@ -12,6 +14,7 @@
   let categorie = $state('')
   let seulementAlertes = $state(false)
   let erreur = $state('')
+  let apercu = $state(false)
 
   onMount(() => {
     appel<LigneSituation[]>('situation', { date: global.date })
@@ -34,9 +37,32 @@
     valeur: filtrees.reduce((s, l) => s + l.valeur, 0)
   })
   const libelleCategorie = (c: string) => global.references?.categories.find((x) => x.code === c)?.libelle ?? c
+  const sousSeuil = $derived(filtrees.filter((l) => l.alerte_depot || l.alerte_boutique))
+
+  // EF-02 / chapitre 9 : export Excel de la situation (nombres bruts).
+  function excel() {
+    exporterExcel(`Situation des stocks ${global.date}`, [
+      {
+        nom: 'Situation des stocks',
+        titre: 'Situation des stocks',
+        sous_titre: `Au ${dateCourte(global.date)}`,
+        colonnes: colonnes(['Produit', 26], ['Catégorie', 12], ['Bt par cond.', 11], ['Dépôt (bt)', 11], ['Dépôt', 18], ['Boutique (bt)', 13], ['Total (bt)', 11], ['Prix', 10], ['Valeur', 13], ['Sous le seuil', 12]),
+        lignes: filtrees.map((l) => [
+          l.designation, libelleCategorie(l.categorie), l.bt_par_conditionnement, l.depot, l.depot_court, l.boutique, l.total, l.prix, l.valeur,
+          l.alerte_depot || l.alerte_boutique ? 'Oui' : ''
+        ]),
+        total: ['Total', null, null, totaux.depot, null, totaux.boutique, totaux.total, null, totaux.valeur, sousSeuil.length]
+      }
+    ])
+  }
 </script>
 
-<EnTete titre="Situation des stocks" sousTitre="Au {dateCourte(global.date)} — dépôt, boutique et total, en bouteilles et en conditionnements." />
+<EnTete titre="Situation des stocks" sousTitre="Au {dateCourte(global.date)} — dépôt, boutique et total, en bouteilles et en conditionnements.">
+  {#snippet actions()}
+    <button class="btn btn-f" onclick={excel}><FileSpreadsheet size={17} /> Excel</button>
+    <button class="btn btn-s" onclick={() => (apercu = true)}><Printer size={17} /> Imprimer</button>
+  {/snippet}
+</EnTete>
 
 <section class="filtres">
   <label class="recherche">
@@ -103,6 +129,43 @@
       </tfoot>
     </table>
   </section>
+{/if}
+
+{#if apercu}
+  <Apercu titre="Situation des stocks" periode="Au {dateCourte(global.date)}" onfermer={() => (apercu = false)}>
+    <div class="doc-resume">
+      <div><span>Produits</span><strong>{filtrees.length}</strong></div>
+      <div><span>Dépôt</span><strong>{entier(totaux.depot)} bt</strong></div>
+      <div><span>Boutique</span><strong>{entier(totaux.boutique)} bt</strong></div>
+      <div><span>Valeur du stock</span><strong>{fcfa(totaux.valeur)} F</strong></div>
+      <div><span>Sous le seuil</span><strong>{sousSeuil.length}</strong></div>
+    </div>
+    <table class="doc-table">
+      <thead>
+        <tr><th>Produit</th><th class="nb">Dépôt</th><th class="nb">Boutique (bt)</th><th class="nb">Total (bt)</th><th class="nb">Total</th><th class="nb">Prix</th><th class="nb">Valeur (F)</th></tr>
+      </thead>
+      <tbody>
+        {#each filtrees as l (l.produit_id)}
+          <tr>
+            <td>{l.designation}{#if l.alerte_depot || l.alerte_boutique}&nbsp;<b class="rouge">▲ seuil</b>{/if}</td>
+            <td class="nb" class:rouge={l.alerte_depot}>{l.depot_court}</td>
+            <td class="nb" class:rouge={l.alerte_boutique}>{entier(l.boutique)}</td>
+            <td class="nb"><strong>{entier(l.total)}</strong></td>
+            <td class="nb">{l.total_court}</td>
+            <td class="nb">{l.prix === null ? '—' : fcfa(l.prix)}</td>
+            <td class="nb">{fcfa(l.valeur)}</td>
+          </tr>
+        {/each}
+      </tbody>
+      <tfoot>
+        <tr><td>Total</td><td class="nb">{entier(totaux.depot)} bt</td><td class="nb">{entier(totaux.boutique)}</td><td class="nb">{entier(totaux.total)}</td><td></td><td></td><td class="nb">{fcfa(totaux.valeur)}</td></tr>
+      </tfoot>
+    </table>
+    {#if sousSeuil.length}
+      <h2 class="doc-section">Produits sous le seuil d’alerte</h2>
+      <p class="doc-note">{sousSeuil.map((l) => `${l.designation} (${l.alerte_depot ? 'dépôt ' + l.depot_court : ''}${l.alerte_depot && l.alerte_boutique ? ', ' : ''}${l.alerte_boutique ? 'boutique ' + l.boutique + ' bt' : ''})`).join(' · ')}</p>
+    {/if}
+  </Apercu>
 {/if}
 
 <style>

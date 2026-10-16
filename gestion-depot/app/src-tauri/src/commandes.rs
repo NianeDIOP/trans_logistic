@@ -598,3 +598,32 @@ pub fn journees_lister(etat: State<Etat>, du: String, au: String) -> R<Vec<Journ
 pub fn journee_reouvrir(etat: State<Etat>, date: String, motif: String) -> R<()> {
     base(&etat)?.reouvrir_journee(&date, &motif).map_err(texte)
 }
+
+// ------------------------------------------------------------------ Rapports (lot 4)
+
+#[tauri::command]
+pub fn rapport_periode(etat: State<Etat>, du: String, au: String) -> R<donnees::RapportPeriode> {
+    base(&etat)?.rapport_periode(&du, &au).map_err(texte)
+}
+
+#[tauri::command]
+pub fn indicateurs(etat: State<Etat>, date: String) -> R<donnees::Indicateurs> {
+    base(&etat)?.indicateurs(&date).map_err(texte)
+}
+
+#[tauri::command]
+pub fn journee_lire(etat: State<Etat>, date: String) -> R<Option<donnees::JourneeEnregistree>> {
+    base(&etat)?.journee(&date).map_err(texte)
+}
+
+/// EF-32 : écrit un classeur Excel au chemin choisi par l'utilisateur.
+#[tauri::command]
+pub fn excel_enregistrer(
+    etat: State<Etat>,
+    chemin: String,
+    feuilles: Vec<crate::excel::Feuille>,
+) -> R<()> {
+    let boutique = base(&etat)?.identite().map_err(texte)?.nom_commercial;
+    crate::excel::ecrire(&chemin, &boutique, &feuilles)
+        .map_err(|e| format!("Le fichier Excel n’a pas pu être écrit : {e}"))
+}

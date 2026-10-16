@@ -3,6 +3,7 @@
 //! et `noyau`.
 
 mod commandes;
+mod excel;
 
 use donnees::Base;
 use std::path::PathBuf;
@@ -21,6 +22,8 @@ const FICHIER_BASE: &str = "gestion_depot.db";
 
 pub fn lancer() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             // GD_DONNEES permet de pointer vers un autre dossier (démonstration, essais).
             let dossier = match std::env::var_os("GD_DONNEES") {
@@ -88,6 +91,10 @@ pub fn lancer() {
             commandes::fiche_valider,
             commandes::journees_lister,
             commandes::journee_reouvrir,
+            commandes::journee_lire,
+            commandes::rapport_periode,
+            commandes::indicateurs,
+            commandes::excel_enregistrer,
         ])
         .run(tauri::generate_context!())
         .expect("impossible de démarrer l’application");

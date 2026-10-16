@@ -1,8 +1,10 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte'
-  import { ChevronLeft, ChevronRight, CircleAlert, TriangleAlert, Plus, Trash2, Lock, RotateCcw } from '@lucide/svelte'
+  import { ChevronLeft, ChevronRight, CircleAlert, TriangleAlert, Plus, Trash2, Lock, RotateCcw, FileText, Printer } from '@lucide/svelte'
   import EnTete from '../composants/EnTete.svelte'
   import Modale from '../composants/Modale.svelte'
+  import FicheVierge from './documents/FicheVierge.svelte'
+  import SituationJour from './documents/SituationJour.svelte'
   import { appel } from '../lib/api'
   import { global, notifier, route } from '../lib/etat.svelte'
   import { dateCourte, dateLongue, decalerDate, enConditionnements, entier, fcfa, lireEntier, valeur } from '../lib/format'
@@ -14,6 +16,7 @@
   interface Saisie { siNote: string; alimCond: string; alimBt: string; restant: string; casse: string; ventesNote: string; montantNote: string }
 
   let date = $state(route.jour || global.date)
+  let docOuvert = $state<'' | 'vierge' | 'situation'>('')
   let prep = $state<FichePreparee | null>(null)
   let saisies = $state<Record<number, Saisie>>({})
   let recu = $state('')
@@ -208,7 +211,17 @@
   {#if !validee}
     <label class="case"><input type="checkbox" bind:checked={controle} /> Contrôler les chiffres du vendeur</label>
   {/if}
+  <button class="btn btn-f" disabled={!prep} onclick={() => (docOuvert = 'vierge')}><FileText size={16} /> Fiche vierge</button>
+  {#if validee}
+    <button class="btn btn-s" onclick={() => (docOuvert = 'situation')}><Printer size={16} /> Situation du jour</button>
+  {/if}
 </section>
+
+{#if docOuvert === 'vierge' && prep}
+  <FicheVierge {date} lignes={prep.lignes} onfermer={() => (docOuvert = '')} />
+{:else if docOuvert === 'situation' && prep?.existante}
+  <SituationJour journee={prep.existante} lignes={prep.lignes} onfermer={() => (docOuvert = '')} />
+{/if}
 
 {#if erreur}<p class="erreur-texte">{erreur}</p>{/if}
 

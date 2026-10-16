@@ -1,0 +1,323 @@
+/* Documents imprimés (EF-52 à EF-54, chapitre 9) : feuille A4 indépendante du thème de l'interface.
+   --dp / --da : couleurs du thème des documents ; .modele-* : mise en page choisie. */
+
+.feuille {
+  --dp: #123d3a;
+  --da: #c8891a;
+  position: relative;
+  padding: 14mm 12mm 12mm;
+  background: #fff;
+  color: #1b2524;
+  font-size: 10pt;
+  line-height: 1.35;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.doc-entete {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid var(--da);
+}
+
+.doc-entete.logo-droite {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.doc-entete.logo-centre {
+  flex-direction: column;
+  text-align: center;
+}
+
+.doc-logo {
+  display: grid;
+  place-items: center;
+  width: 70px;
+  height: 52px;
+  flex: none;
+}
+
+.doc-logo img {
+  max-width: 70px;
+  max-height: 52px;
+  object-fit: contain;
+}
+
+.doc-logo span {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: 1px dashed #aab8b5;
+  color: #8a9a97;
+  font-size: 8pt;
+  font-weight: 800;
+}
+
+.doc-texte {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.doc-texte strong {
+  font-size: 15pt;
+  font-weight: 800;
+  color: var(--dp);
+}
+
+.doc-texte em,
+.doc-texte span {
+  color: #55615f;
+}
+
+.doc-titre {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 12px 0 10px;
+}
+
+.doc-titre h1 {
+  font-size: 15pt;
+  font-weight: 800;
+  color: var(--dp);
+}
+
+.doc-titre p {
+  color: #55615f;
+  font-size: 9pt;
+  text-align: right;
+}
+
+.doc-section {
+  margin: 14px 0 6px;
+  font-size: 11pt;
+  font-weight: 800;
+  color: var(--dp);
+  break-after: avoid;
+}
+
+.doc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9pt;
+}
+
+.doc-table th {
+  padding: 5px 6px;
+  background: var(--dp);
+  color: #fff;
+  font-size: 8pt;
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.doc-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid #e3e9e8;
+}
+
+.doc-table .nb {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.doc-table tr {
+  break-inside: avoid;
+}
+
+.doc-table tfoot td {
+  border-top: 2px solid var(--dp);
+  border-bottom: 0;
+  font-weight: 800;
+}
+
+.feuille .rouge {
+  color: #b42318;
+  font-weight: 700;
+}
+
+.feuille .vert {
+  color: #217a47;
+  font-weight: 700;
+}
+
+/* Cases à remplir au stylo (fiche vierge, feuille d'inventaire). */
+.doc-table.a-remplir td {
+  height: 7.2mm;
+  border: 1px solid #9aa8a5;
+}
+
+.doc-table.a-remplir th {
+  border: 1px solid var(--dp);
+  text-align: center;
+}
+
+.doc-resume {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  margin: 8px 0 4px;
+  border: 1px solid #d5dedc;
+}
+
+.doc-resume div {
+  padding: 6px 10px;
+  border-left: 3px solid var(--da);
+}
+
+.doc-resume span {
+  display: block;
+  color: #6b7a78;
+  font-size: 7.5pt;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.doc-resume strong {
+  font-size: 12pt;
+}
+
+.doc-colonnes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.doc-note {
+  margin-top: 8px;
+  color: #55615f;
+  font-size: 8.5pt;
+}
+
+.doc-signatures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-top: 14px;
+  break-inside: avoid;
+}
+
+.doc-signatures div {
+  height: 22mm;
+  padding-top: 4px;
+  border-top: 1px solid #9aa8a5;
+  color: #55615f;
+  font-size: 8.5pt;
+}
+
+.doc-pied {
+  margin-top: 18px;
+  padding-top: 6px;
+  border-top: 1px solid var(--da);
+  color: #6b7a78;
+  font-size: 8pt;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* ------------------------------------------------ Mises en page (EF-53) */
+
+.modele-bandeau .doc-entete {
+  padding: 12px 14px;
+  margin: -14mm -12mm 0;
+  background: var(--dp);
+  border-bottom: 4px solid var(--da);
+}
+
+.modele-bandeau .doc-texte strong,
+.modele-bandeau .doc-texte span,
+.modele-bandeau .doc-texte em {
+  color: #fff;
+}
+
+.modele-sobre .doc-entete {
+  border-bottom: 1px solid #c9d3d1;
+}
+
+.modele-sobre .doc-table th {
+  background: none;
+  color: var(--dp);
+  border-bottom: 1.5px solid var(--dp);
+}
+
+.modele-sobre .doc-table.a-remplir th {
+  border: 1px solid #9aa8a5;
+}
+
+.modele-compact {
+  padding: 9mm 9mm 8mm;
+  font-size: 9pt;
+}
+
+.modele-compact .doc-table td,
+.modele-compact .doc-table th {
+  padding: 2px 5px;
+}
+
+.modele-compact .doc-table.a-remplir td {
+  height: 6.2mm;
+}
+
+.modele-compact.feuille .doc-entete {
+  padding-bottom: 6px;
+}
+
+.modele-compact.modele-bandeau .doc-entete {
+  margin: -9mm -9mm 0;
+}
+
+/* ------------------------------------------------ Impression */
+
+@media print {
+  html,
+  body,
+  #app {
+    height: auto !important;
+    background: #fff !important;
+  }
+
+  body > :not(.impression) {
+    display: none !important;
+  }
+
+  .impression {
+    position: static !important;
+    display: block !important;
+    overflow: visible !important;
+    background: #fff !important;
+    padding: 0 !important;
+  }
+
+  .impression .non-imprime {
+    display: none !important;
+  }
+
+  .impression .page {
+    width: auto !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+  }
+
+  .impression .feuille {
+    padding: 0 !important;
+  }
+
+  .impression .modele-bandeau .doc-entete {
+    margin: 0 !important;
+  }
+
+  /* Le pied de page est porté par la marge de la page (numérotation automatique). */
+  .impression .doc-pied {
+    display: none;
+  }
+}

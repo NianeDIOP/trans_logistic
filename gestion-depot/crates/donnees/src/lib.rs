@@ -8,10 +8,12 @@ pub mod consultations;
 pub mod migrations;
 mod operations;
 pub mod parametres;
+pub mod rapports;
 
 pub use consultations::*;
 pub use operations::*;
 pub use parametres::*;
+pub use rapports::*;
 
 use rusqlite::Connection;
 use std::path::Path;

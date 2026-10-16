@@ -33,30 +33,3 @@
 {:else}
   <FicheStock />
 {/if}
-
-<style>
-  .onglets {
-    display: flex;
-    gap: 0;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--filet);
-  }
-
-  .onglets button {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border: 0;
-    border-bottom: 3px solid transparent;
-    background: none;
-    color: var(--texte-2);
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  .onglets button.actif {
-    color: var(--texte);
-    border-bottom-color: var(--a);
-  }
-</style>

@@ -254,7 +254,7 @@ impl Base {
         Ok(liste)
     }
 
-    fn derniere_validee(&self) -> Resultat<Option<String>> {
+    pub(crate) fn derniere_validee(&self) -> Resultat<Option<String>> {
         Ok(self.conn.query_row(
             "SELECT MAX(date) FROM journees WHERE statut = 'validee'",
             [],

@@ -228,3 +228,43 @@ export interface JourneeResume {
   ecart: number
   bouteilles_vendues: number
 }
+
+// ------------------------------------------------------------------ Rapports
+
+export interface Cumul { journees: number; ventes: number; recu: number; depenses: number; ecart: number; bouteilles: number }
+
+export interface ActiviteProduit {
+  produit_id: number
+  designation: string
+  categorie: string
+  ordre: number
+  bouteilles_vendues: number
+  montant: number
+  casse: number
+  recu_depot: number
+  alimente: number
+}
+
+export interface RapportPeriode {
+  du: string
+  au: string
+  totaux: Cumul
+  casse: number
+  recu_depot: number
+  alimente: number
+  produits: ActiviteProduit[]
+  categories: { categorie: string; bouteilles: number; montant: number }[]
+  jours: JourneeResume[]
+  depenses: [string, number][]
+}
+
+export interface Indicateurs {
+  date: string
+  jour: Cumul
+  semaine: Cumul
+  mois: Cumul
+  meilleurs: { designation: string; bouteilles: number; montant: number }[]
+  serie: [string, number][]
+  derniere_validee: string | null
+  brouillons: string[]
+}
