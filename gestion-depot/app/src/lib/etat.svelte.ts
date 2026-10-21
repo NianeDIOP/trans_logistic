@@ -48,6 +48,28 @@ export function lireAdresse(): void {
   else if (page === 'parametres' && onglet) route.onglet = onglet as Onglet
 }
 
+// ------------------------------------------------------------------ Préférences de saisie (propres à ce poste)
+
+function lirePreference(cle: string, defaut: string): string {
+  try {
+    return localStorage.getItem(cle) ?? defaut
+  } catch {
+    return defaut
+  }
+}
+
+/** Sens de la touche Entrée dans les grilles : « colonne » (↓) ou « ligne » (→). */
+export const preferences = $state({ entree: lirePreference('gd-entree', 'colonne') as 'colonne' | 'ligne' })
+
+export function changerSensEntree(sens: 'colonne' | 'ligne'): void {
+  preferences.entree = sens
+  try {
+    localStorage.setItem('gd-entree', sens)
+  } catch {
+    /* préférence non conservée */
+  }
+}
+
 // ------------------------------------------------------------------ Notifications
 
 export interface Notification { id: number; genre: 'succes' | 'erreur'; message: string }

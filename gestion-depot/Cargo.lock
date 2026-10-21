@@ -841,7 +841,7 @@ dependencies = [
 
 [[package]]
 name = "donnees"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "argon2",
  "noyau",
@@ -1278,7 +1278,7 @@ dependencies = [
 
 [[package]]
 name = "gestion-depot-app"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "base64 0.23.1",
  "donnees",
@@ -2212,7 +2212,7 @@ checksum = "650eef8c711430f1a879fdd01d4745a7deea475becfb90269c06775983bbf086"
 
 [[package]]
 name = "noyau"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "serde",
 ]

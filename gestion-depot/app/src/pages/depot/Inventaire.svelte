@@ -2,6 +2,8 @@
   import { onMount } from 'svelte'
   import { Printer } from '@lucide/svelte'
   import Apercu from '../../composants/Apercu.svelte'
+  import SensEntree from '../../composants/SensEntree.svelte'
+  import { grille } from '../../lib/clavier'
   import { appel } from '../../lib/api'
   import { global, notifier } from '../../lib/etat.svelte'
   import { dateCourte, enConditionnements, entier, lireEntier, valeur } from '../../lib/format'
@@ -135,9 +137,12 @@
     <div class="doc-signatures"><div>Compté par</div><div>Vérifié par</div></div>
   </Apercu>
 {/if}
-<p class="discret aide">Ne remplissez que les produits comptés. L’écart (compté − théorique) est enregistré comme mouvement d’inventaire.</p>
+<div class="aide">
+  <p class="discret">Ne remplissez que les produits comptés. L’écart (compté − théorique) est enregistré comme mouvement d’inventaire.</p>
+  <SensEntree />
+</div>
 
-<section class="carte" style="padding: 4px 6px">
+<section class="carte" style="padding: 4px 6px" use:grille>
   <table class="tableau">
     <thead>
       <tr>
@@ -158,9 +163,9 @@
               {lieu === 'depot' ? enConditionnements(theorique(p.id), p.bt_par_conditionnement, p.conditionnement, p.conditionnement_pluriel) : `${entier(theorique(p.id))} bt`}
             </td>
             {#if lieu === 'depot'}
-              <td class="nb"><input class="saisie nombre petite" inputmode="numeric" bind:value={comptes[p.id].cond} /></td>
+              <td class="nb"><input class="saisie nombre petite" inputmode="numeric" data-col="cond" bind:value={comptes[p.id].cond} /></td>
             {/if}
-            <td class="nb"><input class="saisie nombre petite" inputmode="numeric" bind:value={comptes[p.id].bt} /></td>
+            <td class="nb"><input class="saisie nombre petite" inputmode="numeric" data-col="bt" bind:value={comptes[p.id].bt} /></td>
             <td class="nb" class:negatif={(ecart ?? 0) < 0} class:positif={(ecart ?? 0) > 0}>
               {ecart === null || Number.isNaN(ecart) ? '—' : ecart > 0 ? `+${entier(ecart)}` : entier(ecart)}
             </td>
@@ -184,6 +189,10 @@
   }
 
   .aide {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
     margin-bottom: 12px;
   }
 

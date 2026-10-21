@@ -1,5 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte'
+  import { aller, grille, premierChamp } from '../lib/clavier'
+  import SensEntree from '../composants/SensEntree.svelte'
   import { ChevronLeft, ChevronRight, CircleAlert, TriangleAlert, Plus, Trash2, Lock, RotateCcw, FileText, Printer } from '@lucide/svelte'
   import EnTete from '../composants/EnTete.svelte'
   import Modale from '../composants/Modale.svelte'
@@ -68,6 +70,11 @@
       }
       saisies = s
       prep = p
+      // Le curseur attend dans la première case : on peut taper tout de suite.
+      if (p.existante?.statut !== 'validee') {
+        await tick()
+        premierChamp(document.querySelector<HTMLElement>('.tableau-fiche'))
+      }
     } catch (e) {
       erreur = (e as Error).message
     }
@@ -173,24 +180,49 @@
     await charger()
   }
 
-  // Entrée : passe à la même colonne de la ligne suivante.
-  async function suivant(e: KeyboardEvent) {
-    if (e.key !== 'Enter') return
+  // Saisie au clavier (ET-05) : la grille gère Entrée et les flèches ; au bout de la grille, on passe à la caisse.
+  let champRecu: HTMLInputElement | undefined = $state()
+  let boutonValider: HTMLButtonElement | undefined = $state()
+  let boutonAjout: HTMLButtonElement | undefined = $state()
+  let caisse: HTMLElement | undefined = $state()
+
+  function vers(e: KeyboardEvent, cible: HTMLElement | null | undefined) {
+    if (e.key !== 'Enter' || e.ctrlKey || e.metaKey) return
     e.preventDefault()
-    const cible = e.target as HTMLInputElement
-    const col = cible.dataset.col
-    const champs = [...document.querySelectorAll<HTMLInputElement>(`input[data-col="${col}"]`)]
-    const i = champs.indexOf(cible)
+    if (cible) aller(cible)
+  }
+
+  /** Après une dépense : la suivante, sinon « Ajouter une dépense ». */
+  function apresDepense(e: KeyboardEvent, k: number) {
+    vers(e, caisse?.querySelectorAll<HTMLInputElement>('.depense input')[2 * (k + 1)] ?? boutonAjout)
+  }
+
+  async function ajouterDepense() {
+    depenses.push({ libelle: '', montant: '' })
     await tick()
-    champs[i + 1]?.focus()
-    champs[i + 1]?.select()
+    const champs = caisse?.querySelectorAll<HTMLInputElement>('.depense input')
+    aller(champs?.[champs.length - 2])
+  }
+
+  // Raccourcis : Ctrl+S = brouillon, Ctrl+Entrée = valider la journée.
+  function raccourci(e: KeyboardEvent) {
+    if (!(e.ctrlKey || e.metaKey) || !prep || validee || document.querySelector('[role="dialog"]')) return
+    if (e.key.toLowerCase() === 's') {
+      e.preventDefault()
+      if (!enCours && !champsInvalides) brouillon()
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      if (!enCours && !champsInvalides && apercu && nbBloquantes === 0) confirmation = true
+    }
   }
 
   const fmt = (l: LigneFiche, bt: number) => enConditionnements(bt, l.bt_par_conditionnement, l.conditionnement, l.conditionnement_pluriel)
   const enregistree = (id: number) => prep?.existante?.lignes.find((e) => e.produit_id === id)
 </script>
 
-<EnTete titre="Fiche du jour" sousTitre="Recopiez la fiche du vendeur : l’application calcule les ventes, contrôle et met à jour les stocks à la validation." />
+<svelte:window onkeydown={raccourci} />
+
+<EnTete titre="Fiche du jour" sousTitre="Recopiez la fiche du vendeur : Entrée ou flèches pour avancer, Ctrl+S pour le brouillon, Ctrl+Entrée pour valider." />
 
 <section class="barre-date">
   <div class="navigateur">
@@ -209,6 +241,7 @@
   <span class="espace"></span>
   {#if prep?.derniere_validee}<span class="discret">Dernière journée validée : {dateCourte(prep.derniere_validee)}</span>{/if}
   {#if !validee}
+    <SensEntree />
     <label class="case"><input type="checkbox" bind:checked={controle} /> Contrôler les chiffres du vendeur</label>
   {/if}
   <button class="btn btn-f" disabled={!prep} onclick={() => (docOuvert = 'vierge')}><FileText size={16} /> Fiche vierge</button>
@@ -227,7 +260,7 @@
 
 {#if prep}
   <div class="disposition">
-    <section class="carte tableau-fiche">
+    <section class="carte tableau-fiche" use:grille={{ fin: () => aller(champRecu) }}>
       <table class="tableau">
         <thead>
           <tr>
@@ -275,28 +308,28 @@
                 </td>
                 <td class="nb">{entier(l.stock_initial)}</td>
                 {#if controle}
-                  <td class="nb vendeur"><input class="saisie nombre cellule" data-col="si" inputmode="numeric" bind:value={saisies[l.produit_id].siNote} onkeydown={suivant} /></td>
+                  <td class="nb vendeur"><input class="saisie nombre cellule" data-col="si" inputmode="numeric" bind:value={saisies[l.produit_id].siNote} /></td>
                 {/if}
                 <td class="nb">
-                  <input class="saisie nombre cellule" data-col="ac" inputmode="numeric" bind:value={saisies[l.produit_id].alimCond} onkeydown={suivant} title="{l.conditionnement_pluriel} reçu(e)s du dépôt" />
+                  <input class="saisie nombre cellule" data-col="ac" inputmode="numeric" bind:value={saisies[l.produit_id].alimCond} title="{l.conditionnement_pluriel} reçu(e)s du dépôt" />
                 </td>
                 <td class="nb">
-                  <input class="saisie nombre cellule" data-col="ab" inputmode="numeric" bind:value={saisies[l.produit_id].alimBt} onkeydown={suivant} />
+                  <input class="saisie nombre cellule" data-col="ab" inputmode="numeric" bind:value={saisies[l.produit_id].alimBt} />
                   {#if l.alimentation_enregistree}<small class="deja" title="Déjà enregistrée dans le module Dépôt">+{l.alimentation_enregistree}</small>{/if}
                 </td>
                 <td class="nb">{c ? entier(c.calcul.stock_total) : '…'}</td>
                 <td class="nb">
-                  <input class="saisie nombre cellule restant" data-col="r" inputmode="numeric" placeholder={c ? String(c.calcul.stock_total) : ''} bind:value={saisies[l.produit_id].restant} onkeydown={suivant} />
+                  <input class="saisie nombre cellule restant" data-col="r" inputmode="numeric" placeholder={c ? String(c.calcul.stock_total) : ''} bind:value={saisies[l.produit_id].restant} />
                 </td>
-                <td class="nb"><input class="saisie nombre cellule etroite" data-col="k" inputmode="numeric" bind:value={saisies[l.produit_id].casse} onkeydown={suivant} /></td>
+                <td class="nb"><input class="saisie nombre cellule etroite" data-col="k" inputmode="numeric" bind:value={saisies[l.produit_id].casse} /></td>
                 <td class="nb"><strong>{c ? entier(c.calcul.ventes) : '…'}</strong></td>
                 {#if controle}
-                  <td class="nb vendeur"><input class="saisie nombre cellule" data-col="v" inputmode="numeric" bind:value={saisies[l.produit_id].ventesNote} onkeydown={suivant} /></td>
+                  <td class="nb vendeur"><input class="saisie nombre cellule" data-col="v" inputmode="numeric" bind:value={saisies[l.produit_id].ventesNote} /></td>
                 {/if}
                 <td class="nb discret">{l.prix === null ? '—' : fcfa(l.prix)}</td>
                 <td class="nb"><strong>{c ? fcfa(c.calcul.montant) : '…'}</strong></td>
                 {#if controle}
-                  <td class="nb vendeur"><input class="saisie nombre cellule large" data-col="m" inputmode="numeric" bind:value={saisies[l.produit_id].montantNote} onkeydown={suivant} /></td>
+                  <td class="nb vendeur"><input class="saisie nombre cellule large" data-col="m" inputmode="numeric" bind:value={saisies[l.produit_id].montantNote} /></td>
                 {/if}
               </tr>
               {#if c?.alertes.length}
@@ -318,7 +351,7 @@
       </table>
     </section>
 
-    <aside class="carte caisse">
+    <aside class="carte caisse" bind:this={caisse}>
       <h2>Caisse du jour</h2>
       {#if validee && prep.existante}
         {@const ex = prep.existante as JourneeEnregistree}
@@ -344,18 +377,18 @@
         </dl>
         <label class="champ">
           <span>Total reçu (argent remis)</span>
-          <input class="saisie nombre gros" inputmode="numeric" bind:value={recu} />
+          <input class="saisie nombre gros" inputmode="numeric" bind:value={recu} bind:this={champRecu} onkeydown={(e) => vers(e, caisse?.querySelector<HTMLInputElement>('.depense input') ?? boutonValider)} />
         </label>
         <div class="depenses">
           <span class="titre-depenses">Dépenses payées avec la caisse</span>
           {#each depenses as d, k (k)}
             <div class="depense">
-              <input class="saisie" placeholder="Libellé" bind:value={d.libelle} />
-              <input class="saisie nombre" inputmode="numeric" placeholder="Montant" bind:value={d.montant} />
+              <input class="saisie" placeholder="Libellé" bind:value={d.libelle} onkeydown={(e) => vers(e, (e.currentTarget as HTMLElement).nextElementSibling as HTMLElement)} />
+              <input class="saisie nombre" inputmode="numeric" placeholder="Montant" bind:value={d.montant} onkeydown={(e) => apresDepense(e, k)} />
               <button class="btn-icone" aria-label="Retirer" onclick={() => depenses.splice(k, 1)}><Trash2 size={15} /></button>
             </div>
           {/each}
-          <button class="btn btn-f" onclick={() => depenses.push({ libelle: '', montant: '' })}><Plus size={15} /> Ajouter une dépense</button>
+          <button class="btn btn-f" bind:this={boutonAjout} onclick={ajouterDepense}><Plus size={15} /> Ajouter une dépense</button>
         </div>
         {#if apercu}
           <div class="ecart" class:manquant={apercu.caisse.ecart < 0} class:excedent={apercu.caisse.ecart > 0}>
@@ -367,8 +400,8 @@
         {#if champsInvalides}<p class="erreur-texte">Une saisie n’est pas un nombre entier.</p>{/if}
         {#if nbBloquantes}<p class="erreur-texte">{nbBloquantes} ligne(s) à corriger avant de valider.</p>{:else if nbAlertes}<p class="avertissement">{nbAlertes} ligne(s) avec un écart signalé.</p>{/if}
         <div class="boutons">
-          <button class="btn btn-s" disabled={enCours || champsInvalides} onclick={brouillon}>Enregistrer le brouillon</button>
-          <button class="btn btn-p" disabled={enCours || champsInvalides || !apercu || nbBloquantes > 0} onclick={() => (confirmation = true)}>Valider la journée</button>
+          <button class="btn btn-s" disabled={enCours || champsInvalides} onclick={brouillon} title="Ctrl+S">Enregistrer le brouillon</button>
+          <button class="btn btn-p" bind:this={boutonValider} disabled={enCours || champsInvalides || !apercu || nbBloquantes > 0} onclick={() => (confirmation = true)} title="Ctrl+Entrée">Valider la journée</button>
         </div>
       {/if}
     </aside>
@@ -376,7 +409,7 @@
 {/if}
 
 {#if confirmation && apercu}
-  <Modale titre="Valider la journée du {dateCourte(date)} ?" sousTitre="Les stocks seront mis à jour et la fiche sera figée." largeur={480} onfermer={() => (confirmation = false)}>
+  <Modale titre="Valider la journée du {dateCourte(date)} ?" sousTitre="Les stocks seront mis à jour et la fiche sera figée. Entrée pour valider, Échap pour revenir." largeur={480} onfermer={() => (confirmation = false)} onvalider={() => !enCours && valider()}>
     <dl class="resume">
       <div><dt>Bouteilles vendues</dt><dd>{entier(bouteillesVendues)}</dd></div>
       <div><dt>Total des ventes</dt><dd>{fcfa(apercu.caisse.total_ventes)} F</dd></div>
@@ -393,7 +426,7 @@
 {/if}
 
 {#if reouverture}
-  <Modale titre="Rouvrir la journée du {dateCourte(date)}" sousTitre="Les ventes et l’alimentation de la fiche sont annulées, la journée repasse en brouillon." largeur={480} onfermer={() => (reouverture = null)}>
+  <Modale titre="Rouvrir la journée du {dateCourte(date)}" sousTitre="Les ventes et l’alimentation de la fiche sont annulées, la journée repasse en brouillon." largeur={480} onfermer={() => (reouverture = null)} onvalider={() => (reouverture?.motif.trim().length ?? 0) >= 3 && rouvrir()}>
     <label class="champ"><span>Motif (obligatoire, conservé au journal)</span><input class="saisie" bind:value={reouverture.motif} placeholder="ex. Restant mal compté sur Heineken PM" /></label>
     {#snippet pied()}
       <button class="btn btn-f" onclick={() => (reouverture = null)}>Annuler</button>
