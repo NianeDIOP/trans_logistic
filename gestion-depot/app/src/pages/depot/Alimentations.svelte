@@ -83,7 +83,7 @@
 </section>
 
 {#if ouverte}
-  <Modale titre="Alimenter la boutique" sousTitre="Conditionnements sortis du dépôt et portés en boutique" largeur={860} onfermer={() => (ouverte = false)}>
+  <Modale titre="Alimenter la boutique" sousTitre="Conditionnements sortis du dépôt et portés en boutique" largeur={860} onfermer={() => (ouverte = false)} onvalider={() => !enCours && enregistrer()}>
     <div class="grille-entete">
       <label class="champ"><span>Date</span><input class="saisie" type="date" bind:value={date} /></label>
       <label class="champ" style="grid-column: span 2"><span>Note</span><input class="saisie" bind:value={notes} placeholder="Facultatif" /></label>
@@ -92,7 +92,7 @@
     {#if erreur}<p class="erreur-texte" style="margin-top: 10px">{erreur}</p>{/if}
     {#snippet pied()}
       <button class="btn btn-f" onclick={() => (ouverte = false)}>Annuler</button>
-      <button class="btn btn-p" disabled={enCours} onclick={enregistrer}>Enregistrer l’alimentation</button>
+      <button class="btn btn-p" disabled={enCours} onclick={enregistrer}>Enregistrer l’alimentation <kbd>Ctrl+Entrée</kbd></button>
     {/snippet}
   </Modale>
 {/if}

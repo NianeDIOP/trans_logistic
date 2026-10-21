@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { Lock } from '@lucide/svelte'
   import { appel } from '../../lib/api'
+  import { grille } from '../../lib/clavier'
   import { global, notifier } from '../../lib/etat.svelte'
   import { dateCourte, entier, lireEntier } from '../../lib/format'
   import type { Ouverture, Produit } from '../../lib/types'
@@ -91,7 +92,7 @@
     <p class="verrou"><Lock size={18} /> Une journée est déjà validée : le stock se corrige désormais par un inventaire (module Dépôt).</p>
   {/if}
 
-  <table class="tableau">
+  <table class="tableau" use:grille>
     <thead>
       <tr>
         <th>Produit</th>
@@ -105,9 +106,9 @@
       {#each lignes as l (l.produit.id)}
         <tr>
           <td><strong>{l.produit.designation}</strong> <span class="discret">({l.produit.conditionnement} de {l.produit.bt_par_conditionnement})</span></td>
-          <td class="nb"><input class="saisie nombre petite" class:invalide={invalide(l.depotCond)} inputmode="numeric" bind:value={l.depotCond} disabled={!possible} /></td>
-          <td class="nb"><input class="saisie nombre petite" class:invalide={invalide(l.depotBt)} inputmode="numeric" bind:value={l.depotBt} disabled={!possible} /></td>
-          <td class="nb"><input class="saisie nombre petite" class:invalide={invalide(l.boutique)} inputmode="numeric" bind:value={l.boutique} disabled={!possible} /></td>
+          <td class="nb"><input class="saisie nombre petite" class:invalide={invalide(l.depotCond)} inputmode="numeric" data-col="dc" bind:value={l.depotCond} disabled={!possible} /></td>
+          <td class="nb"><input class="saisie nombre petite" class:invalide={invalide(l.depotBt)} inputmode="numeric" data-col="db" bind:value={l.depotBt} disabled={!possible} /></td>
+          <td class="nb"><input class="saisie nombre petite" class:invalide={invalide(l.boutique)} inputmode="numeric" data-col="bq" bind:value={l.boutique} disabled={!possible} /></td>
           <td class="nb"><strong>{entier(val(l.depotCond) * l.produit.bt_par_conditionnement + val(l.depotBt) + val(l.boutique))}</strong></td>
         </tr>
       {/each}

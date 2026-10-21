@@ -15,6 +15,19 @@ Un seul utilisateur : le propriétaire.
 > Projet **indépendant** de « 2M Facturation » (le reste de ce dépôt) : code, base de données, identité,
 > installateur et documentation séparés. Rien n'est partagé.
 
+## Saisie au clavier
+
+| Touche | Effet |
+|---|---|
+| Entrée | case suivante (réglage « Entrée ↓ colonne » ou « → ligne » au-dessus des grilles) |
+| Maj+Entrée | case précédente |
+| ↑ ↓ ← → | se déplacer dans la grille |
+| Ctrl+S | fiche du jour : enregistrer le brouillon |
+| Ctrl+Entrée | valider (fiche du jour, réception, alimentation) ; Entrée confirme, Échap annule |
+| 1 à 5, Échap | ouvrir un module, revenir à l'accueil |
+
+Dans une réception ou une alimentation : taper le nom du produit puis Entrée pour aller à sa quantité.
+
 ## Documents
 
 - [Cahier des charges v1.1](docs/cahier-des-charges-v1.1.pdf)

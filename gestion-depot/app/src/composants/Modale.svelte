@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte'
+  import { onMount, type Snippet } from 'svelte'
   import { X } from '@lucide/svelte'
 
   let {
@@ -7,19 +7,48 @@
     sousTitre = '',
     largeur = 560,
     onfermer,
+    onvalider,
     children,
     pied
-  }: { titre: string; sousTitre?: string; largeur?: number; onfermer: () => void; children: Snippet; pied?: Snippet } = $props()
+  }: {
+    titre: string
+    sousTitre?: string
+    largeur?: number
+    onfermer: () => void
+    /** Action principale : Ctrl+Entrée partout, Entrée hors des zones de texte et des grilles. */
+    onvalider?: () => void
+    children: Snippet
+    pied?: Snippet
+  } = $props()
+
+  // À l'ouverture, le focus entre dans la fenêtre : champ marqué `data-premier`, sinon premier champ, sinon la fenêtre elle-même
+  // (Entrée déclenche alors l'action principale). En sortie, il revient où il était.
+  let fenetre: HTMLDivElement | undefined = $state()
+  onMount(() => {
+    const avant = document.activeElement as HTMLElement | null
+    const champ =
+      fenetre?.querySelector<HTMLElement>('[data-premier]') ??
+      fenetre?.querySelector<HTMLElement>('.corps input:not([disabled]), .corps select, .corps textarea')
+    ;(champ ?? fenetre)?.focus()
+    return () => avant?.isConnected && avant.focus({ preventScroll: true })
+  })
 
   function touche(e: KeyboardEvent) {
     if (e.key === 'Escape') onfermer()
+    if (e.key !== 'Enter' || !onvalider) return
+    const cible = e.target as HTMLElement
+    const libre = !cible.closest('textarea, button, select, [data-col]')
+    if (e.ctrlKey || e.metaKey || libre) {
+      e.preventDefault()
+      onvalider()
+    }
   }
 </script>
 
 <svelte:window onkeydown={touche} />
 
 <div class="voile" role="presentation" onmousedown={(e) => e.target === e.currentTarget && onfermer()}>
-  <div class="modale" role="dialog" aria-modal="true" aria-label={titre} style:width="{largeur}px">
+  <div class="modale" role="dialog" aria-modal="true" aria-label={titre} style:width="{largeur}px" tabindex="-1" bind:this={fenetre}>
     <header>
       <div>
         <h2>{titre}</h2>
@@ -45,6 +74,7 @@
   }
 
   .modale {
+    outline: none;
     display: flex;
     flex-direction: column;
     max-width: 100%;

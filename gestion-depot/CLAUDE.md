@@ -80,3 +80,11 @@ Le cahier des charges fait foi : `docs/cahier-des-charges-v1.1.pdf`. Les codes `
   l'installateur se construit aussi depuis Linux avec MinGW (`--target x86_64-pc-windows-gnu`, voir README),
   vérifié sous Wine (`LANG=C.UTF-8` obligatoire, sinon les noms accentués échouent) : installation silencieuse
   `/S`, raccourcis Bureau et menu Démarrer, lancement de l'exécutable.
+- [x] 1.0.1 — Saisie rapide au clavier (ET-05) : `lib/clavier.ts` (action `grille`, champs marqués `data-col`) sur
+  la fiche du jour, réceptions / alimentations (`TableQuantites`), inventaire, stock d'ouverture. Entrée = case
+  suivante selon le réglage « Entrée ↓ colonne / → ligne » (`composants/SensEntree.svelte`, mémorisé dans
+  `localStorage`), Maj+Entrée = retour, flèches, chiffres seuls, contenu sélectionné à l'arrivée (sans
+  sélection différée : une frappe rapide n'est jamais écrasée). Fiche : focus automatique sur la 1re case, fin de
+  grille → total reçu → dépenses → Valider ; Ctrl+S = brouillon, Ctrl+Entrée = valider. Réception/alimentation :
+  taper le nom du produit + Entrée amène à sa quantité. `Modale` : focus à l'ouverture (`data-premier`),
+  `onvalider` (Entrée hors grille, Ctrl+Entrée partout). Vérifié par un script Playwright (frappe simulée).

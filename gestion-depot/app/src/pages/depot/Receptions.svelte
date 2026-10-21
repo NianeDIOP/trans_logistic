@@ -91,7 +91,7 @@
 </section>
 
 {#if ouverte}
-  <Modale titre="Nouvelle réception" sousTitre="Livraison du fournisseur, saisie en conditionnements et bouteilles isolées" largeur={860} onfermer={() => (ouverte = false)}>
+  <Modale titre="Nouvelle réception" sousTitre="Livraison du fournisseur, saisie en conditionnements et bouteilles isolées" largeur={860} onfermer={() => (ouverte = false)} onvalider={() => !enCours && enregistrer()}>
     <div class="grille-entete">
       <label class="champ"><span>Date</span><input class="saisie" type="date" bind:value={saisie.date} /></label>
       <label class="champ">
@@ -111,7 +111,7 @@
     {#if erreur}<p class="erreur-texte" style="margin-top: 10px">{erreur}</p>{/if}
     {#snippet pied()}
       <button class="btn btn-f" onclick={() => (ouverte = false)}>Annuler</button>
-      <button class="btn btn-p" disabled={enCours} onclick={enregistrer}>Enregistrer la réception</button>
+      <button class="btn btn-p" disabled={enCours} onclick={enregistrer}>Enregistrer la réception <kbd>Ctrl+Entrée</kbd></button>
     {/snippet}
   </Modale>
 {/if}
